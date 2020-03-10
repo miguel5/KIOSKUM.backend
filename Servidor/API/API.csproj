@@ -4,13 +4,5 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Email.cs" />
-    <Compile Remove="EmptyClass.cs" />
-    <Compile Remove="Item.cs" />
-    <Compile Remove="Project.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-  </ItemGroup>
+
 </Project>
