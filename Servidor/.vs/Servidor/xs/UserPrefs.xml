@@ -1,11 +1,20 @@
-﻿<Properties StartupConfiguration="{FF8BE303-DD55-4F1F-8A13-A930DCAA4747}|Default">
-  <MonoDevelop.Ide.Workbench>
+﻿<Properties StartupConfiguration="{35BD60F1-B862-443A-AA9C-79E1F03340E7}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="API/Startup.cs">
+    <Files>
+      <File FileName="API/Program.cs" Line="1" Column="1" />
+      <File FileName="API/Controllers/Produto.cs" Line="12" Column="9" />
+      <File FileName="API/Properties/launchSettings.json" Line="23" Column="28" />
+      <File FileName="API/Startup.cs" Line="1" Column="1" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="Servidor" expanded="True">
             <Node name="API" expanded="True">
-              <Node name="Dependencies" expanded="True" selected="True" />
+              <Node name="Dependencies" expanded="True" />
+              <Node name="Controllers" expanded="True" />
+              <Node name="Properties" expanded="True" />
+              <Node name="Startup.cs" selected="True" />
             </Node>
           </Node>
         </State>
