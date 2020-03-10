@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/lazaropinheiro/KIOSK_UM/Servidor/API/API.csproj",
+      "projectUniqueName": "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/API.csproj",
       "projectName": "API",
-      "projectPath": "/Users/lazaropinheiro/KIOSK_UM/Servidor/API/API.csproj",
+      "projectPath": "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/API.csproj",
       "packagesPath": "/Users/lazaropinheiro/.nuget/packages/",
-      "outputPath": "/Users/lazaropinheiro/KIOSK_UM/Servidor/API/obj/",
+      "outputPath": "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/lazaropinheiro/.config/NuGet/NuGet.Config"
