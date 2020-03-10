@@ -18,7 +18,7 @@ namespace API.Models
 
         private static int id = 0;
 
-        public static int entrega = 0;
+        public static int entrega = -1;
 
 
         public Reserva(int IdCliente, IList<Tuple<int, int, string>> Items, double Preco, DateTime HoraEntrega)
@@ -32,7 +32,7 @@ namespace API.Models
             this.NumEntrega = -1;
         }
 
-        private void incEntrega()
+        private void IncEntrega()
         {
             if (entrega < 99)
             {
@@ -50,28 +50,40 @@ namespace API.Models
             switch (decisao)
             {
                 case 'a':
-                    IdFuncionarios = new Tuple<int, int>(IdFuncionario, -1);
-                    Estado = EstadosReservaEnum.Aceite;
+                    if (Estado == EstadosReservaEnum.Pendente)
+                    {
+                        IdFuncionarios = new Tuple<int, int>(IdFuncionario, -1);
+                        Estado = EstadosReservaEnum.Aceite;
+                    }
                     break;
                 case 'r':
-                    IdFuncionarios = new Tuple<int, int>(IdFuncionario, -1);
-                    Estado = EstadosReservaEnum.Rejeitada;
+                    if (Estado == EstadosReservaEnum.Pendente)
+                    {
+                        IdFuncionarios = new Tuple<int, int>(IdFuncionario, -1);
+                        Estado = EstadosReservaEnum.Rejeitada;
+                    }
                     break;
                 case 'e':
-                    IdFuncionarios = new Tuple<int, int>(IdFuncionarios.Item1, IdFuncionario);
-                    Estado = EstadosReservaEnum.Entregue;
+                    if (Estado == EstadosReservaEnum.Paga)
+                    {
+                        IdFuncionarios = new Tuple<int, int>(IdFuncionarios.Item1, IdFuncionario);
+                        Estado = EstadosReservaEnum.Entregue;
+                    }
                     break;
                 default:
                     break;
             }
         }
 
-        public void pagamento(DateTime HoraPagamento)
+        public void RegistaPagamento(DateTime HoraPagamento)
         {
-            this.Estado = EstadosReservaEnum.Paga;
-            this.HoraPagamento = HoraPagamento;
-            NumEntrega = entrega;
-            incEntrega();
+            if (Estado == EstadosReservaEnum.Aceite)
+            {
+                this.Estado = EstadosReservaEnum.Paga;
+                this.HoraPagamento = HoraPagamento;
+                NumEntrega = entrega;
+                IncEntrega();
+            }
         }
 
 
