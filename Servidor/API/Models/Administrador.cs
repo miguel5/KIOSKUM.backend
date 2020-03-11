@@ -17,8 +17,15 @@ namespace API.Models
         }
 
         public override int GetHashCode()
-        {
-            return base.GetHashCode();
+        { 
+            unchecked
+            {
+                int hash = 7;
+                hash = 43 * hash + (Email == null ? 0 : Email.GetHashCode());
+                hash = 43 * hash + (Password == null ? 0 : Password.GetHashCode());
+                hash = 43 * hash + NumFuncionario;
+                return hash;
+            }
         }
 
         public override bool Equals(object obj)

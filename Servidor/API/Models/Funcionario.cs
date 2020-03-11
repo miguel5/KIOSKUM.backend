@@ -14,7 +14,12 @@ namespace API.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            unchecked
+            {
+                int hash = 13;
+                hash = 53 * hash + NumFuncionario;
+                return hash;
+            }
         }
 
         public override bool Equals(object obj)
