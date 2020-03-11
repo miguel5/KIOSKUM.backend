@@ -13,19 +13,15 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProdutoController : ControllerBase
     {
-        private List<Produto> produtos;
+        private List<Produto> produtos = new List<Produto>
+        {
+            new Produto("Massa com Atum", "Prato", 4.25, new List<string> { "Massa", "Atum" }, new List<string> { "Glúten" }, "/azure/Massa_com_Atum.jpeg")
+        };
         private readonly ILogger<ProdutoController> logger;
 
         public ProdutoController(ILogger<ProdutoController> logger)
         {
             this.logger = logger;
-            produtos = new List<Produto>();
-            Produto p;
-            for (int i = 0; i < 5; i++)
-            {
-                p = new Produto("Massa com Atum", "Prato", 4.25, new List<string> { "Massa", "Atum" }, new List<string> { "Glúten" }, "/azure/Massa_com_Atum.jpeg");
-                produtos.Add(p);
-            }
         }
 
 
