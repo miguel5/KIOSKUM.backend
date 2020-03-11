@@ -30,7 +30,18 @@ namespace API
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            unchecked
+            {
+                int hash = 3;
+                hash = 37 * hash + IdProduto;
+                hash = 37 * hash + (Nome == null ? 0 : Nome.GetHashCode());
+                hash = 37 * hash + (Categoria == null ? 0 : Categoria.GetHashCode());
+                hash = 37 * hash + Preco.GetHashCode();
+                hash = 37 * hash + (Ingredientes == null ? 0 : Ingredientes.GetHashCode());
+                hash = 37 * hash + (Alergenios == null ? 0 : Alergenios.GetHashCode());
+                hash = 37 * hash + (PathImagem == null ? 0 : PathImagem.GetHashCode());
+                return hash;
+            }
         }
 
         public override bool Equals(Object obj)

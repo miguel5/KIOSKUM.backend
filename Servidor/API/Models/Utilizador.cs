@@ -20,7 +20,14 @@ namespace API.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            unchecked
+            {
+                int hash = 5;
+                hash = 41 * hash + IdUtilizador;
+                hash = 41 * hash + (Nome == null ? 0 : Nome.GetHashCode());
+                hash = 41 * hash + (PathImagem == null ? 0 : PathImagem.GetHashCode());
+                return hash;
+            }
         }
 
         public override bool Equals(object obj)

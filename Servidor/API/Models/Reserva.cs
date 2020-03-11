@@ -89,7 +89,20 @@ namespace API.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            unchecked
+            {
+                int hash = 2;
+                hash = hash * 31 + IdReserva;
+                hash = hash * 31 + IdCliente;
+                hash = hash * 31 + (IdFuncionarios == null ? 0 : IdFuncionarios.GetHashCode());
+                hash = hash * 31 + (Items == null ? 0 : Items.GetHashCode());
+                hash = hash * 31 + Estado.GetHashCode();
+                hash = hash * 31 + Preco.GetHashCode();
+                hash = hash * 31 + HoraPagamento.GetHashCode();
+                hash = hash * 31 + HoraEntrega.GetHashCode();
+                hash = hash * 31 + NumEntrega;
+                return hash;
+            }
         }
 
         public override bool Equals(object obj)
