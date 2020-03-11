@@ -9,7 +9,7 @@ namespace API.Models
         public string Password { get; set; }
         public int NumFuncionario { get; }
 
-        public Administrador(string Nome, string PathImagem, string Email, string Password, int NumFuncionario) : base(Nome, PathImagem)
+        public Administrador(int IdUtilizador, string Nome, string Email, string Password, int NumFuncionario) : base(IdUtilizador, Nome)
         {
             this.Email = Email;
             this.Password = Password;

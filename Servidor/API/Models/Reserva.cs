@@ -14,34 +14,16 @@ namespace API.Models
         public double Preco { get; }
         public DateTime HoraPagamento { get; set; }
         public DateTime HoraEntrega { get; }
-        public int NumEntrega { get; set; }
-
-        private static int id = 0;
-
-        public static int entrega = -1;
 
 
-        public Reserva(int IdCliente, IList<Tuple<int, int, string>> Items, double Preco, DateTime HoraEntrega)
+        public Reserva(int IdReserva, int IdCliente, IList<Tuple<int, int, string>> Items, double Preco, DateTime HoraEntrega)
         {
-            this.IdReserva = id++;
+            this.IdReserva = IdReserva;
             this.IdCliente = IdCliente;
             this.Items = Items;
             this.Estado = EstadosReservaEnum.Pendente;
             this.Preco = Preco;
             this.HoraEntrega = HoraEntrega;
-            this.NumEntrega = -1;
-        }
-
-        private void IncEntrega()
-        {
-            if (entrega < 99)
-            {
-                entrega++;
-            }
-            else
-            {
-                entrega = 0;
-            }
         }
 
 
@@ -81,8 +63,6 @@ namespace API.Models
             {
                 this.Estado = EstadosReservaEnum.Paga;
                 this.HoraPagamento = HoraPagamento;
-                NumEntrega = entrega;
-                IncEntrega();
             }
         }
 
@@ -100,7 +80,6 @@ namespace API.Models
                 hash = hash * 31 + Preco.GetHashCode();
                 hash = hash * 31 + HoraPagamento.GetHashCode();
                 hash = hash * 31 + HoraEntrega.GetHashCode();
-                hash = hash * 31 + NumEntrega;
                 return hash;
             }
         }
@@ -146,7 +125,6 @@ namespace API.Models
             if (Estado == EstadosReservaEnum.Paga || Estado == EstadosReservaEnum.Entregue)
             {
                 sb.Append("- Hora Pagamento: " + HoraPagamento + "\n");
-                sb.Append("- Número de Entrega: " + NumEntrega + "\n");
             }
             return sb.ToString();
         }

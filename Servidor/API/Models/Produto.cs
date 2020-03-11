@@ -12,20 +12,16 @@ namespace API
         public double Preco { get; set; }
         public IList<string> Ingredientes { get; set; }
         public IList<string> Alergenios { get; set; }
-        public string PathImagem { get; set; }
 
 
-        private static int id = 0;
-
-        public Produto(string Nome, string Categoria, double Preco, IList<string> Ingredientes, IList<string> Alergenios, string PathImagem)
+        public Produto(int IdProduto, string Nome, string Categoria, double Preco, IList<string> Ingredientes, IList<string> Alergenios)
         {
-            this.IdProduto = id++;
+            this.IdProduto = IdProduto;
             this.Nome = Nome;
             this.Categoria = Categoria;
             this.Preco = Preco;
             this.Ingredientes = Ingredientes;
             this.Alergenios = Alergenios;
-            this.PathImagem = PathImagem;
         }
 
         public override int GetHashCode()
@@ -39,7 +35,6 @@ namespace API
                 hash = 37 * hash + Preco.GetHashCode();
                 hash = 37 * hash + (Ingredientes == null ? 0 : Ingredientes.GetHashCode());
                 hash = 37 * hash + (Alergenios == null ? 0 : Alergenios.GetHashCode());
-                hash = 37 * hash + (PathImagem == null ? 0 : PathImagem.GetHashCode());
                 return hash;
             }
         }
@@ -76,7 +71,6 @@ namespace API
             {
                 sb.Append(alergenio + "; ");
             }
-            sb.Append("\n- Path Imagem: " + PathImagem + "\n");
             return sb.ToString();
         }
 

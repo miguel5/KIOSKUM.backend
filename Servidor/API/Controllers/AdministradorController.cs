@@ -23,7 +23,7 @@ namespace API.Controllers
             Administrador a;
             for (int i = 0; i < 5; i++)
             {
-                a = new Administrador("Antonio", "/azure/Massa_com_Atum.jpeg", "tone_biclas@gmail.com", "12345", 4513637);
+                a = new Administrador(1,"Antonio", "tone_biclas@gmail.com", "12345", 4513637);
                 administradores.Add(a);
             }
         }
@@ -40,9 +40,9 @@ namespace API.Controllers
 
 
         [HttpPost]
-        public void AdicionaCliente(string Nome, string PathImagem, string Email, string Password, int NumFuncionario)
+        public void AdicionaCliente(string Nome, string Email, string Password, int NumFuncionario)
         {
-            Administrador a = new Administrador(Nome, PathImagem, Email, Password, NumFuncionario);
+            Administrador a = new Administrador(1, Nome, Email, Password, NumFuncionario);
             administradores.Add(a);
             Console.WriteLine(a.ToString());
         }

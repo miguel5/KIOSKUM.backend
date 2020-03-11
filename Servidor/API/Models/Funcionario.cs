@@ -7,7 +7,7 @@ namespace API.Models
     {
         public int NumFuncionario { get; }
 
-        public Funcionario(string Nome, string PathImagem, int NumFuncionario) : base(Nome, PathImagem)
+        public Funcionario(int IdUtilizador, string Nome, int NumFuncionario) : base(IdUtilizador, Nome)
         {
             this.NumFuncionario = NumFuncionario;
         }

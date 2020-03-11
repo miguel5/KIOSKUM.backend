@@ -7,15 +7,11 @@ namespace API.Models
     {
         public int IdUtilizador { get; }
         public string Nome { get; set; }
-        public string PathImagem { get; set; }
 
-        private static int id = 0;
-
-        public Utilizador(string Nome, string PathImagem)
+        public Utilizador(int IdUtilizador, string Nome)
         {
-            this.IdUtilizador = id++;
+            this.IdUtilizador = IdUtilizador;
             this.Nome = Nome;
-            this.PathImagem = PathImagem;
         }
 
         public override int GetHashCode()
@@ -25,7 +21,6 @@ namespace API.Models
                 int hash = 5;
                 hash = 41 * hash + IdUtilizador;
                 hash = 41 * hash + (Nome == null ? 0 : Nome.GetHashCode());
-                hash = 41 * hash + (PathImagem == null ? 0 : PathImagem.GetHashCode());
                 return hash;
             }
         }
@@ -49,7 +44,6 @@ namespace API.Models
             StringBuilder sb = new StringBuilder();
             sb.Append("- ID : " + IdUtilizador + "\n");
             sb.Append("- Nome : " + Nome + "\n");
-            sb.Append("- Path Imagem: " + PathImagem + "\n");
             return sb.ToString();
         }
     }
