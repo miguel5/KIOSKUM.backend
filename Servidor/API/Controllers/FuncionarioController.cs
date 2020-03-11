@@ -23,7 +23,7 @@ namespace API.Models
             Funcionario f;
             for (int i = 0; i < 5; i++)
             {
-                f = new Funcionario("Antonio", "/azure/Massa_com_Atum.jpeg", 4513637);
+                f = new Funcionario(i,"Antonio", 4513637);
                 funcionarios.Add(f);
             }
         }

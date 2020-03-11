@@ -23,7 +23,7 @@ namespace API.Controllers
             Cliente c;
             for (int i = 0; i < 5; i++)
             {
-                c = new Cliente("Antonio", "/azure/Massa_com_Atum.jpeg", "tone_biclas@gmail.com", "12345", 924513637);
+                c = new Cliente(i,"Antonio", "tone_biclas@gmail.com", "12345", 924513637);
                 clientes.Add(c);
             }
         }
@@ -39,9 +39,9 @@ namespace API.Controllers
 
 
         [HttpPost]
-        public void AdicionaCliente(string Nome, string PathImagem, string Email, string Password, int NumTelemovel)
+        public void AdicionaCliente(string Nome, string Email, string Password, int NumTelemovel)
         {
-            Cliente c = new Cliente(Nome, PathImagem, Email, Password, NumTelemovel);
+            Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
             clientes.Add(c);
             Console.WriteLine(c.ToString());
         }
