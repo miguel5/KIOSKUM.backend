@@ -32,3 +32,7 @@
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/obj/Debug/netcoreapp3.1/staticwebassets/API.StaticWebAssets.xml
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/obj/Debug/netcoreapp3.1/API.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/obj/Debug/netcoreapp3.1/API.pdb
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/FIles/EmailBoasVindas.json
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/FIles/EmailGerarCodigo.json
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Newtonsoft.Json.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/obj/Debug/netcoreapp3.1/API.csproj.CopyComplete
