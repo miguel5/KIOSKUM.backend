@@ -14,7 +14,7 @@ namespace API.Models
         public Dictionary<string, Tuple<string, string, int>> Dados;
 
         private readonly string myEmail = "espeta_espeta@portugalmail.pt";
-        public readonly string myPassword = "arroz_doce";
+        public readonly string myPassword = "meteantonio";
         public readonly string serverAdressSMTP = "smtp.portugalmail.pt";
 
         public GestorDados()
@@ -64,6 +64,7 @@ namespace API.Models
 
             
             string codigo = GerarCodigo();
+            
             string pathEmailgerarCodigo = Path.Combine(path, "Files/EmailGerarCodigo.json");
             sr = new StreamReader(pathEmailgerarCodigo);
             json = sr.ReadToEnd();
