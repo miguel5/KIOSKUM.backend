@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace API.Models
 {
@@ -13,9 +13,9 @@ namespace API.Models
         public Dictionary<string, string> Codigos;
         public Dictionary<string, Tuple<string, string, int>> Dados;
 
-        private readonly string meuEmail = "espeta_espeta@portugalmail.pt";
-        public readonly string meuPassword = "arroz_doce";
-
+        private readonly string myEmail = "espeta_espeta@portugalmail.pt";
+        public readonly string myPassword = "arroz_doce";
+        public readonly string serverAdressSMTP = "smtp.portugalmail.pt";
 
         public GestorDados()
         {
@@ -32,19 +32,19 @@ namespace API.Models
         }
 
 
-        private void EnviarEmail(string email, string titulo, string conteudo)
+        private void EnviarEmail(string email, Email mensagem)
         {
             MailMessage mail = new MailMessage();
             mail.To.Add(email);
-            mail.From = new MailAddress(meuEmail);
-            mail.Subject = titulo;
-            mail.Body = conteudo;
+            mail.From = new MailAddress(myEmail);
+            mail.Subject = mensagem.Assunto;
+            mail.Body = mensagem.Conteudo;
 
             mail.IsBodyHtml = true;
             SmtpClient smtp = new SmtpClient();
-            smtp.Host = "smtp.portugalmail.pt"; //Or Your SMTP Server Address
+            smtp.Host = serverAdressSMTP; //Or Your SMTP Server Address
             smtp.Credentials = new System.Net.NetworkCredential
-                 ("espeta_espeta@portugalmail.pt", "meteantonio"); // ***use valid credentials***
+                 (myEmail, myPassword); // ***use valid credentials***
             smtp.Port = 587;
 
             //Or your Smtp Email ID and Password
@@ -55,15 +55,20 @@ namespace API.Models
 
         public void CriarConta(string nome, string email, string password, int numTelemovel)
         {
-            string titulo = "Boas Vindas ao KIOSK UM!";
-            string conteudo = File.ReadAllText("/Users/lazaropinheiro/Desktop/C#/Email/Email/BoasVindas.txt");
-            EnviarEmail(email, titulo, conteudo);
+            string path =  Directory.GetCurrentDirectory();
+            string pathEmailBoasVindas = Path.Combine(path, "Files/EmailBoasVindas.json");
+            StreamReader sr = new StreamReader(pathEmailBoasVindas);
+            string json = sr.ReadToEnd();
+            Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
+            EnviarEmail(email, emailBoasVindas);
 
-            titulo = "Código de confirmação do seu e-mail no KIOSK UM";
+            
             string codigo = GerarCodigo();
-            conteudo = "Para confirmar o seu e-mail, insira o código de 8 dígitos no KIOSK UM: " + codigo;
-            EnviarEmail(email, titulo, conteudo);
-
+            string pathEmailgerarCodigo = Path.Combine(path, "Files/EmailGerarCodigo.json");
+            sr = new StreamReader(pathEmailgerarCodigo);
+            json = sr.ReadToEnd();
+            Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
+            EnviarEmail(email, emailGerarCodigo);
 
             Tentativas.Add(email, 0);
             Codigos.Add(email, codigo);
