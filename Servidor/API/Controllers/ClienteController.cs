@@ -14,6 +14,7 @@ namespace API.Controllers
     public class ClienteController : ControllerBase
     {
         private List<Cliente> clientes;
+        GestorDados gestorDados = new GestorDados();
         private readonly ILogger<ClienteController> logger;
 
         public ClienteController(ILogger<ClienteController> logger)
@@ -43,6 +44,7 @@ namespace API.Controllers
         {
             Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
             clientes.Add(c);
+            gestorDados.CriarConta(Nome, Email, Password, NumTelemovel);
             Console.WriteLine(c.ToString());
         }
     }
