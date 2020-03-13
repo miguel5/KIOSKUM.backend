@@ -69,6 +69,7 @@ namespace API.Models
             sr = new StreamReader(pathEmailgerarCodigo);
             json = sr.ReadToEnd();
             Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
+            emailGerarCodigo.AdcionaCodigo(codigo);
             EnviarEmail(email, emailGerarCodigo);
 
             Tentativas.Add(email, 0);

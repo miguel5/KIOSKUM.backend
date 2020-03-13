@@ -6,7 +6,7 @@ namespace API.Models
     public class Email
     {
         public string Assunto { get; }
-        public string Conteudo { get; }
+        public string Conteudo { get; private set; }
 
         public Email(string Assunto, string Conteudo)
         {
@@ -24,6 +24,11 @@ namespace API.Models
                 hash = 59 * hash + (Conteudo == null ? 0 : Conteudo.GetHashCode());
                 return hash;
             }
+        }
+
+        public void AdcionaCodigo(string codigo)
+        {
+            Conteudo += codigo;
         }
 
 
