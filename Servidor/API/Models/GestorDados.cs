@@ -56,6 +56,7 @@ namespace API.Models
         public void CriarConta(string nome, string email, string password, int numTelemovel)
         {
             string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
+            //string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
             StreamReader sr = new StreamReader(pathEmailBoasVindas);
             string json = sr.ReadToEnd();
             Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
@@ -63,8 +64,9 @@ namespace API.Models
 
             
             string codigo = GerarCodigo();
-            
+
             string pathEmailgerarCodigo = "D:\\home\\site\\wwwroot\\Files\\EmailGerarCodigo.json";
+            //string pathEmailgerarCodigo = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailGerarCodigo.json";
             sr = new StreamReader(pathEmailgerarCodigo);
             json = sr.ReadToEnd();
             Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
