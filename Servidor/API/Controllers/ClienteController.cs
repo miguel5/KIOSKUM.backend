@@ -47,7 +47,7 @@ namespace API.Controllers
             {
                 Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
                 clientes.Add(c);
-                gestorDados.CriarConta(Nome, Email, Password, NumTelemovel);
+                _ = gestorDados.CriarConta(Nome, Email, Password, NumTelemovel);
                 Console.WriteLine(c.ToString());
             }
         }
