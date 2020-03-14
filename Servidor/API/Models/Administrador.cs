@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace API.Models
 {
@@ -12,9 +13,20 @@ namespace API.Models
         public Administrador(int IdUtilizador, string Nome, string Email, string Password, int NumFuncionario) : base(IdUtilizador, Nome)
         {
             this.Email = Email;
-            this.Password = Password;
+            this.Password = HashPassword(Password);
             this.NumFuncionario = NumFuncionario;
         }
+
+        private string HashPassword(string password)
+        {
+            return Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: new byte[0],
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8));
+        }
+
 
         public override int GetHashCode()
         { 

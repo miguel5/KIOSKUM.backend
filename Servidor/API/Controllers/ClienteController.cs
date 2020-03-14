@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -42,10 +43,21 @@ namespace API.Controllers
         [HttpPost]
         public void AdicionaCliente(string Nome, string Email, string Password, int NumTelemovel)
         {
-            Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
-            clientes.Add(c);
-            gestorDados.CriarConta(Nome, Email, Password, NumTelemovel);
-            Console.WriteLine(c.ToString());
+            if (ValidaNumTelemovel(NumTelemovel))
+            {
+                Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
+                clientes.Add(c);
+                gestorDados.CriarConta(Nome, Email, Password, NumTelemovel);
+                Console.WriteLine(c.ToString());
+            }
+        }
+
+
+        private bool ValidaNumTelemovel(int NumTelemovel)
+        {
+            Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
+            return rx.IsMatch(NumTelemovel.ToString());
+
         }
     }
 }
