@@ -3,12 +3,19 @@ using System.Text;
 
 namespace API.Models
 {
-    public class Funcionario : Utilizador
+    public class Funcionario
     {
-        public int NumFuncionario { get; }
+        public int IdFuncionario { get; set; }
+        public string Nome { get; set; }
+        public int NumFuncionario { get; set; }
 
-        public Funcionario(int IdUtilizador, string Nome, int NumFuncionario) : base(IdUtilizador, Nome)
+
+        public Funcionario() { }
+
+        public Funcionario(int IdFuncionario, string Nome, int NumFuncionario)
         {
+            this.IdFuncionario = IdFuncionario;
+            this.Nome = Nome;
             this.NumFuncionario = NumFuncionario;
         }
 
@@ -16,8 +23,10 @@ namespace API.Models
         {
             unchecked
             {
-                int hash = 13;
-                hash = 53 * hash + NumFuncionario;
+                int hash = 5;
+                hash = 41 * hash + IdFuncionario;
+                hash = 41 * hash + (Nome == null ? 0 : Nome.GetHashCode());
+                hash = 41 * hash + NumFuncionario;
                 return hash;
             }
         }
@@ -32,15 +41,19 @@ namespace API.Models
             {
                 return false;
             }
-            return base.Equals(obj);
+
+            Funcionario funcionario = (Funcionario)obj;
+
+            return IdFuncionario == funcionario.IdFuncionario;
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Funcionário\n");
-            sb.Append(base.ToString());
-            sb.Append("Numero de Funcionario: " + NumFuncionario + "\n");
+            sb.Append("- IdFuncionario: " + IdFuncionario + "\n");
+            sb.Append("- Nome: " + Nome + "\n");
+            sb.Append("- Numero de Funcionario: " + NumFuncionario + "\n");
             return sb.ToString();
         }
     }
