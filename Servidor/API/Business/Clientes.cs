@@ -5,17 +5,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using API.Business;
+using API.Data;
+using System.Text.RegularExpressions;
 
 namespace API.Models
 {
-    public class GestorDadosCliente
+    public class Clientes
     {
+        private ClienteDAO clienteDAO;
         /*public Dictionary<string, int> Tentativas;
         public Dictionary<string, string> Codigos;
         public Dictionary<string, Tuple<string, string, int>> Dados;*/
 
-        public GestorDadosCliente()
+        public Clientes()
         {
+            clienteDAO = new ClienteDAO();
             /*Tentativas = new Dictionary<string, int>();
             Codigos = new Dictionary<string, string>();
             Dados = new Dictionary<string, Tuple<string, string, int>>();*/
@@ -28,6 +32,21 @@ namespace API.Models
             return new string(Enumerable.Repeat(carateres, 8).Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
+
+        private bool ValidaNumTelemovel(int NumTelemovel)
+        {
+            Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
+            return rx.IsMatch(NumTelemovel.ToString());
+
+        }
+
+
+        public void Login(string email, string password)
+        {
+            clienteDAO.containsEmail(email);
+            Cliente cliente = clienteDAO.getCliente(email);
+            cliente.ComparaPasswords(password);
+        }
 
         public async Task CriarConta(string nome, string email, string password, int numTelemovel)
         {

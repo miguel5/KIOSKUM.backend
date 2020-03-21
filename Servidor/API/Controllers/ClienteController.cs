@@ -15,7 +15,7 @@ namespace API.Controllers
     public class ClienteController : ControllerBase
     {
         private List<Cliente> clientes;
-        GestorDadosCliente gestorDadosCliente = new GestorDadosCliente();
+        Clientes gestorDadosCliente = new Clientes();
         private readonly ILogger<ClienteController> logger;
 
         public ClienteController(ILogger<ClienteController> logger)
@@ -41,23 +41,15 @@ namespace API.Controllers
 
 
         [HttpPost]
-        public void AdicionaCliente(string Nome, string Email, string Password, int NumTelemovel)
+        public async Task<IActionResult> AdicionaCliente(string Nome, string Email, string Password, int NumTelemovel)
         {
-            if (ValidaNumTelemovel(NumTelemovel))
-            {
-                Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
-                clientes.Add(c);
-                _ = gestorDadosCliente.CriarConta(Nome, Email, Password, NumTelemovel);
-                Console.WriteLine(c.ToString());
-            }
+             Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
+             clientes.Add(c);
+             await gestorDadosCliente.CriarConta(Nome, Email, Password, NumTelemovel);
+             Console.WriteLine(c.ToString());
+            return Ok("Adicionou");
         }
 
-
-        private bool ValidaNumTelemovel(int NumTelemovel)
-        {
-            Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
-            return rx.IsMatch(NumTelemovel.ToString());
-
-        }
+        
     }
 }
