@@ -12,9 +12,9 @@ namespace API
         public double Preco { get; set; }
         public IList<string> Ingredientes { get; set; }
         public IList<string> Alergenios { get; set; }
-        public string NomeImagem { get; set; }
 
-        public Produto(int IdProduto, string Nome, string Categoria, double Preco, IList<string> Ingredientes, IList<string> Alergenios, string NomeImagem)
+
+        public Produto(int IdProduto, string Nome, string Categoria, double Preco, IList<string> Ingredientes, IList<string> Alergenios)
         {
             this.IdProduto = IdProduto;
             this.Nome = Nome;
@@ -22,7 +22,6 @@ namespace API
             this.Preco = Preco;
             this.Ingredientes = Ingredientes;
             this.Alergenios = Alergenios;
-            this.NomeImagem = NomeImagem;
         }
 
         public override int GetHashCode()
@@ -74,6 +73,5 @@ namespace API
             }
             return sb.ToString();
         }
-
     }
 }

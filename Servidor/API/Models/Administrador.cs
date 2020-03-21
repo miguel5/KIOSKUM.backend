@@ -4,18 +4,19 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace API.Models
 {
-    public class Administrador : Utilizador
+    public class Administrador : Funcionario
     {
         public string Email { get; set; }
         public string Password { get; set; }
-        public int NumFuncionario { get; }
 
-        public Administrador(int IdUtilizador, string Nome, string Email, string Password, int NumFuncionario) : base(IdUtilizador, Nome)
+        public Administrador() { }
+
+        public Administrador(int IdFuncionario, string Nome, int NumFuncionario, string Email, string Password) : base(IdFuncionario, Nome, NumFuncionario)
         {
             this.Email = Email;
             this.Password = HashPassword(Password);
-            this.NumFuncionario = NumFuncionario;
         }
+
 
         private string HashPassword(string password)
         {
@@ -28,17 +29,23 @@ namespace API.Models
         }
 
 
+        public void SetPassword(string password)
+        {
+            Password = HashPassword(password);
+        }
+
+
         public override int GetHashCode()
-        { 
+        {
             unchecked
             {
                 int hash = 7;
                 hash = 43 * hash + (Email == null ? 0 : Email.GetHashCode());
                 hash = 43 * hash + (Password == null ? 0 : Password.GetHashCode());
-                hash = 43 * hash + NumFuncionario;
                 return hash;
             }
         }
+
 
         public override bool Equals(object obj)
         {
@@ -53,15 +60,14 @@ namespace API.Models
             return base.Equals(obj);
         }
 
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Administrador\n");
             sb.Append(base.ToString());
             sb.Append("- Email: " + Email + "\n");
-            sb.Append("Numero de Funcionario: " + NumFuncionario + "\n");
             return sb.ToString();
         }
-
     }
 }
