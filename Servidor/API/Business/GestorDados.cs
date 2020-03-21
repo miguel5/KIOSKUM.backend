@@ -8,17 +8,17 @@ using API.Business;
 
 namespace API.Models
 {
-    public class GestorDados
+    public class GestorDadosCliente
     {
-        public Dictionary<string, int> Tentativas;
+        /*public Dictionary<string, int> Tentativas;
         public Dictionary<string, string> Codigos;
-        public Dictionary<string, Tuple<string, string, int>> Dados;
+        public Dictionary<string, Tuple<string, string, int>> Dados;*/
 
-        public GestorDados()
+        public GestorDadosCliente()
         {
-            Tentativas = new Dictionary<string, int>();
+            /*Tentativas = new Dictionary<string, int>();
             Codigos = new Dictionary<string, string>();
-            Dados = new Dictionary<string, Tuple<string, string, int>>();
+            Dados = new Dictionary<string, Tuple<string, string, int>>();*/
         }
 
         private string GerarCodigo()
@@ -33,9 +33,9 @@ namespace API.Models
         {
             string codigo = GerarCodigo();
 
-            Tentativas.Add(email, 0);
+            /*Tentativas.Add(email, 0);
             Codigos.Add(email, codigo);
-            Dados.Add(email, new Tuple<string, string, int>(nome, password, numTelemovel));
+            Dados.Add(email, new Tuple<string, string, int>(nome, password, numTelemovel));*/
 
             //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
             string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
@@ -58,7 +58,7 @@ namespace API.Models
         public bool ValidaCodigo(string email, string codigo)
         {
             bool resultado = false;
-            if (Codigos[email].Equals(codigo))
+            /*if (Codigos[email].Equals(codigo))
             {
                 resultado = true;
             }
@@ -72,15 +72,15 @@ namespace API.Models
                 {
                     LimpaEntradaCliente(email);
                 }
-            }
+            }*/
             return resultado;
         }
 
         public void LimpaEntradaCliente(string email)
         {
-            Tentativas.Remove(email);
+            /*Tentativas.Remove(email);
             Codigos.Remove(email);
-            Dados.Remove(email);
+            Dados.Remove(email);*/
         }
     }
 }
