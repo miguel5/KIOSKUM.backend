@@ -27,6 +27,12 @@ namespace API.Models
                 numBytesRequested: 256 / 8));
         }
 
+        public bool ComparaPasswords(string password)
+        {
+            string hash = HashPassword(password);
+            return hash.Equals(Password);
+        }
+
 
         public override int GetHashCode()
         {
