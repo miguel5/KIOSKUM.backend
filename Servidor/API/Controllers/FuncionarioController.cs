@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace API.Models
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/funcionario")]
     public class FuncionarioController : ControllerBase
     {
         private List<Funcionario> funcionarios;
@@ -31,7 +31,7 @@ namespace API.Models
 
 
         [HttpGet]
-        [Route("Todos")]
+        [Route("todos")]
         public IList <Funcionario> Get()
         {
             return funcionarios;

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/administrador")]
     public class AdministradorController : ControllerBase
     {
         private List<Administrador> administradores;
@@ -29,7 +29,7 @@ namespace API.Controllers
 
 
         [HttpGet]
-        [Route("Todos")]
+        [Route("todos")]
         public IList<Administrador> Get()
         {
             return administradores;
