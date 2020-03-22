@@ -10,6 +10,7 @@ namespace API.Entities
         public string Email { get; set; }
         public string Password { get; private set; }
         public int NumTelemovel { get; set; }
+        public string Token { get; set; }
 
 
         private string HashPassword(string password)
