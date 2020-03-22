@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/cliente")]
     public class ClienteController : ControllerBase
     {
         private List<Cliente> clientes;
@@ -32,7 +32,7 @@ namespace API.Controllers
 
 
         [HttpGet]
-        [Route("Todos")]
+        [Route("todos")]
         public IList<Cliente> Get()
         {
             return clientes;

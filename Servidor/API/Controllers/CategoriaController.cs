@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace API.Controllers
 { 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/categoria")]
     public class CategoriaController : ControllerBase
     {
         private CategoriaDAO categoriaDAO = new CategoriaDAO();
@@ -24,7 +24,7 @@ namespace API.Controllers
 
 
         [HttpGet]
-        [Route("Todas")]
+        [Route("todas")]
         public IList<Categoria> GetAllCategorias()
         {
             return null;

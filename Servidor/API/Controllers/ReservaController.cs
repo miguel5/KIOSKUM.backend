@@ -12,7 +12,7 @@ namespace API.Controllers
 {
     
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/reserva")]
     public class ReservaController : ControllerBase
     {
         private List<Reserva> reservas;
@@ -25,17 +25,13 @@ namespace API.Controllers
             Reserva r;
             for (int i = 0; i < 5; i++)
             {
-                r = new Reserva(i,1,new List<Tuple<int, int, string>> { new Tuple<int, int, string>(1, 2, ""),new Tuple<int, int, string>(3, 1, "Sem sal.")}, 5.70, DateTime.Now);
-                r.AlteraEstadoReserva(1, 'a');
-                r.RegistaPagamento(DateTime.Now);
-                r.AlteraEstadoReserva(2, 'e');
-                reservas.Add(r);
+                r = new Reserva(1, new List<Tuple<int, int, string>> { new Tuple<int, int, string>(1, 2, ""), new Tuple<int, int, string>(3, 1, "Sem sal.") }, 5.70, DateTime.Now);
             }
         }
        
 
         [HttpGet]
-        [Route("Todos")]
+        [Route("todos")]
         public IList<Reserva> Get()
         {
             return reservas;

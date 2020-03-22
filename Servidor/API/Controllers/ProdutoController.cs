@@ -10,7 +10,7 @@ namespace API.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/produto")]
     public class ProdutoController : ControllerBase
     {
         private List<Produto> produtos;
@@ -30,7 +30,7 @@ namespace API.Controllers
 
 
         [HttpGet]
-        [Route("Todos")]
+        [Route("todos")]
         public IList<Produto> Get()
         {
             return produtos;
