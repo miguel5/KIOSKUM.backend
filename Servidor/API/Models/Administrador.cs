@@ -11,11 +11,20 @@ namespace API.Models
 
         public Administrador() { }
 
+
+        public Administrador(string Nome, int NumFuncionario, string Email, string Password) : base(Nome, NumFuncionario)
+        {
+            this.Email = Email;
+            this.Password = HashPassword(Password);
+        }
+
+
         public Administrador(int IdFuncionario, string Nome, int NumFuncionario, string Email, string Password) : base(IdFuncionario, Nome, NumFuncionario)
         {
             this.Email = Email;
             this.Password = HashPassword(Password);
         }
+
 
 
         private string HashPassword(string password)

@@ -9,12 +9,22 @@ namespace API.Data
         {
         }
 
+        internal bool existeEmail(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool existeNumTelemovel(int numTelemovel)
+        {
+            throw new NotImplementedException();
+        }
+
         internal Cliente getCliente(string email)
         {
             throw new NotImplementedException();
         }
 
-        internal bool containsEmail(string email)
+        internal void EditarNome(string email, string novoEmail)
         {
             throw new NotImplementedException();
         }

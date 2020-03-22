@@ -12,6 +12,14 @@ namespace API.Models
 
         public Funcionario() { }
 
+
+        public Funcionario(string Nome, int NumFuncionario)
+        {
+            this.Nome = Nome;
+            this.NumFuncionario = NumFuncionario;
+        }
+
+
         public Funcionario(int IdFuncionario, string Nome, int NumFuncionario)
         {
             this.IdFuncionario = IdFuncionario;
