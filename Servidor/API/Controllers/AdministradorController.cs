@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using API.Models;
+using API.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -12,16 +12,21 @@ namespace API.Controllers
     public class AdministradorController : ControllerBase
     {
         private List<Administrador> administradores;
-        private readonly ILogger<AdministradorController> logger;
+        private readonly ILogger<AdministradorController> _logger;
 
         public AdministradorController(ILogger<AdministradorController> logger)
         {
-            this.logger = logger;
+            _logger = logger;
             administradores = new List<Administrador>();
             Administrador a;
             for (int i = 0; i < 5; i++)
             {
-                a = new Administrador(1, "Antonio", 123, "tone_biclas@gmail.com", "12345");
+                a = new Administrador();
+                a.IdFuncionario = 1;
+                a.Nome = "Antonio";
+                a.NumFuncionario = 123;
+                a.Email = "tone_biclas@gmail.com";
+                a.SetPassword("12345");
                 administradores.Add(a);
             }
         }
@@ -40,7 +45,12 @@ namespace API.Controllers
         [HttpPost]
         public void AdicionaCliente(string Nome, string Email, string Password, int NumFuncionario)
         {
-            Administrador a = new Administrador(1, Nome, NumFuncionario, Email, Password);
+            Administrador a = new Administrador();
+            a.IdFuncionario = 1;
+            a.Nome = Nome;
+            a.NumFuncionario = NumFuncionario;
+            a.Email = Email;
+            a.SetPassword(Password);
             administradores.Add(a);
             Console.WriteLine(a.ToString());
         }

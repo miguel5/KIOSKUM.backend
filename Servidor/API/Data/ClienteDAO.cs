@@ -1,5 +1,5 @@
 ﻿using System;
-using API.Models;
+using API.Entities;
 
 namespace API.Data
 {

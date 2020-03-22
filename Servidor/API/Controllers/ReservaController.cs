@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using API.Models;
+using API.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -16,16 +14,21 @@ namespace API.Controllers
     public class ReservaController : ControllerBase
     {
         private List<Reserva> reservas;
-        private readonly ILogger<ReservaController> logger;
+        private readonly ILogger<ReservaController> _logger;
 
         public ReservaController(ILogger<ReservaController> logger)
         {
-            this.logger = logger;
+            _logger = logger;
             reservas = new List<Reserva>();
             Reserva r;
             for (int i = 0; i < 5; i++)
             {
-                r = new Reserva(1, new List<Tuple<int, int, string>> { new Tuple<int, int, string>(1, 2, ""), new Tuple<int, int, string>(3, 1, "Sem sal.") }, 5.70, DateTime.Now);
+                r = new Reserva();
+                r.IdReserva = i;
+                r.IdCliente = 1;
+                r.Items = new List<Tuple<int, int, string>> { new Tuple<int, int, string>(1, 2, "") ,  new Tuple<int, int, string>(3, 1, "Sem sal.") };
+                r.Preco = 5.70;
+                r.HoraEntrega = DateTime.Now;
             }
         }
        

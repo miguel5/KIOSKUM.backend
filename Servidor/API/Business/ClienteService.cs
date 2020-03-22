@@ -1,29 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using API.Business;
 using API.Data;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using API.Entities;
 
-namespace API.Models
+namespace API.Business
 {
-    public class Clientes
+    public interface IClienteService
     {
-        private ClienteDAO clienteDAO;
-        /*public Dictionary<string, int> Tentativas;
-        public Dictionary<string, string> Codigos;
-        public Dictionary<string, Tuple<string, string, int>> Dados;*/
+        Task<bool> CriarConta(string nome, string email, string password, int numTelemovel);
+        bool ValidaCodigoValidacao(string email, string codigo);
+        bool Login(string Email, string Password);
+        bool EditarEmail(string token, string novoEmail);
+        bool EditarNome(string token, string novoNome);
+        bool EditarPassword(string token, string novaPassword);
+        bool EditarNumTelemovel(string token, int numTelemovel);
+        IList<Reserva> GetHistoricoReservas(string token);
+    }
 
-        public Clientes()
+
+    public class ClienteService
+    { 
+        private ClienteDAO clienteDAO;
+
+
+        public ClienteService()
         {
             clienteDAO = new ClienteDAO();
-            /*Tentativas = new Dictionary<string, int>();
-            Codigos = new Dictionary<string, string>();
-            Dados = new Dictionary<string, Tuple<string, string, int>>();*/
         }
+
+
 
         private string GerarCodigo()
         {
@@ -93,7 +103,7 @@ namespace API.Models
                 Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
                 emailGerarCodigo.AdcionaCodigo(codigoValidacao);
 
-                EmailSender emailSender = new EmailSender();
+                EmailSenderService emailSender = new EmailSenderService();
                 await emailSender.SendEmail(Email, emailGerarCodigo);
                 await emailSender.SendEmail(Email, emailBoasVindas);
             }
@@ -101,111 +111,44 @@ namespace API.Models
         }
 
 
-        public bool ValidaCodigoValidacao(string Email, string Codigo)
+        public bool ValidaCodigoValidacao(string email, string codigo)
         {
-            bool resultado = false;
-            /*if (Codigos[email].Equals(codigo))
-            {
-                resultado = true;
-            }
-            else
-            {
-                if (Tentativas[email] < 3)
-                {
-                    Tentativas[email]++;
-                }
-                else
-                {
-                    LimpaEntradaCliente(email);
-                }
-            }*/
-            return resultado;
+            throw new NotImplementedException();
         }
 
 
-        public bool Login(string Email, string Password)
+        public bool Login(string email, string password)
         {
-            bool sucesso;
-            if (!clienteDAO.existeEmail(Email))
-            {
-                sucesso = false;
-            }
-            else
-            {
-                Cliente cliente = clienteDAO.getCliente(Email);
-                sucesso = cliente.ComparaPasswords(Password);
-            }
-            return sucesso;
+            throw new NotImplementedException();
         }
 
 
-        public bool EditarEmail(string Email, string NovoEmail)
+        public bool EditarEmail(string token, string novoEmail)
         {
-            bool sucesso;
-            if (string.IsNullOrWhiteSpace(Email))
-            {
-                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
-            }
-
-            if (!ValidaEmail(Email) && !clienteDAO.existeEmail(Email))
-            {
-                sucesso = false;
-            }
-            else
-            {
-                clienteDAO.EditarNome(Email, NovoEmail);
-                sucesso = true;
-            }
-            return sucesso;
+            throw new NotImplementedException();
         }
 
 
-        public bool EditarNome(string Email, string NovoNome)
+        public bool EditarNome(string token, string novoNome)
         {
-            bool sucesso;
-            if (string.IsNullOrWhiteSpace(NovoNome))
-            {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
-
-            if (!clienteDAO.existeEmail(Email))
-            {
-                sucesso = false;
-            }
-            else
-            {
-                clienteDAO.EditarNome(Email, NovoNome);
-                sucesso = true;
-            }
-            return sucesso;
+            throw new NotImplementedException();
         }
 
 
-        public bool EditarPassword(string Email, string NovaPassword)
+        public bool EditarPassword(string token, string novaPassword)
         {
-            bool sucesso;
-            if (string.IsNullOrWhiteSpace(NovaPassword))
-            {
-                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
-            }
+            throw new NotImplementedException();
+        }
 
-            if (!clienteDAO.existeEmail(Email))
-            {
-                sucesso = false;
-            }
-            else
-            {
-                clienteDAO.EditarNome(Email, NovaPassword);
-                sucesso = true;
-            }
-            return sucesso;
+        public bool EditarNumTelemovel(string token, int numTelemovel)
+        {
+            throw new NotImplementedException();
         }
 
 
-        public IList<Reserva> GetHistoricoReservas(string Email)
+        public IList<Reserva> GetHistoricoReservas(string token)
         {
-            return null;
+            throw new NotImplementedException();
         }
-
     }
 }

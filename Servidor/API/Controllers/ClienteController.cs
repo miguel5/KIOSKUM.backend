@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using API.Models;
+using API.Business;
+using API.Entities;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -15,17 +15,22 @@ namespace API.Controllers
     public class ClienteController : ControllerBase
     {
         private List<Cliente> clientes;
-        Clientes gestorDadosCliente = new Clientes();
-        private readonly ILogger<ClienteController> logger;
+        ClienteService gestorDadosCliente = new ClienteService();
+        private readonly ILogger<ClienteController> _logger;
 
         public ClienteController(ILogger<ClienteController> logger)
         {
-            this.logger = logger;
+            _logger = logger;
             clientes = new List<Cliente>();
             Cliente c;
             for (int i = 0; i < 5; i++)
             {
-                c = new Cliente(i,"Antonio", "tone_biclas@gmail.com", "12345", 924513637);
+                c = new Cliente();
+                c.IdCliente = i;
+                c.Nome = "Antonio";
+                c.Email = "tone_biclas@gmail.com";
+                c.SetPassword("12345");
+                c.NumTelemovel = 924513637;
                 clientes.Add(c);
             }
         }
@@ -43,11 +48,8 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> AdicionaCliente(string Nome, string Email, string Password, int NumTelemovel)
         {
-             Cliente c = new Cliente(0, Nome, Email, Password, NumTelemovel);
-             clientes.Add(c);
              await gestorDadosCliente.CriarConta(Nome, Email, Password, NumTelemovel);
-             Console.WriteLine(c.ToString());
-            return Ok("Adicionou");
+             return Ok("Adicionou");
         }
 
         

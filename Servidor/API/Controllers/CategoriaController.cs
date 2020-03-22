@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using API.Data;
-using API.Models;
+using API.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -15,11 +12,11 @@ namespace API.Controllers
     public class CategoriaController : ControllerBase
     {
         private CategoriaDAO categoriaDAO = new CategoriaDAO();
-        private readonly ILogger<CategoriaController> logger;
+        private readonly ILogger<CategoriaController> _logger;
 
         public CategoriaController(ILogger<CategoriaController> logger)
         {
-            this.logger = logger;
+            _logger = logger;
         }
 
 

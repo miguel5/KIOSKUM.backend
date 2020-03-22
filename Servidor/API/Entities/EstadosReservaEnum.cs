@@ -1,5 +1,4 @@
-﻿using System;
-namespace API.Models
+﻿namespace API.Entities
 {
     public enum EstadosReservaEnum
     {
