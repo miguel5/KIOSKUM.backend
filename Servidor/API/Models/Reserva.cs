@@ -6,64 +6,24 @@ namespace API.Models
 {
     public class Reserva
     {
-        public int IdReserva { get; }
+        public int IdReserva { get; set; }
         public int IdCliente { get; set; }
-        public Tuple<int, int> IdFuncionarios { get; set; }
+        public Tuple<int, int> IdFuncionarios { get; private set; }
         public IList<Tuple<int, int, string>> Items { get; set; } //(idProduto,Quantidade,Observações)
         public EstadosReservaEnum Estado { get; set; }
-        public double Preco { get; }
+        public double Preco { get; set; }
         public DateTime HoraPagamento { get; set; }
         public DateTime HoraEntrega { get; }
 
+        public Reserva() { }
 
-        public Reserva(int IdReserva, int IdCliente, IList<Tuple<int, int, string>> Items, double Preco, DateTime HoraEntrega)
+        public Reserva(int IdCliente, IList<Tuple<int, int, string>> Items, double Preco, DateTime HoraEntrega)
         {
-            this.IdReserva = IdReserva;
             this.IdCliente = IdCliente;
             this.Items = Items;
-            this.Estado = EstadosReservaEnum.Pendente;
+            Estado = EstadosReservaEnum.Pendente;
             this.Preco = Preco;
             this.HoraEntrega = HoraEntrega;
-        }
-
-
-        public void AlteraEstadoReserva(int IdFuncionario, char decisao)
-        {
-            switch (decisao)
-            {
-                case 'a':
-                    if (Estado == EstadosReservaEnum.Pendente)
-                    {
-                        IdFuncionarios = new Tuple<int, int>(IdFuncionario, -1);
-                        Estado = EstadosReservaEnum.Aceite;
-                    }
-                    break;
-                case 'r':
-                    if (Estado == EstadosReservaEnum.Pendente)
-                    {
-                        IdFuncionarios = new Tuple<int, int>(IdFuncionario, -1);
-                        Estado = EstadosReservaEnum.Rejeitada;
-                    }
-                    break;
-                case 'e':
-                    if (Estado == EstadosReservaEnum.Paga)
-                    {
-                        IdFuncionarios = new Tuple<int, int>(IdFuncionarios.Item1, IdFuncionario);
-                        Estado = EstadosReservaEnum.Entregue;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public void RegistaPagamento(DateTime HoraPagamento)
-        {
-            if (Estado == EstadosReservaEnum.Aceite)
-            {
-                this.Estado = EstadosReservaEnum.Paga;
-                this.HoraPagamento = HoraPagamento;
-            }
         }
 
 

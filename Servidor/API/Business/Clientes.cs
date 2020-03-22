@@ -33,48 +33,75 @@ namespace API.Models
         }
 
 
+        private bool ValidaEmail(string Email)
+        {
+            Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
+            return rx.IsMatch(Email);
+        }
+
+        private bool ValidaPassword(string Password)
+        {
+            return Password.Length >= 8;
+        }
+
         private bool ValidaNumTelemovel(int NumTelemovel)
         {
             Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
             return rx.IsMatch(NumTelemovel.ToString());
-
         }
 
 
-        public void Login(string email, string password)
+        public async Task<bool> CriarConta(string Nome, string Email, string Password, int NumTelemovel)
         {
-            clienteDAO.containsEmail(email);
-            Cliente cliente = clienteDAO.getCliente(email);
-            cliente.ComparaPasswords(password);
+            bool sucesso = true;
+            if (string.IsNullOrWhiteSpace(Nome))
+            {
+                throw new ArgumentNullException("Nome","Parametro não pode ser nulo");
+            }
+            if (string.IsNullOrWhiteSpace(Email))
+            {
+                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
+            }
+            if (string.IsNullOrWhiteSpace(Password))
+            {
+                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
+            }
+
+            if(!ValidaEmail(Email) && !ValidaPassword(Password) && ValidaNumTelemovel(NumTelemovel) &&
+                !clienteDAO.existeEmail(Email) && !clienteDAO.existeNumTelemovel(NumTelemovel))
+            {
+                sucesso = false;
+            }
+            else
+            {
+                string codigoValidacao = GerarCodigo();
+
+                /*Tentativas.Add(email, 0);
+                Codigos.Add(email, codigo);
+                Dados.Add(email, new Tuple<string, string, int>(nome, password, numTelemovel));*/
+
+                //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
+                string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
+                StreamReader sr = new StreamReader(pathEmailBoasVindas);
+                string json = sr.ReadToEnd();
+                Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
+
+                //string pathEmailgerarCodigo = "D:\\home\\site\\wwwroot\\Files\\EmailGerarCodigo.json";
+                string pathEmailgerarCodigo = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailGerarCodigo.json";
+                sr = new StreamReader(pathEmailgerarCodigo);
+                json = sr.ReadToEnd();
+                Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
+                emailGerarCodigo.AdcionaCodigo(codigoValidacao);
+
+                EmailSender emailSender = new EmailSender();
+                await emailSender.SendEmail(Email, emailGerarCodigo);
+                await emailSender.SendEmail(Email, emailBoasVindas);
+            }
+            return sucesso;
         }
 
-        public async Task CriarConta(string nome, string email, string password, int numTelemovel)
-        {
-            string codigo = GerarCodigo();
 
-            /*Tentativas.Add(email, 0);
-            Codigos.Add(email, codigo);
-            Dados.Add(email, new Tuple<string, string, int>(nome, password, numTelemovel));*/
-
-            //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
-            string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
-            StreamReader sr = new StreamReader(pathEmailBoasVindas);
-            string json = sr.ReadToEnd();
-            Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
-
-            //string pathEmailgerarCodigo = "D:\\home\\site\\wwwroot\\Files\\EmailGerarCodigo.json";
-            string pathEmailgerarCodigo = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailGerarCodigo.json";
-            sr = new StreamReader(pathEmailgerarCodigo);
-            json = sr.ReadToEnd();
-            Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
-            emailGerarCodigo.AdcionaCodigo(codigo);
-
-            EmailSender emailSender = new EmailSender();
-            await emailSender.SendEmail(email,emailGerarCodigo);
-            await emailSender.SendEmail(email, emailBoasVindas);
-        }
-
-        public bool ValidaCodigo(string email, string codigo)
+        public bool ValidaCodigoValidacao(string Email, string Codigo)
         {
             bool resultado = false;
             /*if (Codigos[email].Equals(codigo))
@@ -95,11 +122,90 @@ namespace API.Models
             return resultado;
         }
 
-        public void LimpaEntradaCliente(string email)
+
+        public bool Login(string Email, string Password)
         {
-            /*Tentativas.Remove(email);
-            Codigos.Remove(email);
-            Dados.Remove(email);*/
+            bool sucesso;
+            if (!clienteDAO.existeEmail(Email))
+            {
+                sucesso = false;
+            }
+            else
+            {
+                Cliente cliente = clienteDAO.getCliente(Email);
+                sucesso = cliente.ComparaPasswords(Password);
+            }
+            return sucesso;
         }
+
+
+        public bool EditarEmail(string Email, string NovoEmail)
+        {
+            bool sucesso;
+            if (string.IsNullOrWhiteSpace(Email))
+            {
+                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
+            }
+
+            if (!ValidaEmail(Email) && !clienteDAO.existeEmail(Email))
+            {
+                sucesso = false;
+            }
+            else
+            {
+                clienteDAO.EditarNome(Email, NovoEmail);
+                sucesso = true;
+            }
+            return sucesso;
+        }
+
+
+        public bool EditarNome(string Email, string NovoNome)
+        {
+            bool sucesso;
+            if (string.IsNullOrWhiteSpace(NovoNome))
+            {
+                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+            }
+
+            if (!clienteDAO.existeEmail(Email))
+            {
+                sucesso = false;
+            }
+            else
+            {
+                clienteDAO.EditarNome(Email, NovoNome);
+                sucesso = true;
+            }
+            return sucesso;
+        }
+
+
+        public bool EditarPassword(string Email, string NovaPassword)
+        {
+            bool sucesso;
+            if (string.IsNullOrWhiteSpace(NovaPassword))
+            {
+                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
+            }
+
+            if (!clienteDAO.existeEmail(Email))
+            {
+                sucesso = false;
+            }
+            else
+            {
+                clienteDAO.EditarNome(Email, NovaPassword);
+                sucesso = true;
+            }
+            return sucesso;
+        }
+
+
+        public IList<Reserva> GetHistoricoReservas(string Email)
+        {
+            return null;
+        }
+
     }
 }
