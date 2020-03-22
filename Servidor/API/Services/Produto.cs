@@ -1,22 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace API.ViewModel
+namespace API
 {
-    public class ProdutoModelView
+    public class Produto
     {
-        public int IdProduto { get; set; }
+        public int IdProduto { get; }
         public string Nome { get; set; }
         public string Categoria { get; set; }
         public double Preco { get; set; }
         public IList<string> Ingredientes { get; set; }
         public IList<string> Alergenios { get; set; }
-        public string URLProduto { get; set; }
 
-        public ProdutoModelView() { }
 
-        public ProdutoModelView(int IdProduto, string Nome, string Categoria, double Preco, IList<string> Ingredientes, IList<string> Alergenios, string URLProduto)
+        public Produto(int IdProduto, string Nome, string Categoria, double Preco, IList<string> Ingredientes, IList<string> Alergenios)
         {
             this.IdProduto = IdProduto;
             this.Nome = Nome;
@@ -24,10 +22,36 @@ namespace API.ViewModel
             this.Preco = Preco;
             this.Ingredientes = Ingredientes;
             this.Alergenios = Alergenios;
-            this.URLProduto = URLProduto;
         }
 
-        
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 3;
+                hash = 37 * hash + IdProduto;
+                hash = 37 * hash + (Nome == null ? 0 : Nome.GetHashCode());
+                hash = 37 * hash + (Categoria == null ? 0 : Categoria.GetHashCode());
+                hash = 37 * hash + Preco.GetHashCode();
+                hash = 37 * hash + (Ingredientes == null ? 0 : Ingredientes.GetHashCode());
+                hash = 37 * hash + (Alergenios == null ? 0 : Alergenios.GetHashCode());
+                return hash;
+            }
+        }
+
+        public override bool Equals(Object obj)
+        {
+            if (obj == this)
+            {
+                return true;
+            }
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            {
+                return false;
+            }
+            Produto produto = (Produto)obj;
+            return IdProduto == produto.IdProduto;
+        }
 
         public override string ToString()
         {
@@ -47,7 +71,6 @@ namespace API.ViewModel
             {
                 sb.Append(alergenio + "; ");
             }
-            sb.Append("- URLProduto: " + URLProduto + "\n");
             return sb.ToString();
         }
     }

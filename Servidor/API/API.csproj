@@ -12,9 +12,23 @@
     <Folder Include="Data\" />
     <Folder Include="Business\" />
     <Folder Include="Exceptions\" />
-    <Folder Include="ModelView\" />
+    <Folder Include="Entities\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="mono_crash.mem.9613.70000a033000.blob" />
+    <None Remove="mono_crash.mem.9613.70000a83f000.blob" />
+    <None Remove="mono_crash.mem.9613.70000a439000.blob" />
+    <None Remove="mono_crash.mem.9613.1.blob" />
+    <None Remove="mono_crash.mem.9613.700009624000.blob" />
+    <None Remove="mono_crash.mem.9613.700009a2a000.blob" />
+    <None Remove="mono_crash.mem.9613.700009118000.blob" />
+    <None Remove="mono_crash.mem.9613.700009c2d000.blob" />
+    <None Remove="mono_crash.mem.9613.10535cdc0.blob" />
+    <None Remove="mono_crash.mem.9613.70000a63c000.blob" />
+    <None Remove="mono_crash.mem.9613.700009827000.blob" />
+    <None Remove="mono_crash.mem.9651.1.blob" />
   </ItemGroup>
 </Project>

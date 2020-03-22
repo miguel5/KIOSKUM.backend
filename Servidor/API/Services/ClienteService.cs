@@ -10,19 +10,16 @@ using System.Text.RegularExpressions;
 
 namespace API.Models
 {
-    public class Clientes
+    public class ClienteService
     {
         private ClienteDAO clienteDAO;
         /*public Dictionary<string, int> Tentativas;
         public Dictionary<string, string> Codigos;
         public Dictionary<string, Tuple<string, string, int>> Dados;*/
 
-        public Clientes()
+        public ClienteService()
         {
             clienteDAO = new ClienteDAO();
-            /*Tentativas = new Dictionary<string, int>();
-            Codigos = new Dictionary<string, string>();
-            Dados = new Dictionary<string, Tuple<string, string, int>>();*/
         }
 
         private string GerarCodigo()
@@ -123,7 +120,7 @@ namespace API.Models
         }
 
 
-        public bool Login(string Email, string Password)
+        /*public bool Login(string Email, string Password)
         {
             bool sucesso;
             if (!clienteDAO.existeEmail(Email))
@@ -205,7 +202,7 @@ namespace API.Models
         public IList<Reserva> GetHistoricoReservas(string Email)
         {
             return null;
-        }
+        }*/
 
     }
 }

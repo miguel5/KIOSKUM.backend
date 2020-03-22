@@ -1,18 +1,22 @@
-﻿using System;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using API.Models;
 
 namespace API.Business
 {
-    public class EmailSender
+    public interface IEmailSenderService
+    {
+        Task SendEmail(string email, Email mensagem);
+    }
+
+    public class EmailSenderService : IEmailSenderService
     {
         private readonly string myEmail = "espeta_espeta@portugalmail.pt";
         private readonly string myPassword = "meteantonio";
         private readonly string serverAdressSMTP = "smtp.portugalmail.pt";
         private readonly SmtpClient smtp;
 
-        public EmailSender()
+        public EmailSenderService()
         {
             smtp = new SmtpClient
             {
