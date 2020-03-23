@@ -37,3 +37,10 @@
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Newtonsoft.Json.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/obj/Debug/netcoreapp3.1/API.csproj.CopyComplete
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/obj/Debug/netcoreapp3.1/API.csproj.CoreCompileInputs.cache
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.IdentityModel.JsonWebTokens.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.IdentityModel.Logging.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.IdentityModel.Protocols.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.IdentityModel.Tokens.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/System.IdentityModel.Tokens.Jwt.dll

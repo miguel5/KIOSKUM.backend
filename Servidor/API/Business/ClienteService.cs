@@ -23,7 +23,7 @@ namespace API.Business
     }
 
 
-    public class ClienteService
+    public class ClienteService : IClienteService
     { 
         private ClienteDAO clienteDAO;
 
