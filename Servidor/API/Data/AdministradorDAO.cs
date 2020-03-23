@@ -1,5 +1,4 @@
-﻿using System;
-namespace API.Data
+﻿namespace API.Data
 {
     public class AdministradorDAO
     {

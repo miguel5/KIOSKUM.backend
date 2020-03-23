@@ -6,7 +6,11 @@ namespace API.Entities
    public class Administrador : Funcionario
     {
         public string Email { get; set; }
-        public string Password { get; private set; }
+        public string Password
+        {
+            get => Password;
+            set => Password = HashPassword(value);
+        }
 
 
         private string HashPassword(string password)
@@ -17,12 +21,6 @@ namespace API.Entities
                 prf: KeyDerivationPrf.HMACSHA1,
                 iterationCount: 10000,
                 numBytesRequested: 256 / 8));
-        }
-
-
-        public void SetPassword(string password)
-        {
-            Password = HashPassword(password);
         }
     }
 }

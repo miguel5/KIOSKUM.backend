@@ -26,11 +26,11 @@ namespace API.Controllers
                 a.Nome = "Antonio";
                 a.NumFuncionario = 123;
                 a.Email = "tone_biclas@gmail.com";
-                a.SetPassword("12345");
+                a.Password = "12345";
                 administradores.Add(a);
             }
         }
-       
+
 
 
         [HttpGet]
@@ -50,10 +50,9 @@ namespace API.Controllers
             a.Nome = Nome;
             a.NumFuncionario = NumFuncionario;
             a.Email = Email;
-            a.SetPassword(Password);
+            a.Password = Password;
             administradores.Add(a);
             Console.WriteLine(a.ToString());
         }
     }
 }
-
