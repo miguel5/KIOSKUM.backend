@@ -8,7 +8,11 @@ namespace API.Entities
         public int IdCliente { get; set; }
         public string Nome { get; set; }
         public string Email { get; set; }
-        public string Password { get; private set; }
+        public string Password
+        {
+            get => Password;
+            set => Password = HashPassword(value);
+        }
         public int NumTelemovel { get; set; }
         public string Token { get; set; }
 
@@ -23,10 +27,6 @@ namespace API.Entities
                 numBytesRequested: 256 / 8));
         }
 
-        public void SetPassword(string password)
-        {
-            Password = HashPassword(password);
-        }
 
         public bool ComparaPasswords(string password)
         {

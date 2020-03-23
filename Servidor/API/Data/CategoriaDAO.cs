@@ -1,5 +1,4 @@
 ﻿using System;
-using API.Models;
 
 namespace API.Data
 {
@@ -21,7 +20,7 @@ namespace API.Data
 
         internal void AddNovaCategoria(string Nome)
         {
-            int idCategoria = GetLastId();
+            throw new NotImplementedException();
         }
     }
 }

@@ -29,7 +29,7 @@ namespace API.Controllers
                 c.IdCliente = i;
                 c.Nome = "Antonio";
                 c.Email = "tone_biclas@gmail.com";
-                c.SetPassword("12345");
+                c.Password = "12345";
                 c.NumTelemovel = 924513637;
                 clientes.Add(c);
             }
