@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using API.Business;
 using API.Entities;
 using API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 
 namespace API.Controllers
@@ -24,11 +21,15 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("authenticate")]
+        [HttpPost("autenticacao")]
         public IActionResult Login([FromBody] AutenticacaoModel model)
         {
-            Console.WriteLine(model.Email + "\n" + model.Password);
-            return Ok();
+            var cliente = _clienteService.Login(model.Email, model.Password);
+
+            if (cliente == null)
+                return BadRequest(new { message = "Email ou Password incorretos" });
+
+            return Ok(cliente);
         }
 
         /*
