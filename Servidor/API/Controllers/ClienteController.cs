@@ -16,12 +16,11 @@ namespace API.Controllers
     [Route("api/cliente")]
     public class ClienteController : ControllerBase
     {
-        ClienteService clienteService = new ClienteService();
-        private readonly ILogger<ClienteController> _logger;
+        private IClienteService _clienteService;
 
-        public ClienteController(ILogger<ClienteController> logger)
+        public ClienteController(IClienteService clienteService)
         {
-            _logger = logger;
+            _clienteService = clienteService;
         }
 
         [AllowAnonymous]
