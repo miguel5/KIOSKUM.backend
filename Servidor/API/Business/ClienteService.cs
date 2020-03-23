@@ -7,6 +7,13 @@ using API.Data;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using API.Entities;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using API.Helpers;
+using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace API.Business
 {
@@ -14,7 +21,7 @@ namespace API.Business
     {
         Task<bool> CriarConta(string nome, string email, string password, int numTelemovel);
         bool ValidaCodigoValidacao(string email, string codigo);
-        bool Login(string Email, string Password);
+        Cliente Login(string Email, string Password);
         bool EditarEmail(string token, string novoEmail);
         bool EditarNome(string token, string novoNome);
         bool EditarPassword(string token, string novaPassword);
@@ -24,15 +31,30 @@ namespace API.Business
 
 
     public class ClienteService : IClienteService
-    { 
+    {
+        private readonly AppSettings _appSettings;
         private ClienteDAO clienteDAO;
-
-
-        public ClienteService()
+        private List<Cliente> _clientes = new List<Cliente>
         {
+            new Cliente { IdCliente = 1, Nome = "Lázaro", Email = "lazaro.pinheiro1998@gmail.com", Password = "123456", NumTelemovel = 913136226, Token = ""}
+        };
+
+        public ClienteService(IOptions<AppSettings> appSettings)
+        {
+            _appSettings = appSettings.Value;
             clienteDAO = new ClienteDAO();
         }
 
+
+        private string HashPassword(string password)
+        {
+            return Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: new byte[0],
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8));
+        }
 
 
         private string GerarCodigo()
@@ -117,9 +139,30 @@ namespace API.Business
         }
 
 
-        public bool Login(string email, string password)
+        public Cliente Login(string email, string password)
         {
-            throw new NotImplementedException();
+            var cliente = _clientes.SingleOrDefault(x => x.Email == email && x.Password == password);
+
+            // return null if user not found
+            if (cliente == null)
+                return null;
+
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Email, cliente.IdCliente.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            cliente.Token = tokenHandler.WriteToken(token);
+
+            return cliente;
         }
 
 
