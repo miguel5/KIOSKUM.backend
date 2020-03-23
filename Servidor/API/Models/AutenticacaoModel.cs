@@ -2,7 +2,7 @@
 
 namespace API.Models
 {
-    public class Autenticacao
+    public class AutenticacaoModel
     {
         [Required]
         public string Email { get; set; }
