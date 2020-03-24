@@ -8,17 +8,7 @@ namespace API.Data
         {
         }
 
-        internal bool ContainsNome(string nome)
-        {
-            throw new NotImplementedException();
-        }
-
-        private int GetLastId()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void AddNovaCategoria(string Nome)
+        internal int GetIdCategoria(string nomeCategoria)
         {
             throw new NotImplementedException();
         }

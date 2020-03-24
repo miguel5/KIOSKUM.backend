@@ -29,18 +29,6 @@ namespace API.Controllers
 
 
 
-        [HttpPost]
-        public void AddCategoria(string Nome)
-        {
-            if (categoriaDAO.ContainsNome(Nome))
-            {
-
-            }
-            else
-            {
-                categoriaDAO.AddNovaCategoria(Nome);
-
-            }
-        }
+       
     }
 }

@@ -96,8 +96,9 @@ namespace API.Business
             if (ValidaEmail(email) && ValidaPassword(password) && ValidaNumTelemovel(numTelemovel) &&
                 !clienteDAO.ExisteEmail(email) && !clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
-                sucesso = true;
                 string codigoValidacao = GerarCodigo();
+                Cliente cliente = new Cliente { Nome = nome, Email = email, Password = password, NumTelemovel = numTelemovel };
+                clienteDAO.InserirCliente(cliente, codigoValidacao);
 
                 //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
                 string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
@@ -115,6 +116,8 @@ namespace API.Business
                 EmailSenderService emailSender = new EmailSenderService();
                 await emailSender.SendEmail(email, emailGerarCodigo);
                 await emailSender.SendEmail(email, emailBoasVindas);
+
+                sucesso = true;
             }
             return sucesso;
         }

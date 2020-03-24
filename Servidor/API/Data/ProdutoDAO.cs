@@ -6,5 +6,15 @@ namespace API.Data
         public ProdutoDAO()
         {
         }
+
+        internal bool ExisteNome(string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static void AddProduto(object produto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
