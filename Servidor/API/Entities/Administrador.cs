@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-
-namespace API.Entities
+﻿namespace API.Entities
 {
    public class Administrador : Funcionario
     {

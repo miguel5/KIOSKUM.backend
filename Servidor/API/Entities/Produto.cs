@@ -6,7 +6,7 @@ namespace API.Entities
     {
         public int IdProduto { get; set; }
         public string Nome { get; set; }
-        public Categoria Categoria { get; set; }
+        public string Categoria { get; set; }
         public double Preco { get; set; }
         public IList<string> Ingredientes { get; set; }
         public IList<string> Alergenios { get; set; }

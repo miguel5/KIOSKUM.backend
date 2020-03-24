@@ -1,11 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using API.Data;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using API.Entities;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using API.Helpers;
@@ -14,6 +12,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace API.Business
 {
@@ -22,11 +22,10 @@ namespace API.Business
         Task<bool> CriarConta(string nome, string email, string password, int numTelemovel);
         bool ValidaCodigoValidacao(string email, string codigo);
         Cliente Login(string Email, string Password);
-        bool EditarEmail(string token, string novoEmail);
-        bool EditarNome(string token, string novoNome);
-        bool EditarPassword(string token, string novaPassword);
-        bool EditarNumTelemovel(string token, int numTelemovel);
-        IList<Reserva> GetHistoricoReservas(string token);
+        Cliente EditarEmail(string token, string novoEmail);
+        Cliente EditarNome(string token, string novoNome);
+        Cliente EditarPassword(string token, string novaPassword);
+        Cliente EditarNumTelemovel(string token, int numTelemovel);
     }
 
 
@@ -34,10 +33,6 @@ namespace API.Business
     {
         private readonly AppSettings _appSettings;
         private ClienteDAO clienteDAO;
-        private List<Cliente> _clientes = new List<Cliente>
-        {
-            new Cliente { IdCliente = 1, Nome = "Lázaro", Email = "lazaro.pinheiro1998@gmail.com", Password = "123456", NumTelemovel = 913136226, Token = ""}
-        };
 
         public ClienteService(IOptions<AppSettings> appSettings)
         {
@@ -85,10 +80,10 @@ namespace API.Business
 
         public async Task<bool> CriarConta(string Nome, string Email, string Password, int NumTelemovel)
         {
-            bool sucesso = true;
+            bool sucesso = false;
             if (string.IsNullOrWhiteSpace(Nome))
             {
-                throw new ArgumentNullException("Nome","Parametro não pode ser nulo");
+                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
             }
             if (string.IsNullOrWhiteSpace(Email))
             {
@@ -99,18 +94,11 @@ namespace API.Business
                 throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
             }
 
-            if(!ValidaEmail(Email) && !ValidaPassword(Password) && ValidaNumTelemovel(NumTelemovel) &&
-                !clienteDAO.existeEmail(Email) && !clienteDAO.existeNumTelemovel(NumTelemovel))
+            if (ValidaEmail(Email) && ValidaPassword(Password) && ValidaNumTelemovel(NumTelemovel)) //&&
+                //!clienteDAO.ExisteEmail(Email) && !clienteDAO.ExisteNumTelemovel(NumTelemovel))
             {
-                sucesso = false;
-            }
-            else
-            {
+                sucesso = true;
                 string codigoValidacao = GerarCodigo();
-
-                /*Tentativas.Add(email, 0);
-                Codigos.Add(email, codigo);
-                Dados.Add(email, new Tuple<string, string, int>(nome, password, numTelemovel));*/
 
                 //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
                 string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
@@ -138,13 +126,13 @@ namespace API.Business
             throw new NotImplementedException();
         }
 
-
+        
         public Cliente Login(string email, string password)
         {
-            var cliente = _clientes.SingleOrDefault(x => x.Email == email && x.Password == password);
+            var cliente = clienteDAO.GetClienteEmail(email);
 
             // return null if user not found
-            if (cliente == null)
+            if (cliente == null || !cliente.Password.Equals(HashPassword(password)))
                 return null;
 
             // authentication successful so generate jwt token
@@ -166,32 +154,54 @@ namespace API.Business
         }
 
 
-        public bool EditarEmail(string token, string novoEmail)
+        public Cliente EditarEmail(string token, string novoEmail)
         {
-            throw new NotImplementedException();
+            var cliente = clienteDAO.GetClienteToken(token);
+            if(cliente == null)
+            {
+                return null;
+            }
+            cliente.Email = novoEmail;
+            clienteDAO.EditarEmail(cliente);
+            return cliente;
         }
 
 
-        public bool EditarNome(string token, string novoNome)
+        public Cliente EditarNome(string token, string novoNome)
         {
-            throw new NotImplementedException();
+            var cliente = clienteDAO.GetClienteToken(token);
+            if (cliente == null)
+            {
+                return null;
+            }
+            cliente.Nome = novoNome;
+            clienteDAO.EditarNumTelemovel(cliente);
+            return cliente;
         }
 
 
-        public bool EditarPassword(string token, string novaPassword)
+        public Cliente EditarPassword(string token, string novaPassword)
         {
-            throw new NotImplementedException();
+            var cliente = clienteDAO.GetClienteToken(token);
+            if (cliente == null)
+            {
+                return null;
+            }
+            cliente.Password = HashPassword(novaPassword);
+            clienteDAO.EditarNumTelemovel(cliente);
+            return cliente;
         }
 
-        public bool EditarNumTelemovel(string token, int numTelemovel)
+        public Cliente EditarNumTelemovel(string token, int numTelemovel)
         {
-            throw new NotImplementedException();
-        }
-
-
-        public IList<Reserva> GetHistoricoReservas(string token)
-        {
-            throw new NotImplementedException();
+            var cliente = clienteDAO.GetClienteToken(token);
+            if (cliente == null)
+            {
+                return null;
+            }
+            cliente.NumTelemovel = numTelemovel;
+            clienteDAO.EditarNumTelemovel(cliente);
+            return cliente;
         }
     }
 }
