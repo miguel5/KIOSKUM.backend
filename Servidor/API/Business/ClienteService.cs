@@ -60,42 +60,42 @@ namespace API.Business
         }
 
 
-        private bool ValidaEmail(string Email)
+        private bool ValidaEmail(string email)
         {
             Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
-            return rx.IsMatch(Email);
+            return rx.IsMatch(email);
         }
 
-        private bool ValidaPassword(string Password)
+        private bool ValidaPassword(string password)
         {
-            return Password.Length >= 8;
+            return password.Length >= 8;
         }
 
-        private bool ValidaNumTelemovel(int NumTelemovel)
+        private bool ValidaNumTelemovel(int numTelemovel)
         {
             Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
-            return rx.IsMatch(NumTelemovel.ToString());
+            return rx.IsMatch(numTelemovel.ToString());
         }
 
 
-        public async Task<bool> CriarConta(string Nome, string Email, string Password, int NumTelemovel)
+        public async Task<bool> CriarConta(string nome, string email, string password, int numTelemovel)
         {
             bool sucesso = false;
-            if (string.IsNullOrWhiteSpace(Nome))
+            if (string.IsNullOrWhiteSpace(nome))
             {
                 throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
             }
-            if (string.IsNullOrWhiteSpace(Email))
+            if (string.IsNullOrWhiteSpace(email))
             {
                 throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
             }
-            if (string.IsNullOrWhiteSpace(Password))
+            if (string.IsNullOrWhiteSpace(password))
             {
                 throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
             }
 
-            if (ValidaEmail(Email) && ValidaPassword(Password) && ValidaNumTelemovel(NumTelemovel)) //&&
-                //!clienteDAO.ExisteEmail(Email) && !clienteDAO.ExisteNumTelemovel(NumTelemovel))
+            if (ValidaEmail(email) && ValidaPassword(password) && ValidaNumTelemovel(numTelemovel) &&
+                !clienteDAO.ExisteEmail(email) && !clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
                 sucesso = true;
                 string codigoValidacao = GerarCodigo();
@@ -114,8 +114,8 @@ namespace API.Business
                 emailGerarCodigo.AdcionaCodigo(codigoValidacao);
 
                 EmailSenderService emailSender = new EmailSenderService();
-                await emailSender.SendEmail(Email, emailGerarCodigo);
-                await emailSender.SendEmail(Email, emailBoasVindas);
+                await emailSender.SendEmail(email, emailGerarCodigo);
+                await emailSender.SendEmail(email, emailBoasVindas);
             }
             return sucesso;
         }
@@ -129,6 +129,15 @@ namespace API.Business
         
         public Cliente Login(string email, string password)
         {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
+            }
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
+            }
+
             var cliente = clienteDAO.GetClienteEmail(email);
 
             // return null if user not found
