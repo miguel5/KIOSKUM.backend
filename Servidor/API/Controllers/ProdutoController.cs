@@ -1,51 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using API.Entities;
+using API.Business;
+using API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
-
+    [Authorize]
     [ApiController]
     [Route("api/produto")]
     public class ProdutoController : ControllerBase
     {
-        private List<Produto> produtos;
-        private readonly ILogger<ProdutoController> _logger;
+        private IProdutoService _produtoService;
 
-        public ProdutoController(ILogger<ProdutoController> logger)
+        public ProdutoController(IProdutoService produtoService)
         {
-            _logger = logger;
-            produtos = new List<Produto>();
-            Produto p;
-            for (int i = 0; i < 5; i++)
+            _produtoService = produtoService;
+        }
+
+
+        [HttpPost("add")]
+        public IActionResult AddProduto([FromBody] AddProdutoModel model)
+        {
+            if (model is null)
             {
-                p = new Produto();
-                p.IdProduto = i;
-                p.Nome = "Massa com Atum";
-                p.Categoria = "Prato";
-                p.Preco = 4.25;
-                p.Ingredientes = new List<string> { "Massa", "Atum" };
-                p.Alergenios = new List<string> { "Glúten" };
-                produtos.Add(p);
+                return BadRequest(nameof(model));
             }
+            try
+            {
+                bool res = _produtoService.AddProduto(model.Nome, model.NomeCategoria, model.Preco, model.Ingredientes, model.Alergenios);
+                if (res == false)
+                {
+                    return BadRequest(new { message = "Dados Inseridos inválidos" });
+                }
+                return Ok("Adicionou");
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+
         }
 
-
-        [HttpGet]
-        [Route("todos")]
-        public IList<Produto> Get()
-        {
-            return produtos;
-        
-        }
-
-
-        [HttpPost]
-        public void AdicionaProduto(string Nome, string Categoria, double Preco)
-        {
-           
-        }
     }
 }
