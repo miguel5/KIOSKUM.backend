@@ -13,7 +13,6 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace API.Business
 {
@@ -126,7 +125,7 @@ namespace API.Business
             throw new NotImplementedException();
         }
 
-        
+
         public Cliente Login(string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -165,8 +164,16 @@ namespace API.Business
 
         public Cliente EditarEmail(string token, string novoEmail)
         {
-            var cliente = clienteDAO.GetClienteToken(token);
-            if(cliente == null)
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException("Token", "Parametro não pode ser nulo");
+            }
+            if (string.IsNullOrWhiteSpace(novoEmail))
+            {
+                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
+            }
+            Cliente cliente = clienteDAO.GetClienteToken(token);
+            if (cliente == null && !ValidaEmail(novoEmail))
             {
                 return null;
             }
@@ -178,33 +185,62 @@ namespace API.Business
 
         public Cliente EditarNome(string token, string novoNome)
         {
-            var cliente = clienteDAO.GetClienteToken(token);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException("Token", "Parametro não pode ser nulo");
+            }
+            if (string.IsNullOrWhiteSpace(novoNome))
+            {
+                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+            }
+
+            Cliente cliente = clienteDAO.GetClienteToken(token);
+
             if (cliente == null)
             {
                 return null;
             }
+
             cliente.Nome = novoNome;
-            clienteDAO.EditarNumTelemovel(cliente);
+
+            clienteDAO.EditarNome(cliente);
+
             return cliente;
         }
 
 
         public Cliente EditarPassword(string token, string novaPassword)
         {
-            var cliente = clienteDAO.GetClienteToken(token);
-            if (cliente == null)
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException("Token", "Parametro não pode ser nulo");
+            }
+            if (string.IsNullOrWhiteSpace(novaPassword))
+            {
+                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
+            }
+
+            Cliente cliente = clienteDAO.GetClienteToken(token);
+
+            if (cliente == null && !ValidaPassword(novaPassword))
             {
                 return null;
             }
             cliente.Password = HashPassword(novaPassword);
-            clienteDAO.EditarNumTelemovel(cliente);
+            clienteDAO.EditarPassword(cliente);
             return cliente;
         }
 
         public Cliente EditarNumTelemovel(string token, int numTelemovel)
         {
-            var cliente = clienteDAO.GetClienteToken(token);
-            if (cliente == null)
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentNullException("Token", "Parametro não pode ser nulo");
+            }
+
+            Cliente cliente = clienteDAO.GetClienteToken(token);
+
+            if (cliente == null && !ValidaNumTelemovel(numTelemovel))
             {
                 return null;
             }
