@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
 using API.Business;
 using API.Entities;
 using API.Models;
+using API.ModelViews;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +23,18 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("autenticacao")]
+        [HttpPost("criar-cliente")]
+        public async Task<IActionResult> CriarConta([FromBody] ContaClienteModel model)
+        {
+            bool res = await _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
+            if(res == false){
+                return BadRequest(new { message = "Dados Inseridos inválidos" });
+            }
+            return Ok("Adicionou");
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login")]
         public IActionResult Login([FromBody] AutenticacaoModel model)
         {
             var cliente = _clienteService.Login(model.Email, model.Password);
@@ -29,17 +42,8 @@ namespace API.Controllers
             if (cliente == null)
                 return BadRequest(new { message = "Email ou Password incorretos" });
 
-            return Ok(cliente);
+            ClienteModelView clienteModelView = new ClienteModelView { Nome = cliente.Nome, Email = cliente.Email, NumTelemovel = cliente.NumTelemovel, Token = cliente.Token }; 
+            return Ok(clienteModelView);
         }
-
-        /*
-        [HttpPost]
-        public async Task<IActionResult> AdicionaCliente(string Nome, string Email, string Password, int NumTelemovel)
-        {
-             await gestorDadosCliente.CriarConta(Nome, Email, Password, NumTelemovel);
-             return Ok("Adicionou");
-        }
-
-        */
     }
 }

@@ -24,11 +24,7 @@ namespace API.Controllers
                 p = new Produto();
                 p.IdProduto = i;
                 p.Nome = "Massa com Atum";
-                p.Categoria = new Categoria
-                {
-                    IdCategoria = 1,
-                    Nome = "Prato"
-                };
+                p.Categoria = "Prato";
                 p.Preco = 4.25;
                 p.Ingredientes = new List<string> { "Massa", "Atum" };
                 p.Alergenios = new List<string> { "Glúten" };
