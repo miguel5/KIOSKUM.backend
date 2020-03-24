@@ -39,9 +39,21 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
+        internal void EditarNome(Cliente cliente)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void EditarPassword(Cliente cliente)
+        {
+            throw new NotImplementedException();
+        }
+
         internal void EditarNumTelemovel(Cliente cliente)
         {
             throw new NotImplementedException();
         }
+
+        
     }
 }
