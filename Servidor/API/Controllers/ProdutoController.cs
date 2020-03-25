@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using API.Business;
 using API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace API.Controllers
 {
@@ -19,7 +21,7 @@ namespace API.Controllers
         }
 
 
-        /*[HttpPost("add")]
+        [HttpPost("add")]
         public IActionResult AddProduto([FromBody] AddProdutoModel model)
         {
             if (model is null)
@@ -40,6 +42,22 @@ namespace API.Controllers
                 return BadRequest(new { message = e.Message });
             }
 
+        }
+
+
+
+
+        /*[AllowAnonymous]
+        [HttpPost("upload/imagem")]
+        public IActionResult UploadImagem()
+        {
+            if (HttpContext.Request.Form.Files != null)
+            {
+                var files = HttpContext.Request.Form.Files;
+
+                if(file)
+            }
+            return Ok("");
         }*/
 
     }
