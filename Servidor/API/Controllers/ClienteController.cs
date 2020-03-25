@@ -83,7 +83,7 @@ namespace API.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost("editar/email")]
+        [HttpPost("editar")]
         public IActionResult EditarDados([FromBody] ClienteDTO model)
         {
             if (model is null)
