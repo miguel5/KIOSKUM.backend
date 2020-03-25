@@ -93,7 +93,8 @@ namespace API.Controllers
 
             try
             {
-                string token; 
+                string accessToken = Request.Headers["Authorization"];
+                string token =  accessToken.Split(' ')[1]; 
                 Cliente cliente = _clienteService.EditarDados(token, model.Nome, model.Email, model.Password, model.NumTelemovel);
 
                 if (cliente == null)

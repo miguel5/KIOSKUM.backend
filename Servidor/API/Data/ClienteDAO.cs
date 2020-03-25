@@ -34,5 +34,9 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
+        internal Cliente GetClienteToken(string token)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

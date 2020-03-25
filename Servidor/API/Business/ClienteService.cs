@@ -30,6 +30,7 @@ namespace API.Business
         private readonly AppSettings _appSettings;
         private ClienteDAO clienteDAO;
 
+
         public ClienteService(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
@@ -140,7 +141,7 @@ namespace API.Business
             var cliente = clienteDAO.GetClienteEmail(email);
 
             // return null if user not found
-            if (cliente == null || !cliente.Password.Equals(HashPassword(password)))
+            if (cliente == null && cliente.Password.Equals(HashPassword(password)) == false)
                 return null;
 
             // authentication successful so generate jwt token
@@ -157,7 +158,7 @@ namespace API.Business
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             cliente.Token = tokenHandler.WriteToken(token);
-
+            Console.WriteLine(cliente.Token.ToString());
             return cliente;
         }
 
