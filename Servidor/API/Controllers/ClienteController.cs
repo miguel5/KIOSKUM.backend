@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using API.Business;
-using API.Models;
-using API.ModelViews;
 using API.Entities;
+using API.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -16,15 +17,24 @@ namespace API.Controllers
     public class ClienteController : ControllerBase
     {
         private IClienteService _clienteService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ClienteController(IClienteService clienteService)
+        public ClienteController(IHttpContextAccessor httpContextAccessor,IClienteService clienteService)
         {
+            _httpContextAccessor = httpContextAccessor;
             _clienteService = clienteService;
         }
 
+        public bool IsUserLoggedIn()
+        {
+            var context = _httpContextAccessor.HttpContext;
+            return context.User.Identities.Any(x => x.IsAuthenticated);
+        }
+
+
         [AllowAnonymous]
         [HttpPost("criar")]
-        public async Task<IActionResult> CriarConta([FromBody] ContaClienteModel model)
+        public async Task<IActionResult> CriarConta([FromBody] ClienteDTO model)
         {
             if (model is null)
             {
@@ -48,7 +58,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public IActionResult Login([FromBody] AutenticacaoModel model)
+        public IActionResult Login([FromBody] AutenticacaoDTO model)
         {
             if (model is null)
             {
@@ -57,13 +67,13 @@ namespace API.Controllers
 
             try
             {
-                Cliente cliente = _clienteService.Login(null, model.Password);
+                Cliente cliente = _clienteService.Login(model.Email, model.Password);
 
                 if (cliente == null)
                     return BadRequest(new { message = "Email ou Password incorretos" });
 
-                ClienteModelView clienteModelView = new ClienteModelView { Nome = cliente.Nome, Email = cliente.Email, NumTelemovel = cliente.NumTelemovel, Token = cliente.Token };
-                return Ok(clienteModelView);
+                ClienteDTO clienteDTO = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
+                return Ok(clienteDTO);
             }
             catch (ArgumentNullException e)
             {
@@ -74,7 +84,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("editar/email")]
-        public IActionResult EditarEmail([FromBody] EditarEmailModel model)
+        public IActionResult EditarDados([FromBody] ClienteDTO model)
         {
             if (model is null)
             {
@@ -83,91 +93,13 @@ namespace API.Controllers
 
             try
             {
-                Cliente cliente = _clienteService.EditarEmail(model.Token, model.Email);
+                string token; 
+                Cliente cliente = _clienteService.EditarDados(token, model.Nome, model.Email, model.Password, model.NumTelemovel);
 
                 if (cliente == null)
                     return BadRequest("Dados Inseridos inválidos");
 
-                ClienteModelView clienteModelView = new ClienteModelView { Nome = cliente.Nome, Email = cliente.Email, NumTelemovel = cliente.NumTelemovel, Token = cliente.Token };
-                return Ok(clienteModelView);
-
-            }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-        }
-
-
-
-        [HttpPost("editar/nome")]
-        public IActionResult EditarNome([FromBody] EditarNomeModel model)
-        {
-            if (model is null)
-            {
-                return BadRequest(nameof(model));
-            }
-
-            try
-            {
-                Cliente cliente = _clienteService.EditarNome(model.Token, model.Nome);
-
-                if (cliente == null)
-                    return BadRequest("Dados Inseridos inválidos");
-
-                ClienteModelView clienteModelView = new ClienteModelView { Nome = cliente.Nome, Email = cliente.Email, NumTelemovel = cliente.NumTelemovel, Token = cliente.Token };
-                return Ok(clienteModelView);
-
-            }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-        }
-
-
-        [HttpPost("editar/password")]
-        public IActionResult EditarPassword([FromBody] EditarPasswordModel model)
-        {
-            if (model is null)
-            {
-                return BadRequest(nameof(model));
-            }
-
-            try
-            {
-                Cliente cliente = _clienteService.EditarPassword(model.Token, model.Password);
-
-                if (cliente == null)
-                    return BadRequest("Dados Inseridos inválidos");
-
-                ClienteModelView clienteModelView = new ClienteModelView { Nome = cliente.Nome, Email = cliente.Email, NumTelemovel = cliente.NumTelemovel, Token = cliente.Token };
-                return Ok(clienteModelView);
-
-            }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-        }
-
-
-        [HttpPost("editar/numTelemovel")]
-        public IActionResult EditarNumTelemovel([FromBody] EditarNumTelemovelModel model)
-        {
-            if (model is null)
-            {
-                return BadRequest(nameof(model));
-            }
-
-            try
-            {
-                Cliente cliente = _clienteService.EditarNumTelemovel(model.Token, model.NumTelemovel);
-
-                if (cliente == null)
-                    return BadRequest("Dados Inseridos inválidos");
-
-                ClienteModelView clienteModelView = new ClienteModelView { Nome = cliente.Nome, Email = cliente.Email, NumTelemovel = cliente.NumTelemovel, Token = cliente.Token };
+                ClienteDTO clienteModelView = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
                 return Ok(clienteModelView);
 
             }

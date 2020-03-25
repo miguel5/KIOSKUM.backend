@@ -19,7 +19,7 @@ namespace API.Controllers
         }
 
 
-        [HttpPost("add")]
+        /*[HttpPost("add")]
         public IActionResult AddProduto([FromBody] AddProdutoModel model)
         {
             if (model is null)
@@ -40,7 +40,7 @@ namespace API.Controllers
                 return BadRequest(new { message = e.Message });
             }
 
-        }
+        }*/
 
     }
 }

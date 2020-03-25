@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API.Models
+namespace API.ViewModels
 {
-    public class ContaClienteModel
+    public class ClienteDTO
     {
         [Required]
         public string Nome { get; set; }

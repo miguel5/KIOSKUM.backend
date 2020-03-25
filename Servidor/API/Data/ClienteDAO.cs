@@ -24,36 +24,15 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        internal Cliente GetClienteToken(string token)
-        {
-            throw new NotImplementedException();
-        }
-
         internal Cliente GetClienteEmail(string email)
         {
             throw new NotImplementedException();
         }
 
-        internal void EditarEmail(Cliente cliente)
+        internal void EditarDados(Cliente cliente)
         {
             throw new NotImplementedException();
         }
 
-        internal void EditarNome(Cliente cliente)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void EditarPassword(Cliente cliente)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void EditarNumTelemovel(Cliente cliente)
-        {
-            throw new NotImplementedException();
-        }
-
-        
     }
 }
