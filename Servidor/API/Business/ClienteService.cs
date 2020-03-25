@@ -158,7 +158,6 @@ namespace API.Business
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             cliente.Token = tokenHandler.WriteToken(token);
-            Console.WriteLine(cliente.Token.ToString());
             return cliente;
         }
 

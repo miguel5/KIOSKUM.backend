@@ -4,7 +4,6 @@ using API.Business;
 using API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 
 namespace API.Controllers
 {
@@ -45,20 +44,30 @@ namespace API.Controllers
         }
 
 
-
-
-        /*[AllowAnonymous]
+        [AllowAnonymous]
         [HttpPost("upload/imagem")]
         public IActionResult UploadImagem()
         {
-            if (HttpContext.Request.Form.Files != null)
+            var files = HttpContext.Request.Form.Files;
+            if (files != null)
             {
-                var files = HttpContext.Request.Form.Files;
-
-                if(file)
+                bool sucesso;
+                if(files[0].Length > 0)
+                {
+                    sucesso = _produtoService.UploadImagem(files[0]);
+                    if (sucesso)
+                    {
+                        return Ok("Adicionado");
+                    }
+                    else
+                    {
+                        return BadRequest("Extensão não é compatível");
+                    }
+                }
+                
             }
-            return Ok("");
-        }*/
+            return BadRequest("Ficheiro Inválido");
+        }
 
     }
 }
