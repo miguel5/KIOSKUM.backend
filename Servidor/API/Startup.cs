@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Hosting;
 using API.Business;
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace API
 {
@@ -53,6 +54,8 @@ namespace API
             });
 
             // configure DI for application services
+            services.AddMvc();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IProdutoService, ProdutoService>();
         }
