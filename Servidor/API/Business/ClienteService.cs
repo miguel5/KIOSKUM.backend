@@ -28,13 +28,15 @@ namespace API.Business
     public class ClienteService : IClienteService
     {
         private readonly AppSettings _appSettings;
+        Cliente c;
         private ClienteDAO clienteDAO;
-
 
         public ClienteService(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
             clienteDAO = new ClienteDAO();
+            c = new Cliente { IdCliente = 1, Nome = "Lázaro", Email = "lazaro.pinhairo1998@gmail.com", NumTelemovel = 913136226 };
+            c.Password = HashPassword("1234567890");
         }
 
 
@@ -91,12 +93,12 @@ namespace API.Business
                 throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
             }
 
-            if (ValidaEmail(email) && ValidaPassword(password) && ValidaNumTelemovel(numTelemovel) &&
-                !clienteDAO.ExisteEmail(email) && !clienteDAO.ExisteNumTelemovel(numTelemovel))
+            if (ValidaEmail(email) && ValidaPassword(password) && ValidaNumTelemovel(numTelemovel)) //&&
+                //!clienteDAO.ExisteEmail(email) && !clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
                 string codigoValidacao = GerarCodigo();
                 Cliente cliente = new Cliente { Nome = nome, Email = email, Password = password, NumTelemovel = numTelemovel };
-                clienteDAO.InserirCliente(cliente, codigoValidacao);
+                //clienteDAO.InserirCliente(cliente, codigoValidacao);
 
                 //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
                 string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
@@ -138,10 +140,15 @@ namespace API.Business
                 throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
             }
 
-            var cliente = clienteDAO.GetClienteEmail(email);
+            var cliente = c;//clienteDAO.GetClienteEmail(email);
+
+            if (!c.Email.Equals(email))
+            {
+                return null;
+            }
 
             // return null if user not found
-            if (cliente == null && cliente.Password.Equals(HashPassword(password)) == false)
+            if (cliente == null || cliente.Password.Equals(HashPassword(password)) == false)
                 return null;
 
             // authentication successful so generate jwt token
@@ -158,6 +165,7 @@ namespace API.Business
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             cliente.Token = tokenHandler.WriteToken(token);
+            //clienteDAO.EditarDados(cliente);
             return cliente;
         }
 
@@ -177,16 +185,20 @@ namespace API.Business
                 throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
             }
 
-            Cliente cliente = clienteDAO.GetClienteToken(token);
-            if (cliente == null && !ValidaEmail(novoEmail) && !ValidaPassword(novaPassword) && !ValidaNumTelemovel(numTelemovel))
-                return null;
+            Cliente cliente = c;//clienteDAO.GetClienteToken(token);
+            if (cliente != null && ValidaEmail(novoEmail) && ValidaPassword(novaPassword) && ValidaNumTelemovel(numTelemovel))
+            {
+                cliente.Nome = novoNome;
+                cliente.Email = novoEmail;
+                cliente.Password = HashPassword(novaPassword);
+                cliente.NumTelemovel = numTelemovel;
 
-            cliente.Nome = novoNome;
-            cliente.Email = novoEmail;
-            cliente.Password = HashPassword(novaPassword);
-            cliente.NumTelemovel = numTelemovel;
-
-            clienteDAO.EditarDados(cliente);
+                //clienteDAO.EditarDados(cliente);
+            }
+            else
+            {
+                cliente = null;
+            }
             return cliente;
         }
     }

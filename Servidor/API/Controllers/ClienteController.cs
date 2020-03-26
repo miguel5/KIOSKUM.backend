@@ -73,6 +73,7 @@ namespace API.Controllers
                     return BadRequest(new { message = "Email ou Password incorretos" });
 
                 ClienteDTO clienteDTO = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
+                
                 return Ok(clienteDTO);
             }
             catch (ArgumentNullException e)
@@ -82,7 +83,6 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
         [HttpPost("editar")]
         public IActionResult EditarDados([FromBody] ClienteDTO model)
         {
@@ -94,7 +94,8 @@ namespace API.Controllers
             try
             {
                 string accessToken = Request.Headers["Authorization"];
-                string token =  accessToken.Split(' ')[1]; 
+                string token =  accessToken.Split(' ')[1];
+                Console.WriteLine(token);
                 Cliente cliente = _clienteService.EditarDados(token, model.Nome, model.Email, model.Password, model.NumTelemovel);
 
                 if (cliente == null)
