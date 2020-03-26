@@ -15,8 +15,5 @@ namespace API.ViewModels
 
         [Required]
         public int NumTelemovel { get; set; }
-
-        [Required]
-        public string Token { get; set; }
     }
 }

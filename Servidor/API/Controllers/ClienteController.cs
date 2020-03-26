@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Business;
 using API.Entities;
@@ -11,24 +12,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Cliente")]
     [ApiController]
     [Route("api/cliente")]
     public class ClienteController : ControllerBase
     {
         private IClienteService _clienteService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ClienteController(IHttpContextAccessor httpContextAccessor,IClienteService clienteService)
+        public ClienteController(IClienteService clienteService)
         {
-            _httpContextAccessor = httpContextAccessor;
             _clienteService = clienteService;
-        }
-
-        public bool IsUserLoggedIn()
-        {
-            var context = _httpContextAccessor.HttpContext;
-            return context.User.Identities.Any(x => x.IsAuthenticated);
         }
 
 
@@ -48,7 +41,7 @@ namespace API.Controllers
                 {
                     return BadRequest(new { message = "Dados Inseridos inválidos" });
                 }
-                return Ok("Adicionou");
+                return Ok("Sucesso");
             }
             catch (ArgumentNullException e)
             {
@@ -61,19 +54,17 @@ namespace API.Controllers
         public IActionResult Login([FromBody] AutenticacaoDTO model)
         {
             if (model is null)
-            {
                 return BadRequest(nameof(model));
-            }
 
             try
             {
                 Cliente cliente = _clienteService.Login(model.Email, model.Password);
 
                 if (cliente == null)
-                    return BadRequest(new { message = "Email ou Password incorretos" });
-
-                ClienteDTO clienteDTO = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
-                return Ok(clienteDTO);
+                {
+                    return Unauthorized(new { message = "Email ou Password incorretos" });
+                }
+                return Ok(new TokenDTO { Token =    cliente.Token });
             }
             catch (ArgumentNullException e)
             {
@@ -81,8 +72,6 @@ namespace API.Controllers
             }
         }
 
-
-        [AllowAnonymous]
         [HttpPost("editar")]
         public IActionResult EditarDados([FromBody] ClienteDTO model)
         {
@@ -93,15 +82,17 @@ namespace API.Controllers
 
             try
             {
-                string accessToken = Request.Headers["Authorization"];
-                string token =  accessToken.Split(' ')[1]; 
-                Cliente cliente = _clienteService.EditarDados(token, model.Nome, model.Email, model.Password, model.NumTelemovel);
+                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                if(nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
+                {
+                    bool sucesso = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
 
-                if (cliente == null)
-                    return BadRequest("Dados Inseridos inválidos");
-
-                ClienteDTO clienteModelView = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
-                return Ok(clienteModelView);
+                    if (sucesso)
+                    {
+                        return Ok("Sucesso");
+                    }
+                }
+                return BadRequest("Dados Inseridos inválidos");
 
             }
             catch (ArgumentNullException e)

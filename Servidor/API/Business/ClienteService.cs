@@ -21,7 +21,7 @@ namespace API.Business
         Task<bool> CriarConta(string nome, string email, string password, int numTelemovel);
         bool ValidaCodigoValidacao(string email, string codigo);
         Cliente Login(string Email, string Password);
-        Cliente EditarDados(string token, string novoNome, string novoEmail, string novaPassword, int numTelemovels);
+        bool EditarDados(int token, string novoNome, string novoEmail, string novaPassword, int numTelemovels);
     }
 
 
@@ -29,7 +29,6 @@ namespace API.Business
     {
         private readonly AppSettings _appSettings;
         private ClienteDAO clienteDAO;
-
 
         public ClienteService(IOptions<AppSettings> appSettings)
         {
@@ -57,42 +56,49 @@ namespace API.Business
         }
 
 
+        private bool ValidaNome(string nome)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+            }
+            return nome.Length <= 45;
+        }
+
+
         private bool ValidaEmail(string email)
         {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
+            }
             Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
-            return rx.IsMatch(email);
+            
+            return rx.IsMatch(email) && email.Length <= 45 && clienteDAO.ExisteEmail(email);
         }
 
         private bool ValidaPassword(string password)
         {
-            return password.Length >= 8;
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
+            }
+             
+            return password.Length >= 8 && password.Length <= 45;
         }
 
         private bool ValidaNumTelemovel(int numTelemovel)
         {
             Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
-            return rx.IsMatch(numTelemovel.ToString());
+
+            return rx.IsMatch(numTelemovel.ToString()) && clienteDAO.ExisteNumTelemovel(numTelemovel);
         }
 
 
         public async Task<bool> CriarConta(string nome, string email, string password, int numTelemovel)
         {
             bool sucesso = false;
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
-            }
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
-            }
-
-            if (ValidaEmail(email) && ValidaPassword(password) && ValidaNumTelemovel(numTelemovel) &&
-                !clienteDAO.ExisteEmail(email) && !clienteDAO.ExisteNumTelemovel(numTelemovel))
+            if (ValidaNome(nome) && ValidaEmail(email) && ValidaPassword(password) && ValidaNumTelemovel(numTelemovel))
             {
                 string codigoValidacao = GerarCodigo();
                 Cliente cliente = new Cliente { Nome = nome, Email = email, Password = password, NumTelemovel = numTelemovel };
@@ -138,10 +144,11 @@ namespace API.Business
                 throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
             }
 
-            var cliente = clienteDAO.GetClienteEmail(email);
+            Cliente cliente = clienteDAO.GetClienteEmail(email);
 
-            // return null if user not found
-            if (cliente == null && cliente.Password.Equals(HashPassword(password)) == false)
+            
+             // return null if user not found
+            if (cliente == null || cliente.Password.Equals(HashPassword(password)) == false)
                 return null;
 
             // authentication successful so generate jwt token
@@ -151,7 +158,8 @@ namespace API.Business
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Email, cliente.IdCliente.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, cliente.IdCliente.ToString()),
+                    new Claim(ClaimTypes.Role, "Cliente")
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -162,32 +170,22 @@ namespace API.Business
         }
 
 
-        public Cliente EditarDados(string token, string novoNome, string novoEmail, string novaPassword, int numTelemovel)
+        public bool EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel)
         {
-            if (string.IsNullOrWhiteSpace(novoEmail))
+            bool sucesso = false;
+            Cliente cliente = clienteDAO.GetClienteId(idCliente);
+            if (cliente != null && ValidaNome(novoNome) && ValidaEmail(novoEmail) && ValidaPassword(novaPassword) && ValidaNumTelemovel(numTelemovel))
             {
-                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
-            }
-            if (string.IsNullOrWhiteSpace(novoNome))
-            {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
-            if (string.IsNullOrWhiteSpace(novaPassword))
-            {
-                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
-            }
+                cliente.Nome = novoNome;
+                cliente.Email = novoEmail;
+                cliente.Password = HashPassword(novaPassword);
+                cliente.NumTelemovel = numTelemovel;
 
-            Cliente cliente = clienteDAO.GetClienteToken(token);
-            if (cliente == null && !ValidaEmail(novoEmail) && !ValidaPassword(novaPassword) && !ValidaNumTelemovel(numTelemovel))
-                return null;
-
-            cliente.Nome = novoNome;
-            cliente.Email = novoEmail;
-            cliente.Password = HashPassword(novaPassword);
-            cliente.NumTelemovel = numTelemovel;
-
-            clienteDAO.EditarDados(cliente);
-            return cliente;
+                clienteDAO.EditarDados(cliente);
+                sucesso = true;
+            }
+            return sucesso;
         }
+
     }
 }
