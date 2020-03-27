@@ -15,6 +15,7 @@ namespace API.Business
         public bool UploadImagem(IFormFile file);
     }
 
+
     public class ProdutoService : IProdutoService
     {
         private ProdutoDAO produtoDAO;
@@ -57,7 +58,7 @@ namespace API.Business
             {
                 int idCategoria = categoriaDAO.GetIdCategoria(nomeCategoria);
                 Produto produto = new Produto { Nome = nome, IdCategoria = idCategoria, Preco = preco, Ingredientes = ingredientes, Alergenios = alergenios };
-                ProdutoDAO.AddProduto(produto);
+                produtoDAO.AddProduto(produto);
                 sucesso = true;
             }
             return sucesso;

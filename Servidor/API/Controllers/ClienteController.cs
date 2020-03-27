@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Business;
 using API.Entities;
 using API.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -36,16 +34,18 @@ namespace API.Controllers
 
             try
             {
-                bool res = await _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
-                if (res == false)
-                {
-                    return BadRequest(new { message = "Dados Inseridos inválidos" });
-                }
+                Tuple<Email, Email> emails = _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
+                EmailSenderService emailSender = new EmailSenderService();
+                await emailSender.SendEmail(model.Email, emails.Item1);
+                await emailSender.SendEmail(model.Email, emails.Item2);
                 return Ok("Sucesso");
-            }
-            catch (ArgumentNullException e)
+            } catch (ArgumentNullException e)
             {
-                return BadRequest(new { message = e.Message });
+                return BadRequest(e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                return Conflict(e.Message);
             }
         }
 
@@ -64,11 +64,15 @@ namespace API.Controllers
                 {
                     return Unauthorized(new { message = "Email ou Password incorretos" });
                 }
-                return Ok(new TokenDTO { Token =    cliente.Token });
+                return Ok(new TokenDTO { Token = cliente.Token });
             }
             catch (ArgumentNullException e)
             {
                 return BadRequest(new { message = e.Message });
+            }
+            catch (ArgumentException e)
+            {
+                return NotFound(e.Message);
             }
         }
 
@@ -83,7 +87,7 @@ namespace API.Controllers
             try
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                if(nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
+                if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
                 {
                     bool sucesso = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
 
@@ -99,6 +103,32 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            catch (ArgumentException e)
+            {
+                return Conflict(new { message = e.Message });
+            }
+        }
+
+
+        [HttpGet("get")]
+        public IActionResult GetCliente()
+        {
+            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
+            {
+                Cliente cliente = _clienteService.GetCliente(idCliente);
+                if (cliente != null)
+                {
+                    ClienteDTO clienteDTO = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
+                    return Ok(clienteDTO);
+                }
+            }
+            return NotFound("ClienteNotFound");
+
         }
     }
 }

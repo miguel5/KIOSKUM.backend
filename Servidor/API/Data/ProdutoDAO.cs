@@ -12,7 +12,7 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        internal static void AddProduto(object produto)
+        internal void AddProduto(object produto)
         {
             throw new NotImplementedException();
         }
