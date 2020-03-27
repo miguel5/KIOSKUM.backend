@@ -29,12 +29,12 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        internal void EditarDados(Cliente cliente)
+        internal Cliente GetClienteId(int idCliente)
         {
             throw new NotImplementedException();
         }
 
-        internal Cliente GetClienteId(int idCliente)
+        internal void EditarDados(Cliente cliente)
         {
             throw new NotImplementedException();
         }

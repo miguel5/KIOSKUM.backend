@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace API.Models
+namespace API.ViewModels
 {
-    public class AddProdutoModel
+    public class ProdutoDTO
     {
         [Required]
         public string Nome { get; set; }

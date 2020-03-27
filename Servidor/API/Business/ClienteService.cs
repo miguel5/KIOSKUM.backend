@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using API.Data;
 using System.Text.RegularExpressions;
 using API.Entities;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
@@ -12,23 +11,24 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using API.Data;
 
 namespace API.Business
 {
     public interface IClienteService
     {
-        Task<bool> CriarConta(string nome, string email, string password, int numTelemovel);
+        Tuple<Email, Email> CriarConta(string nome, string email, string password, int numTelemovel);
         bool ValidaCodigoValidacao(string email, string codigo);
         Cliente Login(string Email, string Password);
         bool EditarDados(int token, string novoNome, string novoEmail, string novaPassword, int numTelemovels);
+        Cliente GetCliente(int idCliente);
     }
 
 
     public class ClienteService : IClienteService
     {
         private readonly AppSettings _appSettings;
-        private ClienteDAO clienteDAO;
+        private readonly ClienteDAO clienteDAO;
 
         public ClienteService(IOptions<AppSettings> appSettings)
         {
@@ -58,73 +58,92 @@ namespace API.Business
 
         private bool ValidaNome(string nome)
         {
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
             return nome.Length <= 45;
         }
 
-
         private bool ValidaEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
-            }
             Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
-            
-            return rx.IsMatch(email) && email.Length <= 45 && clienteDAO.ExisteEmail(email);
+            return rx.IsMatch(email) && email.Length <= 45;
         }
 
         private bool ValidaPassword(string password)
         {
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
-            }
-             
             return password.Length >= 8 && password.Length <= 45;
         }
 
         private bool ValidaNumTelemovel(int numTelemovel)
         {
             Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
-
-            return rx.IsMatch(numTelemovel.ToString()) && clienteDAO.ExisteNumTelemovel(numTelemovel);
+            return rx.IsMatch(numTelemovel.ToString());
         }
 
 
-        public async Task<bool> CriarConta(string nome, string email, string password, int numTelemovel)
+
+        public Tuple<Email,Email> CriarConta(string nome, string email, string password, int numTelemovel)
         {
-            bool sucesso = false;
-            if (ValidaNome(nome) && ValidaEmail(email) && ValidaPassword(password) && ValidaNumTelemovel(numTelemovel))
+            if (string.IsNullOrWhiteSpace(nome))
             {
-                string codigoValidacao = GerarCodigo();
-                Cliente cliente = new Cliente { Nome = nome, Email = email, Password = password, NumTelemovel = numTelemovel };
-                clienteDAO.InserirCliente(cliente, codigoValidacao);
-
-                //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
-                string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
-                StreamReader sr = new StreamReader(pathEmailBoasVindas);
-                string json = sr.ReadToEnd();
-                Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
-
-                //string pathEmailgerarCodigo = "D:\\home\\site\\wwwroot\\Files\\EmailGerarCodigo.json";
-                string pathEmailgerarCodigo = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailGerarCodigo.json";
-                sr = new StreamReader(pathEmailgerarCodigo);
-                json = sr.ReadToEnd();
-                Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
-                emailGerarCodigo.AdcionaCodigo(codigoValidacao);
-
-                EmailSenderService emailSender = new EmailSenderService();
-                await emailSender.SendEmail(email, emailGerarCodigo);
-                await emailSender.SendEmail(email, emailBoasVindas);
-
-                sucesso = true;
+                throw new ArgumentNullException("Nome", "FieldNull");
             }
-            return sucesso;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentNullException("Email", "FieldNull");
+            }
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentNullException("Password","FieldNull");
+            }
+
+            if (clienteDAO.ExisteEmail(email))
+            {
+                throw new ArgumentException("EmailRepetido", "Email");
+            }
+
+            if (clienteDAO.ExisteNumTelemovel(numTelemovel))
+            {
+                throw new ArgumentException("TelemovelRepetido", "NumTelemovel");
+            }
+            if (!ValidaNome(nome))
+            {
+                throw new ArgumentOutOfRangeException("Nome", "NomeInvalido");
+            }
+            if (!ValidaEmail(email))
+            {
+                throw new ArgumentOutOfRangeException("Email", "EmailInvalido");
+            }
+            if (!ValidaPassword(password))
+            {
+                throw new ArgumentOutOfRangeException("Password", "PasswordInvalido");
+            }
+            if (!ValidaNumTelemovel(numTelemovel))
+            {
+                throw new ArgumentOutOfRangeException("NumTelemovel", "NumTelemovelInvalido");
+            }
+
+            string codigoValidacao = GerarCodigo();
+            Cliente cliente = new Cliente { Nome = nome, Email = email, Password = password, NumTelemovel = numTelemovel };
+            clienteDAO.InserirCliente(cliente, codigoValidacao);
+
+            //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
+            string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
+            StreamReader sr = new StreamReader(pathEmailBoasVindas);
+            string json = sr.ReadToEnd();
+            Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
+
+            //string pathEmailgerarCodigo = "D:\\home\\site\\wwwroot\\Files\\EmailGerarCodigo.json";
+            string pathEmailgerarCodigo = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailGerarCodigo.json";
+            sr = new StreamReader(pathEmailgerarCodigo);
+            json = sr.ReadToEnd();
+            Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
+            emailGerarCodigo.AdcionaCodigo(codigoValidacao);
+
+            Tuple<Email,Email > emails = new Tuple<Email, Email>(emailBoasVindas, emailGerarCodigo);
+            return emails;
         }
+
+
+
 
 
         public bool ValidaCodigoValidacao(string email, string codigo)
@@ -133,23 +152,32 @@ namespace API.Business
         }
 
 
+
+
+
         public Cliente Login(string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
-                throw new ArgumentNullException("Email", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Email", "FieldNull");
             }
             if (string.IsNullOrWhiteSpace(password))
             {
-                throw new ArgumentNullException("Password", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Password", "FieldNull");
+            }
+            if (!clienteDAO.ExisteEmail(email))
+            {
+                throw new ArgumentException("EmailNotFound", "Email");
             }
 
             Cliente cliente = clienteDAO.GetClienteEmail(email);
-
             
              // return null if user not found
             if (cliente == null || cliente.Password.Equals(HashPassword(password)) == false)
+            {
                 return null;
+            }
+               
 
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -172,9 +200,48 @@ namespace API.Business
 
         public bool EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel)
         {
+            if (string.IsNullOrWhiteSpace(novoNome))
+            {
+                throw new ArgumentNullException("Nome", "FieldNull");
+            }
+            if (string.IsNullOrWhiteSpace(novoEmail))
+            {
+                throw new ArgumentNullException("Email", "FieldNull");
+            }
+            if (string.IsNullOrWhiteSpace(novaPassword))
+            {
+                throw new ArgumentNullException("Password", "FieldNull");
+            }
+
+            if (clienteDAO.ExisteEmail(novoEmail))
+            {
+                throw new ArgumentException("EmailRepetido", "Email");
+            }
+
+            if (clienteDAO.ExisteNumTelemovel(numTelemovel))
+            {
+                throw new ArgumentException("TelemovelRepetido", "NumTelemovel");
+            }
+            if (!ValidaNome(novoNome))
+            {
+                throw new ArgumentOutOfRangeException("Nome", "NomeInvalido");
+            }
+            if (!ValidaEmail(novoEmail))
+            {
+                throw new ArgumentOutOfRangeException("Email", "EmailInvalido");
+            }
+            if (!ValidaPassword(novaPassword))
+            {
+                throw new ArgumentOutOfRangeException("Password", "PasswordInvalido");
+            }
+            if (!ValidaNumTelemovel(numTelemovel))
+            {
+                throw new ArgumentOutOfRangeException("NumTelemovel", "NumTelemovelInvalido");
+            }
+
             bool sucesso = false;
             Cliente cliente = clienteDAO.GetClienteId(idCliente);
-            if (cliente != null && ValidaNome(novoNome) && ValidaEmail(novoEmail) && ValidaPassword(novaPassword) && ValidaNumTelemovel(numTelemovel))
+            if (cliente != null)
             {
                 cliente.Nome = novoNome;
                 cliente.Email = novoEmail;
@@ -185,6 +252,12 @@ namespace API.Business
                 sucesso = true;
             }
             return sucesso;
+        }
+
+
+        public Cliente GetCliente(int idCliente)
+        {
+            return clienteDAO.GetClienteId(idCliente);
         }
 
     }
