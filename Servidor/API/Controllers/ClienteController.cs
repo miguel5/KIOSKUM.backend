@@ -38,8 +38,12 @@ namespace API.Controllers
                 EmailSenderService emailSender = new EmailSenderService();
                 await emailSender.SendEmail(model.Email, emails.Item1);
                 await emailSender.SendEmail(model.Email, emails.Item2);
-                return Ok("Sucesso");
+                return Ok("Success");
             } catch (ArgumentNullException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch(ArgumentOutOfRangeException e)
             {
                 return BadRequest(e.Message);
             }
@@ -62,7 +66,7 @@ namespace API.Controllers
 
                 if (cliente == null)
                 {
-                    return Unauthorized(new { message = "Email ou Password incorretos" });
+                    return Unauthorized(new { message = "LoginFailed" });
                 }
                 return Ok(new TokenDTO { Token = cliente.Token });
             }
@@ -93,10 +97,10 @@ namespace API.Controllers
 
                     if (sucesso)
                     {
-                        return Ok("Sucesso");
+                        return Ok("Success");
                     }
                 }
-                return BadRequest("Dados Inseridos inválidos");
+                return Unauthorized("InvalidToken");
 
             }
             catch (ArgumentNullException e)
