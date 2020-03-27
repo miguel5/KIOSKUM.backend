@@ -355,4 +355,4 @@ MigrationBackup/
 .DS_Store
 
 # VS project generated objects
-Servidor/API/obj/
+Servidor/API/obj/*
