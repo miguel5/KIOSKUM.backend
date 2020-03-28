@@ -38,5 +38,20 @@ namespace API.Data
         {
             throw new NotImplementedException();
         }
+
+        internal object GetCodigoValidacao(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool ContaValida(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ValidarConta(string email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
