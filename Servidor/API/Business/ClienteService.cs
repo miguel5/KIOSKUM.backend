@@ -1,25 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using System.Text.RegularExpressions;
-using API.Entities;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using API.Helpers;
-using Microsoft.Extensions.Options;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using API.Data;
+using API.Entities;
+using API.Helpers;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace API.Business
 {
     public interface IClienteService
     {
-        Tuple<Email, Email> CriarConta(string nome, string email, string password, int numTelemovel);
+        Task CriarConta(string nome, string email, string password, int numTelemovel);
         bool ValidarConta(string email, string codigo);
-        Cliente Login(string Email, string Password);
+        string Login(string Email, string Password);
         bool EditarDados(int token, string novoNome, string novoEmail, string novaPassword, int numTelemovels);
         Cliente GetCliente(int idCliente);
     }
@@ -27,13 +30,19 @@ namespace API.Business
 
     public class ClienteService : IClienteService
     {
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly AppSettings _appSettings;
-        private readonly ClienteDAO clienteDAO;
+        private readonly ClienteDAO _clienteDAO;
+        Cliente c;
 
-        public ClienteService(IOptions<AppSettings> appSettings)
+        public ClienteService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment)
         {
+            _webHostEnvironment = webHostEnviroment;
             _appSettings = appSettings.Value;
-            clienteDAO = new ClienteDAO();
+            _clienteDAO = new ClienteDAO();
+            c = new Cliente { Nome = "Lázaro", Email = "lazaro.pinheiro1998@gmail.com", NumTelemovel = 913136226 };
+            c.Password = HashPassword("0123456789");
+            
         }
 
 
@@ -58,13 +67,13 @@ namespace API.Business
 
         private bool ValidaNome(string nome)
         {
-            return nome.Length <= 45;
+            return nome.Length <= 100;
         }
 
         private bool ValidaEmail(string email)
         {
             Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
-            return rx.IsMatch(email) && email.Length <= 45;
+            return rx.IsMatch(email) && email.Length <= 100;
         }
 
         private bool ValidaPassword(string password)
@@ -80,7 +89,7 @@ namespace API.Business
 
 
 
-        public Tuple<Email,Email> CriarConta(string nome, string email, string password, int numTelemovel)
+        public async Task CriarConta(string nome, string email, string password, int numTelemovel)
         {
             if (string.IsNullOrWhiteSpace(nome))
             {
@@ -94,13 +103,12 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Password","FieldNull");
             }
-
-            if (clienteDAO.ExisteEmail(email))
+            if (_clienteDAO.ExisteEmail(email))
             {
                 throw new ArgumentException("EmailRepetido", "Email");
             }
 
-            if (clienteDAO.ExisteNumTelemovel(numTelemovel))
+            if (_clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
                 throw new ArgumentException("TelemovelRepetido", "NumTelemovel");
             }
@@ -123,23 +131,24 @@ namespace API.Business
 
             string codigoValidacao = GerarCodigo();
             Cliente cliente = new Cliente { Nome = nome, Email = email, Password = password, NumTelemovel = numTelemovel };
-            clienteDAO.InserirCliente(cliente, codigoValidacao);
+            //clienteDAO.InserirCliente(cliente, codigoValidacao);
 
             //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
-            string pathEmailBoasVindas = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailBoasVindas.json";
+            string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
             StreamReader sr = new StreamReader(pathEmailBoasVindas);
             string json = sr.ReadToEnd();
             Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
 
             //string pathEmailgerarCodigo = "D:\\home\\site\\wwwroot\\Files\\EmailGerarCodigo.json";
-            string pathEmailgerarCodigo = "/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/Files/EmailGerarCodigo.json";
+            string pathEmailgerarCodigo = Path.Combine(_webHostEnvironment.ContentRootPath, "Files","EmailGerarCodigo.json");
             sr = new StreamReader(pathEmailgerarCodigo);
             json = sr.ReadToEnd();
             Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
             emailGerarCodigo.AdcionaCodigo(codigoValidacao);
 
-            Tuple<Email,Email > emails = new Tuple<Email, Email>(emailBoasVindas, emailGerarCodigo);
-            return emails;
+            EmailSenderService emailSender = new EmailSenderService(_appSettings.EmailSettings);
+            await emailSender.SendEmail(email, emailGerarCodigo);
+            await emailSender.SendEmail(email, emailBoasVindas);
         }
 
 
@@ -156,15 +165,15 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Codigo", "FieldNull");
             }
-            if (!clienteDAO.ExisteEmail(email))
+            if (!_clienteDAO.ExisteEmail(email))
             {
                 throw new ArgumentException("EmailNotFound", "Email");
             }
 
-            bool sucesso = clienteDAO.ContaValida(email).Equals(codigo);
+            bool sucesso = _clienteDAO.ContaValida(email).Equals(codigo);
             if (sucesso)
             {
-                clienteDAO.ValidarConta(email);
+                _clienteDAO.ValidarConta(email);
             }
             return sucesso;
         }
@@ -173,7 +182,7 @@ namespace API.Business
 
 
 
-        public Cliente Login(string email, string password)
+        public string Login(string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -183,17 +192,18 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Password", "FieldNull");
             }
-            if (!clienteDAO.ExisteEmail(email))
+            /*if (!_clienteDAO.ExisteEmail(email))
             {
                 throw new ArgumentException("EmailNotFound", "Email");
             }
-            if (!clienteDAO.ContaValida(email))
+            if (!_clienteDAO.ContaValida(email))
             {
                 throw new ArgumentException("UnverifiedAccount", "Email");
-            }
+            }*/
 
-            Cliente cliente = clienteDAO.GetClienteEmail(email);
-            if (cliente != null && cliente.Password.Equals(HashPassword(password)))
+            string resulToken = null;
+            Cliente cliente = c;//_clienteDAO.GetClienteEmail(email);
+            if (cliente != null && cliente.Password.Equals(HashPassword(password)) && cliente.Email.Equals(email))
             {
                 // authentication successful so generate jwt token
                 var tokenHandler = new JwtSecurityTokenHandler();
@@ -209,9 +219,9 @@ namespace API.Business
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
-                cliente.Token = tokenHandler.WriteToken(token);
+                resulToken = tokenHandler.WriteToken(token);
             }
-            return cliente;
+            return resulToken;
         }
 
 
@@ -230,12 +240,12 @@ namespace API.Business
                 throw new ArgumentNullException("Password", "FieldNull");
             }
 
-            if (clienteDAO.ExisteEmail(novoEmail))
+            if (_clienteDAO.ExisteEmail(novoEmail))
             {
                 throw new ArgumentException("EmailRepetido", "Email");
             }
 
-            if (clienteDAO.ExisteNumTelemovel(numTelemovel))
+            if (_clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
                 throw new ArgumentException("TelemovelRepetido", "NumTelemovel");
             }
@@ -257,7 +267,7 @@ namespace API.Business
             }
 
             bool sucesso = false;
-            Cliente cliente = clienteDAO.GetClienteId(idCliente);
+            Cliente cliente = _clienteDAO.GetClienteId(idCliente);
             if (cliente != null)
             {
                 cliente.Nome = novoNome;
@@ -265,7 +275,7 @@ namespace API.Business
                 cliente.Password = HashPassword(novaPassword);
                 cliente.NumTelemovel = numTelemovel;
 
-                clienteDAO.EditarDados(cliente);
+                _clienteDAO.EditarConta(cliente);
                 sucesso = true;
             }
             return sucesso;
@@ -274,7 +284,7 @@ namespace API.Business
 
         public Cliente GetCliente(int idCliente)
         {
-            return clienteDAO.GetClienteId(idCliente);
+            return _clienteDAO.GetClienteId(idCliente);
         }
 
     }
