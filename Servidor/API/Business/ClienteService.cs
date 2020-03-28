@@ -18,7 +18,7 @@ namespace API.Business
     public interface IClienteService
     {
         Tuple<Email, Email> CriarConta(string nome, string email, string password, int numTelemovel);
-        bool ValidaCodigoValidacao(string email, string codigo);
+        bool ValidarConta(string email, string codigo);
         Cliente Login(string Email, string Password);
         bool EditarDados(int token, string novoNome, string novoEmail, string novaPassword, int numTelemovels);
         Cliente GetCliente(int idCliente);
@@ -146,9 +146,27 @@ namespace API.Business
 
 
 
-        public bool ValidaCodigoValidacao(string email, string codigo)
+        public bool ValidarConta(string email, string codigo)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentNullException("Email", "FieldNull");
+            }
+            if (string.IsNullOrWhiteSpace(codigo))
+            {
+                throw new ArgumentNullException("Codigo", "FieldNull");
+            }
+            if (!clienteDAO.ExisteEmail(email))
+            {
+                throw new ArgumentException("EmailNotFound", "Email");
+            }
+
+            bool sucesso = clienteDAO.ContaValida(email).Equals(codigo);
+            if (sucesso)
+            {
+                clienteDAO.ValidarConta(email);
+            }
+            return sucesso;
         }
 
 
@@ -169,31 +187,30 @@ namespace API.Business
             {
                 throw new ArgumentException("EmailNotFound", "Email");
             }
+            if (!clienteDAO.ContaValida(email))
+            {
+                throw new ArgumentException("UnverifiedAccount", "Email");
+            }
 
             Cliente cliente = clienteDAO.GetClienteEmail(email);
-            
-             // return null if user not found
-            if (cliente == null || cliente.Password.Equals(HashPassword(password)) == false)
+            if (cliente != null && cliente.Password.Equals(HashPassword(password)))
             {
-                return null;
-            }
-               
-
-            // authentication successful so generate jwt token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
+                // authentication successful so generate jwt token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
                     new Claim(ClaimTypes.NameIdentifier, cliente.IdCliente.ToString()),
                     new Claim(ClaimTypes.Role, "Cliente")
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            cliente.Token = tokenHandler.WriteToken(token);
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                cliente.Token = tokenHandler.WriteToken(token);
+            }
             return cliente;
         }
 

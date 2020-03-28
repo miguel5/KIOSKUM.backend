@@ -53,6 +53,17 @@ namespace API.Controllers
             }
         }
 
+
+
+        [AllowAnonymous]
+        [HttpPost("validar")]
+        public async IActionResult ValidarConta([FromBody] ClienteDTO model)
+        {
+            
+        }
+
+
+
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] AutenticacaoDTO model)
