@@ -34,10 +34,7 @@ namespace API.Controllers
 
             try
             {
-                Tuple<Email, Email> emails = _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
-                EmailSenderService emailSender = new EmailSenderService();
-                await emailSender.SendEmail(model.Email, emails.Item1);
-                await emailSender.SendEmail(model.Email, emails.Item2);
+                await _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
                 return Ok("Success");
             } catch (ArgumentNullException e)
             {
@@ -57,9 +54,29 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("validar")]
-        public async IActionResult ValidarConta([FromBody] ClienteDTO model)
+        public IActionResult ValidarConta([FromBody] ValidarClienteDTO model)
         {
-            
+            if(model is null)
+                return BadRequest(nameof(model));
+
+            try
+            {
+                bool sucesso = _clienteService.ValidarConta(model.Email, model.Codigo);
+
+                if (sucesso)
+                {
+                    return Ok("Success");
+                }
+                return BadRequest("InvalidCode");
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            catch (ArgumentException e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
 
@@ -73,13 +90,13 @@ namespace API.Controllers
 
             try
             {
-                Cliente cliente = _clienteService.Login(model.Email, model.Password);
+                string token = _clienteService.Login(model.Email, model.Password);
 
-                if (cliente == null)
+                if (token == null)
                 {
                     return Unauthorized(new { message = "LoginFailed" });
                 }
-                return Ok(new TokenDTO { Token = cliente.Token });
+                return Ok(new TokenDTO { Token = token});
             }
             catch (ArgumentNullException e)
             {

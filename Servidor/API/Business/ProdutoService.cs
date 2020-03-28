@@ -46,14 +46,7 @@ namespace API.Business
             {
                 throw new ArgumentNullException("NomeCategoria", "Parametro não pode ser nulo");
             }
-            if (ingredientes is null)
-            {
-                throw new ArgumentNullException("Ingredientes", "Parametro não pode ser nulo");
-            }
-            if (alergenios is null)
-            {
-                throw new ArgumentNullException("Alergenios", "Parametro não pode ser nulo");
-            }
+            
             if (validaPreco(preco) && !produtoDAO.ExisteNome(nome))
             {
                 int idCategoria = categoriaDAO.GetIdCategoria(nomeCategoria);

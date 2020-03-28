@@ -1,6 +1,10 @@
-﻿using System.Net.Mail;
+﻿using System;
+using System.Net.Mail;
+using System.Text;
 using System.Threading.Tasks;
 using API.Entities;
+using API.Helpers;
+using Microsoft.Extensions.Options;
 
 namespace API.Business
 {
@@ -11,20 +15,18 @@ namespace API.Business
 
     public class EmailSenderService : IEmailSenderService
     {
-        private readonly string myEmail = "espeta_espeta@portugalmail.pt";
-        private readonly string myPassword = "meteantonio";
-        private readonly string serverAdressSMTP = "smtp.portugalmail.pt";
-        private readonly int port = 587;
         private readonly SmtpClient smtp;
+        private readonly EmailSettings _emailSettings;
 
-        public EmailSenderService()
+        public EmailSenderService(EmailSettings emailSettings)
         {
+            _emailSettings = emailSettings;
             smtp = new SmtpClient
             {
-                Host = serverAdressSMTP, //Or Your SMTP Server Address
+                Host = _emailSettings.ServerAdressSMTP, //Or Your SMTP Server Address
                 Credentials = new System.Net.NetworkCredential
-                 (myEmail, myPassword), // ***use valid credentials***
-                Port = port,
+                 (_emailSettings.MyEmail, _emailSettings.MyPassword), // ***use valid credentials***
+                Port = _emailSettings.Port,
                 EnableSsl = false
             };
         }
@@ -35,11 +37,10 @@ namespace API.Business
         {
             MailMessage mail = new MailMessage();
             mail.To.Add(email);
-            mail.From = new MailAddress(myEmail);
+            mail.From = new MailAddress(_emailSettings.MyEmail);
             mail.Subject = mensagem.Assunto;
             mail.Body = mensagem.Conteudo;
             mail.IsBodyHtml = true;
-            
             await smtp.SendMailAsync(mail);
         }
         

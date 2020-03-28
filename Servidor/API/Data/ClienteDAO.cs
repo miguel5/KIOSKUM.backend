@@ -34,12 +34,12 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        internal void EditarDados(Cliente cliente)
+        internal void EditarConta(Cliente cliente)
         {
             throw new NotImplementedException();
         }
 
-        internal object GetCodigoValidacao(string email)
+        internal string GetCodigoValidacao(string email)
         {
             throw new NotImplementedException();
         }
