@@ -33,12 +33,16 @@ namespace API.Business
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly AppSettings _appSettings;
         private readonly ClienteDAO _clienteDAO;
+        Cliente c;
 
         public ClienteService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment)
         {
             _webHostEnvironment = webHostEnviroment;
             _appSettings = appSettings.Value;
             _clienteDAO = new ClienteDAO();
+            c = new Cliente { Nome = "Lázaro", Email = "lazaro.pinheiro1998@gmail.com", NumTelemovel = 913136226 };
+            c.Password = HashPassword("0123456789");
+            
         }
 
 
@@ -188,18 +192,18 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Password", "FieldNull");
             }
-            if (!_clienteDAO.ExisteEmail(email))
+            /*if (!_clienteDAO.ExisteEmail(email))
             {
                 throw new ArgumentException("EmailNotFound", "Email");
             }
             if (!_clienteDAO.ContaValida(email))
             {
                 throw new ArgumentException("UnverifiedAccount", "Email");
-            }
+            }*/
 
             string resulToken = null;
-            Cliente cliente = _clienteDAO.GetClienteEmail(email);
-            if (cliente != null && cliente.Password.Equals(HashPassword(password)))
+            Cliente cliente = c;//_clienteDAO.GetClienteEmail(email);
+            if (cliente != null && cliente.Password.Equals(HashPassword(password)) && cliente.Email.Equals(email))
             {
                 // authentication successful so generate jwt token
                 var tokenHandler = new JwtSecurityTokenHandler();
