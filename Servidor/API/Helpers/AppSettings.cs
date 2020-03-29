@@ -5,6 +5,10 @@
     {
         public string Secret { get; set; }
 
-        public EmailSettings EmailSettings { get; set; } 
+        public EmailSettings EmailSettings { get; set; }
+
+        public DBSettings DBSettings { get; set; }
+
+        public int NumTentativasCodigoValidacao { get; set; }
     }
 }
