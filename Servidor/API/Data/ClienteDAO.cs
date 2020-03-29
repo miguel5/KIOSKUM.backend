@@ -36,7 +36,6 @@ namespace API.Data
             MySqlCommand cmd;
             if (_dbConnection.OpenConnection())
             {
-                Console.WriteLine(cliente.Nome + "\n" + codigoValidacao);
                 cmd = new MySqlCommand();
                 cmd.Connection = _dbConnection.Connection;
 
