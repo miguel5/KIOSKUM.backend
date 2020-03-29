@@ -1,5 +1,4 @@
-﻿using System;
-using API.Helpers;
+﻿using API.Helpers;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -15,9 +14,8 @@ namespace API.Data
 
     public class DBConnection : IDBConnection
     {
-        private readonly DBSettings _dbSettings;
         public MySqlConnection Connection { get; private set; }
-
+        private DBSettings _dbSettings;
 
         public DBConnection(IOptions<AppSettings> appSettings)
         {
@@ -32,11 +30,13 @@ namespace API.Data
                 Server = _dbSettings.Server,
                 Database = _dbSettings.Database,
                 UserID = _dbSettings.UserID,
-                Password = _dbSettings.UserID,
-                SslMode = MySqlSslMode.Required
+                Password = _dbSettings.Password,
+                SslMode = MySqlSslMode.Required,
             };
+
             Connection = new MySqlConnection(builder.ConnectionString);
         }
+
 
         public bool OpenConnection()
         {
@@ -47,6 +47,7 @@ namespace API.Data
             }
             catch (MySqlException)
             {
+
                 return false;
             }
         }
@@ -60,6 +61,7 @@ namespace API.Data
             }
             catch (MySqlException)
             {
+
                 return false;
             }
         }

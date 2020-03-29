@@ -35,7 +35,6 @@ namespace API.Business
             _webHostEnvironment = webHostEnviroment;
             _appSettings = appSettings.Value;
             _clienteDAO = clienteDAO;
-            
         }
 
 
