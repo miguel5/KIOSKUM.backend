@@ -1,5 +1,6 @@
 using System.Text;
 using API.Business;
+using API.Data;
 using API.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -53,6 +54,9 @@ namespace API
 
             // configure DI for application services
             services.AddScoped<IClienteService, ClienteService>();
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddScoped<IClienteDAO, ClienteDAO>();
+            services.AddScoped<IDBConnection, DBConnection>();
             services.AddScoped<IProdutoService, ProdutoService>();
         }
 

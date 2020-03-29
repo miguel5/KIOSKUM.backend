@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Mail;
-using System.Text;
+﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using API.Entities;
 using API.Helpers;
@@ -18,9 +16,9 @@ namespace API.Business
         private readonly SmtpClient smtp;
         private readonly EmailSettings _emailSettings;
 
-        public EmailSenderService(EmailSettings emailSettings)
+        public EmailSenderService(IOptions<AppSettings> appSettings)
         {
-            _emailSettings = emailSettings;
+            _emailSettings = appSettings.Value.EmailSettings;
             smtp = new SmtpClient
             {
                 Host = _emailSettings.ServerAdressSMTP, //Or Your SMTP Server Address

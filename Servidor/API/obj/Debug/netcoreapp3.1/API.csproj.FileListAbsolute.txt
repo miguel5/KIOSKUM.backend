@@ -44,3 +44,13 @@
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Microsoft.IdentityModel.Tokens.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/System.IdentityModel.Tokens.Jwt.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/BouncyCastle.Crypto.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Google.Protobuf.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/MySql.Data.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Ubiety.Dns.Core.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Renci.SshNet.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/SshNet.Security.Cryptography.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/System.Configuration.ConfigurationManager.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/System.Security.Cryptography.ProtectedData.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/System.Xml.XPath.XmlDocument.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll

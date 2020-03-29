@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Business;
@@ -16,10 +18,12 @@ namespace API.Controllers
     public class ClienteController : ControllerBase
     {
         private IClienteService _clienteService;
+        private IEmailSenderService _emailSenderService;
 
-        public ClienteController(IClienteService clienteService)
+        public ClienteController(IClienteService clienteService,IEmailSenderService emailSenderService)
         {
             _clienteService = clienteService;
+            _emailSenderService = emailSenderService;
         }
 
 
@@ -34,19 +38,19 @@ namespace API.Controllers
 
             try
             {
-                await _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
-                return Ok("Success");
+                IList<Erro> erros = _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
+                if (erros.Any())
+                {
+                    return BadRequest(erros);
+                }
+                Tuple<Email, Email> emails = _clienteService.GetEmails(model.Email);
+                await _emailSenderService.SendEmail(model.Email, emails.Item1);
+                await _emailSenderService.SendEmail(model.Email, emails.Item2);
+                return Ok();
+
             } catch (ArgumentNullException e)
             {
                 return BadRequest(e.Message);
-            }
-            catch(ArgumentOutOfRangeException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (ArgumentException e)
-            {
-                return Conflict(e.Message);
             }
         }
 
@@ -61,21 +65,17 @@ namespace API.Controllers
 
             try
             {
-                bool sucesso = _clienteService.ValidarConta(model.Email, model.Codigo);
+                IList<Erro>  erros = _clienteService.ValidarConta(model.Email, model.Codigo);
 
-                if (sucesso)
+                if (erros.Any())
                 {
-                    return Ok("Success");
+                    return BadRequest(erros);
                 }
-                return BadRequest("InvalidCode");
+                return Ok();
             }
             catch (ArgumentNullException e)
             {
                 return BadRequest(new { message = e.Message });
-            }
-            catch (ArgumentException e)
-            {
-                return NotFound(e.Message);
             }
         }
 
@@ -90,21 +90,17 @@ namespace API.Controllers
 
             try
             {
-                string token = _clienteService.Login(model.Email, model.Password);
+                Tuple<IList<Erro>, string> resultado = _clienteService.Login(model.Email, model.Password);
 
-                if (token == null)
+                if (resultado.Item1.Any())
                 {
-                    return Unauthorized(new { message = "LoginFailed" });
+                    return BadRequest(resultado);
                 }
-                return Ok(new TokenDTO { Token = token});
+                return Ok(resultado.Item2);
             }
             catch (ArgumentNullException e)
             {
                 return BadRequest(new { message = e.Message });
-            }
-            catch (ArgumentException e)
-            {
-                return NotFound(e.Message);
             }
         }
 
@@ -121,27 +117,20 @@ namespace API.Controllers
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
                 {
-                    bool sucesso = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
+                    IList<Erro> erros = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
 
-                    if (sucesso)
+                    if (erros.Any())
                     {
-                        return Ok("Success");
+                        return BadRequest(erros);
                     }
+                    return Ok();
                 }
-                return Unauthorized("InvalidToken");
+                return BadRequest(new Erro { Codigo = 13, Mensagem = "O token é inválido." });
 
             }
             catch (ArgumentNullException e)
             {
                 return BadRequest(new { message = e.Message });
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-            catch (ArgumentException e)
-            {
-                return Conflict(new { message = e.Message });
             }
         }
 
@@ -159,8 +148,7 @@ namespace API.Controllers
                     return Ok(clienteDTO);
                 }
             }
-            return NotFound("ClienteNotFound");
-
+            return BadRequest(new Erro { Codigo = 13, Mensagem = "O token é inválido." });
         }
     }
 }

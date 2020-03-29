@@ -1,29 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using API.Helpers;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace API.Business
 {
     public interface IClienteService
     {
-        Task CriarConta(string nome, string email, string password, int numTelemovel);
-        bool ValidarConta(string email, string codigo);
-        string Login(string Email, string Password);
-        bool EditarDados(int token, string novoNome, string novoEmail, string novaPassword, int numTelemovels);
+        IList<Erro> CriarConta(string nome, string email, string password, int numTelemovel);
+        Tuple<Email, Email> GetEmails(string email);
+        IList<Erro> ValidarConta(string email, string codigo);
+        Tuple<IList<Erro>, string> Login(string email, string password);
+        IList<Erro> EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel);
         Cliente GetCliente(int idCliente);
     }
 
@@ -32,16 +28,13 @@ namespace API.Business
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly AppSettings _appSettings;
-        private readonly ClienteDAO _clienteDAO;
-        Cliente c;
+        private readonly IClienteDAO _clienteDAO;
 
-        public ClienteService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment)
+        public ClienteService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IClienteDAO clienteDAO)
         {
             _webHostEnvironment = webHostEnviroment;
             _appSettings = appSettings.Value;
-            _clienteDAO = new ClienteDAO();
-            c = new Cliente { Nome = "Lázaro", Email = "lazaro.pinheiro1998@gmail.com", NumTelemovel = 913136226 };
-            c.Password = HashPassword("0123456789");
+            _clienteDAO = clienteDAO;
             
         }
 
@@ -89,100 +82,120 @@ namespace API.Business
 
 
 
-        public async Task CriarConta(string nome, string email, string password, int numTelemovel)
+        public IList<Erro> CriarConta(string nome, string email, string password, int numTelemovel)
         {
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                throw new ArgumentNullException("Nome", "FieldNull");
-            }
             if (string.IsNullOrWhiteSpace(email))
             {
-                throw new ArgumentNullException("Email", "FieldNull");
+                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
             }
             if (string.IsNullOrWhiteSpace(password))
             {
-                throw new ArgumentNullException("Password","FieldNull");
-            }
-            if (_clienteDAO.ExisteEmail(email))
-            {
-                throw new ArgumentException("EmailRepetido", "Email");
+                throw new ArgumentNullException("Password","Campo não poder ser nulo.");
             }
 
+            IList<Erro> erros = new List<Erro>();
+
+            /*if (_clienteDAO.ExisteEmail(email))
+            {
+                erros.Add(new Erro{Codigo = 1, Mensagem = "O email inserido já existe." });
+
+            }
             if (_clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
-                throw new ArgumentException("TelemovelRepetido", "NumTelemovel");
-            }
+                erros.Add(new Erro { Codigo = 2, Mensagem = "O número de telemóvel inserido já existe." });
+            }*/
             if (!ValidaNome(nome))
             {
-                throw new ArgumentOutOfRangeException("Nome", "NomeInvalido");
+                erros.Add(new Erro { Codigo = 3, Mensagem = "O nome inserido ultrapassa o limite de caractéres." });
             }
             if (!ValidaEmail(email))
             {
-                throw new ArgumentOutOfRangeException("Email", "EmailInvalido");
+                erros.Add(new Erro { Codigo = 4, Mensagem = "O formato do email inserido é inválido." });
             }
             if (!ValidaPassword(password))
             {
-                throw new ArgumentOutOfRangeException("Password", "PasswordInvalido");
+                erros.Add(new Erro { Codigo = 5, Mensagem = "A password deve ter entre 8 e 45 caractéres." });
             }
             if (!ValidaNumTelemovel(numTelemovel))
             {
-                throw new ArgumentOutOfRangeException("NumTelemovel", "NumTelemovelInvalido");
+                erros.Add(new Erro { Codigo = 6, Mensagem = "O número de telemóvel inserido é inválido." });
             }
 
-            string codigoValidacao = GerarCodigo();
-            Cliente cliente = new Cliente { Nome = nome, Email = email, Password = password, NumTelemovel = numTelemovel };
-            //clienteDAO.InserirCliente(cliente, codigoValidacao);
+            if (!erros.Any()) { 
+                string codigoValidacao = GerarCodigo();
+                Cliente cliente = new Cliente { Nome = nome, Email = email, NumTelemovel = numTelemovel };
+                cliente.Password = HashPassword(password);
+                _clienteDAO.InserirCliente(cliente, codigoValidacao);
+            }
+            return erros;
+        }
 
-            //string pathEmailBoasVindas = "D:\\home\\site\\wwwroot\\Files\\EmailBoasVindas.json";
+
+        public Tuple<Email, Email> GetEmails(string email)
+        {
+            string codigoValidacao = "";//_clienteDAO.GetCodigoValidacao(email);
+
             string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
             StreamReader sr = new StreamReader(pathEmailBoasVindas);
             string json = sr.ReadToEnd();
             Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
 
-            //string pathEmailgerarCodigo = "D:\\home\\site\\wwwroot\\Files\\EmailGerarCodigo.json";
-            string pathEmailgerarCodigo = Path.Combine(_webHostEnvironment.ContentRootPath, "Files","EmailGerarCodigo.json");
+            string pathEmailgerarCodigo = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailGerarCodigo.json");
             sr = new StreamReader(pathEmailgerarCodigo);
             json = sr.ReadToEnd();
             Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
             emailGerarCodigo.AdcionaCodigo(codigoValidacao);
 
-            EmailSenderService emailSender = new EmailSenderService(_appSettings.EmailSettings);
-            await emailSender.SendEmail(email, emailGerarCodigo);
-            await emailSender.SendEmail(email, emailBoasVindas);
+            return new Tuple<Email, Email>(emailBoasVindas, emailGerarCodigo);
         }
 
-
-
-
-
-        public bool ValidarConta(string email, string codigo)
+       public IList<Erro> ValidarConta(string email, string codigo)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
-                throw new ArgumentNullException("Email", "FieldNull");
+                throw new ArgumentNullException("Email", "Campo não poder ser nulo!");
             }
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                throw new ArgumentNullException("Codigo", "FieldNull");
-            }
-            if (!_clienteDAO.ExisteEmail(email))
-            {
-                throw new ArgumentException("EmailNotFound", "Email");
+                throw new ArgumentNullException("Codigo", "Campo não poder ser nulo!");
             }
 
-            bool sucesso = _clienteDAO.ContaValida(email).Equals(codigo);
-            if (sucesso)
+            IList<Erro> erros = new List<Erro>();
+
+            /*if (!_clienteDAO.ExisteEmail(email))
+            {
+                erros.Add(new Erro { Codigo = 7, Mensagem = "O Email inserido não existe!" });
+            }
+            if (_clienteDAO.ContaValida(email)) 
+            {
+                erros.Add(new Erro { Codigo = 11, Mensagem = "A conta já se encontra validada." });
+            }
+            if (!_clienteDAO.GetCodigoValidacao(email).Equals(codigo))
+            {
+                int numTentativas = _clienteDAO.GetNumTentativas(email)+1;
+                int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
+                if (numTentativas <= numMaximoTentativas)
+                {
+                    erros.Add(new Erro { Codigo = 8, Mensagem = "Codigo de Validação invlálido .Tem mais " + (numMaximoTentativas-numTentativas) + "tentativas." });
+                    _clienteDAO.IncrementaNumTentativas(email);
+                }
+                else
+                {
+                    erros.Add(new Erro { Codigo = 9, Mensagem = "Numero de tentativas excedido. A sua conta foi removida." });
+                    _clienteDAO.RemoverContaInvalida(email);
+                }
+            }
+
+            if (!erros.Any())
             {
                 _clienteDAO.ValidarConta(email);
-            }
-            return sucesso;
+            }*/
+            return erros;
         }
 
 
 
-
-
-        public string Login(string email, string password)
+        public Tuple<IList<Erro>,string> Login(string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -192,40 +205,47 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Password", "FieldNull");
             }
-            /*if (!_clienteDAO.ExisteEmail(email))
+
+            IList<Erro> erros = new List<Erro>();
+
+            /*if (!_clienteDAO.ContaValida(email))
             {
-                throw new ArgumentException("EmailNotFound", "Email");
-            }
-            if (!_clienteDAO.ContaValida(email))
-            {
-                throw new ArgumentException("UnverifiedAccount", "Email");
+                erros.Add(new Erro { Codigo = 10, Mensagem = "A conta ainda não se encontra verificada." });
             }*/
 
-            string resulToken = null;
-            Cliente cliente = c;//_clienteDAO.GetClienteEmail(email);
-            if (cliente != null && cliente.Password.Equals(HashPassword(password)) && cliente.Email.Equals(email))
+            string resultToken = null;
+            if (!erros.Any())
             {
-                // authentication successful so generate jwt token
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                var tokenDescriptor = new SecurityTokenDescriptor
+                /*Cliente cliente = _clienteDAO.GetClienteEmail(email);
+                if (cliente != null && cliente.Password.Equals(HashPassword(password)))
                 {
-                    Subject = new ClaimsIdentity(new Claim[]
+                    // authentication successful so generate jwt token
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                    var tokenDescriptor = new SecurityTokenDescriptor
                     {
+                        Subject = new ClaimsIdentity(new Claim[]
+                        {
                     new Claim(ClaimTypes.NameIdentifier, cliente.IdCliente.ToString()),
                     new Claim(ClaimTypes.Role, "Cliente")
-                    }),
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                resulToken = tokenHandler.WriteToken(token);
+                        }),
+                        Expires = DateTime.UtcNow.AddDays(7),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    };
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
+                    resultToken = tokenHandler.WriteToken(token);
+                }
+                else
+                {
+                    erros.Add(new Erro { Codigo = 12, Mensagem = "Email ou Password Incorreta." });
+                }*/
             }
-            return resulToken;
+            return new Tuple<IList<Erro>,string>( erros,resultToken);
         }
 
 
-        public bool EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel)
+
+        public IList<Erro> EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel)
         {
             if (string.IsNullOrWhiteSpace(novoNome))
             {
@@ -240,51 +260,54 @@ namespace API.Business
                 throw new ArgumentNullException("Password", "FieldNull");
             }
 
-            if (_clienteDAO.ExisteEmail(novoEmail))
+            IList<Erro> erros = new List<Erro>();
+
+            /*if (_clienteDAO.ExisteEmail(novoEmail))
             {
-                throw new ArgumentException("EmailRepetido", "Email");
+                erros.Add(new Erro { Codigo = 1, Mensagem = "O email inserido já existe." });
             }
 
             if (_clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
-                throw new ArgumentException("TelemovelRepetido", "NumTelemovel");
-            }
+                erros.Add(new Erro { Codigo = 2, Mensagem = "O número de telemóvel inserido já existe." });
+            }*/
             if (!ValidaNome(novoNome))
             {
-                throw new ArgumentOutOfRangeException("Nome", "NomeInvalido");
+                erros.Add(new Erro { Codigo = 3, Mensagem = "O nome inserido ultrapassa o limite de caractéres." });
             }
             if (!ValidaEmail(novoEmail))
             {
-                throw new ArgumentOutOfRangeException("Email", "EmailInvalido");
+                erros.Add(new Erro { Codigo = 4, Mensagem = "O formato do email inserido é inválido." });
             }
             if (!ValidaPassword(novaPassword))
             {
-                throw new ArgumentOutOfRangeException("Password", "PasswordInvalido");
+                erros.Add(new Erro { Codigo = 5, Mensagem = "A password deve ter entre 8 e 45 caractéres." });
             }
             if (!ValidaNumTelemovel(numTelemovel))
             {
-                throw new ArgumentOutOfRangeException("NumTelemovel", "NumTelemovelInvalido");
+                erros.Add(new Erro { Codigo = 6, Mensagem = "O número de telemóvel inserido é inválido." });
             }
 
-            bool sucesso = false;
-            Cliente cliente = _clienteDAO.GetClienteId(idCliente);
-            if (cliente != null)
+
+            if (!erros.Any())
             {
+                /*Cliente cliente = _clienteDAO.GetClienteId(idCliente);
+
                 cliente.Nome = novoNome;
                 cliente.Email = novoEmail;
                 cliente.Password = HashPassword(novaPassword);
                 cliente.NumTelemovel = numTelemovel;
 
-                _clienteDAO.EditarConta(cliente);
-                sucesso = true;
+                _clienteDAO.EditarConta(cliente);*/
             }
-            return sucesso;
+            return erros;
         }
 
 
         public Cliente GetCliente(int idCliente)
         {
-            return _clienteDAO.GetClienteId(idCliente);
+            return null;
+            //return _clienteDAO.GetClienteId(idCliente);
         }
 
     }
