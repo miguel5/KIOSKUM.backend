@@ -32,9 +32,7 @@ namespace API.Controllers
         public async Task<IActionResult> CriarConta([FromBody] ClienteDTO model)
         {
             if (model is null)
-            {
                 return BadRequest(nameof(model));
-            }
 
             try
             {
@@ -67,12 +65,7 @@ namespace API.Controllers
             try
             {
                 IList<int> erros = _clienteService.ValidarConta(model.Email, model.Codigo);
-
-                if (erros.Any())
-                {
-                    return BadRequest(erros);
-                }
-                return Ok();
+                return erros.Any() ? BadRequest(erros) : (IActionResult)Ok();
             }
             catch (ArgumentNullException e)
             {
@@ -92,12 +85,7 @@ namespace API.Controllers
             try
             {
                 Tuple<IList<int>, TokenDTO> resultado = _clienteService.Login(model.Email, model.Password);
-
-                if (resultado.Item1.Any())
-                {
-                    return BadRequest(resultado);
-                }
-                return Ok(resultado.Item2);
+                return resultado.Item1.Any() ? BadRequest(resultado) : (IActionResult)Ok(resultado.Item2);
             }
             catch (ArgumentNullException e)
             {
@@ -109,9 +97,7 @@ namespace API.Controllers
         public IActionResult EditarDados([FromBody] ClienteDTO model)
         {
             if (model is null)
-            {
                 return BadRequest(nameof(model));
-            }
 
             try
             {
@@ -119,12 +105,7 @@ namespace API.Controllers
                 if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
                 {
                     IList<int> erros = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
-
-                    if (erros.Any())
-                    {
-                        return BadRequest(erros);
-                    }
-                    return Ok();
+                    return erros.Any() ? BadRequest(erros) : (IActionResult)Ok();
                 }
                 return BadRequest(new ErrosDTO { ListaErros = new List<int> { Erros.TokenInvalido } });
 
@@ -139,7 +120,7 @@ namespace API.Controllers
         [HttpGet("get")]
         public IActionResult GetCliente()
         {
-            string nameIdentifier = null;//HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
             {
                 Cliente cliente = _clienteService.GetCliente(idCliente);
