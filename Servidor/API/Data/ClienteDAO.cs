@@ -13,6 +13,7 @@ namespace API.Data
         string GetCodigoValidacao(string email);
         bool ContaValida(string email);
         void ValidarConta(string email);
+        void EditarConta(Cliente cliente);
     }
 
 
@@ -110,7 +111,6 @@ namespace API.Data
             MySqlCommand cmd;
             if (_connectionDB.OpenConnection())
             {
-                Console.WriteLine(email);
                 cmd = new MySqlCommand();
                 cmd.Connection = _connectionDB.Connection;
 
@@ -131,7 +131,26 @@ namespace API.Data
 
         public bool ContaValida(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                Console.WriteLine(email);
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "conta_valida";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                object val = cmd.ExecuteScalar();
+
+                _connectionDB.CloseConnection();
+
+                return (val != null ? Convert.ToBoolean(val) : false);
+            }
+            return false;
         }
 
         internal int GetNumTentativas(string email)
@@ -151,7 +170,22 @@ namespace API.Data
 
         public void ValidarConta(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "validar_conta";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                cmd.ExecuteNonQuery();
+
+                _connectionDB.CloseConnection();
+            }
         }
 
         internal Cliente GetClienteEmail(string email)
@@ -164,9 +198,33 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        internal void EditarConta(Cliente cliente)
+        public void EditarConta(Cliente cliente)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "editar_dados";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?nome", cliente.Nome);
+                cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
+
+                cmd.Parameters.AddWithValue("?password", cliente.Password);
+                cmd.Parameters["?password"].Direction = ParameterDirection.Input;
+
+                cmd.Parameters.AddWithValue("?email", cliente.Email);
+                cmd.Parameters["?email"].Direction = ParameterDirection.Input;
+
+                cmd.Parameters.AddWithValue("?numTelemovel", cliente.NumTelemovel);
+                cmd.Parameters["?numTelemovel"].Direction = ParameterDirection.Input;
+
+                cmd.ExecuteNonQuery();
+
+                _connectionDB.CloseConnection();
+            }
         }
     }
 }
