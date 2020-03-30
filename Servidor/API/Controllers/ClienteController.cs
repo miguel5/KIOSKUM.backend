@@ -38,10 +38,10 @@ namespace API.Controllers
 
             try
             {
-                IList<Erro> erros = _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
+                IList<int> erros = _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
                 if (erros.Any())
                 {
-                    return BadRequest(erros);
+                    return BadRequest(new ErrosDTO { ListaErros = erros });
                 }
                 Tuple<Email, Email> emails = _clienteService.GetEmails(model.Email);
                 await _emailSenderService.SendEmail(model.Email, emails.Item1);
@@ -66,7 +66,7 @@ namespace API.Controllers
 
             try
             {
-                IList<Erro> erros = _clienteService.ValidarConta(model.Email, model.Codigo);
+                IList<int> erros = _clienteService.ValidarConta(model.Email, model.Codigo);
 
                 if (erros.Any())
                 {
@@ -91,7 +91,7 @@ namespace API.Controllers
 
             try
             {
-                Tuple<IList<Erro>, string> resultado = _clienteService.Login(model.Email, model.Password);
+                Tuple<IList<int>, TokenDTO> resultado = _clienteService.Login(model.Email, model.Password);
 
                 if (resultado.Item1.Any())
                 {
@@ -118,7 +118,7 @@ namespace API.Controllers
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
                 {
-                    IList<Erro> erros = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
+                    IList<int> erros = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
 
                     if (erros.Any())
                     {
@@ -126,7 +126,7 @@ namespace API.Controllers
                     }
                     return Ok();
                 }
-                return BadRequest(new Erro { Codigo = 13, Mensagem = "O token é inválido." });
+                return BadRequest(new ErrosDTO { ListaErros = new List<int> { Erros.TokenInvalido } });
 
             }
             catch (ArgumentNullException e)
@@ -139,7 +139,7 @@ namespace API.Controllers
         [HttpGet("get")]
         public IActionResult GetCliente()
         {
-            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string nameIdentifier = null;//HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
             {
                 Cliente cliente = _clienteService.GetCliente(idCliente);
@@ -149,7 +149,7 @@ namespace API.Controllers
                     return Ok(clienteDTO);
                 }
             }
-            return BadRequest(new Erro { Codigo = 13, Mensagem = "O token é inválido." });
+            return BadRequest(new ErrosDTO { ListaErros = new List<int> { Erros.TokenInvalido } });
         }
     }
 }
