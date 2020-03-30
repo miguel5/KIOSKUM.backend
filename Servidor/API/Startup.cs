@@ -56,8 +56,7 @@ namespace API
             services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
             services.AddScoped<IClienteDAO, ClienteDAO>();
-            services.AddScoped<IDBConnection, DBConnection>();
-            services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddScoped<IConnectionDB, ConnectionDB>();
             services.AddScoped<IProdutoService, ProdutoService>();
         }
 

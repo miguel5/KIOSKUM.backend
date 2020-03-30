@@ -7,37 +7,79 @@ namespace API.Data
 {
     public interface IClienteDAO
     {
+        public bool ExisteEmail(string email);
+        bool ExisteNumTelemovel(int numTelemovel);
         void InserirCliente(Cliente cliente, string codigoValidacao);
+        string GetCodigoValidacao(string email);
+        bool ContaValida(string email);
+        void ValidarConta(string email);
     }
 
 
     public class ClienteDAO : IClienteDAO
     {
-        private readonly IDBConnection _dbConnection;
+        private readonly IConnectionDB _connectionDB;
 
-        public ClienteDAO(IDBConnection dbConnection)
+        public ClienteDAO(IConnectionDB connectionDB)
         {
-            _dbConnection = dbConnection;
+            _connectionDB = connectionDB;
         }
 
 
-        internal bool ExisteEmail(string email)
+        public bool ExisteEmail(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "existe_email";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                object val = cmd.ExecuteScalar();
+                
+                _connectionDB.CloseConnection();
+                
+                return (val != null ? Convert.ToBoolean(val) : false);
+            }
+            return false;
         }
 
-        internal bool ExisteNumTelemovel(int numTelemovel)
+        public bool ExisteNumTelemovel(int numTelemovel)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "existe_telemovel";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?telemovel", numTelemovel);
+                cmd.Parameters["?telemovel"].Direction = ParameterDirection.Input;
+
+                object val = cmd.ExecuteScalar();
+                
+
+                _connectionDB.CloseConnection();
+
+                return (val != null ? Convert.ToBoolean(val) : false);
+            }
+            return false;
         }
 
         public void InserirCliente(Cliente cliente, string codigoValidacao)
         {
             MySqlCommand cmd;
-            if (_dbConnection.OpenConnection())
+            if (_connectionDB.OpenConnection())
             {
                 cmd = new MySqlCommand();
-                cmd.Connection = _dbConnection.Connection;
+                cmd.Connection = _connectionDB.Connection;
 
                 cmd.CommandText = "inserir_cliente";
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -59,16 +101,35 @@ namespace API.Data
 
                 cmd.ExecuteNonQuery();
 
-                _dbConnection.CloseConnection();
+                _connectionDB.CloseConnection();
             }
         }
 
-        internal string GetCodigoValidacao(string email)
+        public string GetCodigoValidacao(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                Console.WriteLine(email);
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "get_codigo_validacao";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                string val = (string)cmd.ExecuteScalar();
+
+                _connectionDB.CloseConnection();
+
+                return val;
+            }
+            return null;
         }
 
-        internal bool ContaValida(string email)
+        public bool ContaValida(string email)
         {
             throw new NotImplementedException();
         }
@@ -88,7 +149,7 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        internal void ValidarConta(string email)
+        public void ValidarConta(string email)
         {
             throw new NotImplementedException();
         }

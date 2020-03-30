@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Text.RegularExpressions;
 using API.Data;
 using API.Entities;
@@ -9,6 +12,7 @@ using API.Helpers;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace API.Business
@@ -94,15 +98,15 @@ namespace API.Business
 
             IList<Erro> erros = new List<Erro>();
 
-            /*if (_clienteDAO.ExisteEmail(email))
+            if (_clienteDAO.ExisteEmail(email))
             {
-                erros.Add(new Erro{Codigo = 1, Mensagem = "O email inserido já existe." });
+               erros.Add(new Erro{Codigo = 1, Mensagem = "O email inserido já existe." });
 
             }
             if (_clienteDAO.ExisteNumTelemovel(numTelemovel))
             {
-                erros.Add(new Erro { Codigo = 2, Mensagem = "O número de telemóvel inserido já existe." });
-            }*/
+               erros.Add(new Erro { Codigo = 2, Mensagem = "O número de telemóvel inserido já existe." });
+            }
             if (!ValidaNome(nome))
             {
                 erros.Add(new Erro { Codigo = 3, Mensagem = "O nome inserido ultrapassa o limite de caractéres." });
@@ -132,7 +136,7 @@ namespace API.Business
 
         public Tuple<Email, Email> GetEmails(string email)
         {
-            string codigoValidacao = "";//_clienteDAO.GetCodigoValidacao(email);
+            string codigoValidacao = _clienteDAO.GetCodigoValidacao(email);
 
             string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
             StreamReader sr = new StreamReader(pathEmailBoasVindas);
@@ -161,7 +165,7 @@ namespace API.Business
 
             IList<Erro> erros = new List<Erro>();
 
-            /*if (!_clienteDAO.ExisteEmail(email))
+            if (!_clienteDAO.ExisteEmail(email))
             {
                 erros.Add(new Erro { Codigo = 7, Mensagem = "O Email inserido não existe!" });
             }
@@ -171,7 +175,7 @@ namespace API.Business
             }
             if (!_clienteDAO.GetCodigoValidacao(email).Equals(codigo))
             {
-                int numTentativas = _clienteDAO.GetNumTentativas(email)+1;
+                /*int numTentativas = _clienteDAO.GetNumTentativas(email)+1;
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
                 if (numTentativas <= numMaximoTentativas)
                 {
@@ -182,13 +186,13 @@ namespace API.Business
                 {
                     erros.Add(new Erro { Codigo = 9, Mensagem = "Numero de tentativas excedido. A sua conta foi removida." });
                     _clienteDAO.RemoverContaInvalida(email);
-                }
+                }*/
             }
 
             if (!erros.Any())
             {
                 _clienteDAO.ValidarConta(email);
-            }*/
+            }
             return erros;
         }
 
@@ -207,15 +211,14 @@ namespace API.Business
 
             IList<Erro> erros = new List<Erro>();
 
-            /*if (!_clienteDAO.ContaValida(email))
+            if (!_clienteDAO.ContaValida(email))
             {
                 erros.Add(new Erro { Codigo = 10, Mensagem = "A conta ainda não se encontra verificada." });
-            }*/
-
+            }
             string resultToken = null;
             if (!erros.Any())
             {
-                /*Cliente cliente = _clienteDAO.GetClienteEmail(email);
+                Cliente cliente = null; //= _clienteDAO.GetClienteEmail(email);
                 if (cliente != null && cliente.Password.Equals(HashPassword(password)))
                 {
                     // authentication successful so generate jwt token
@@ -237,7 +240,7 @@ namespace API.Business
                 else
                 {
                     erros.Add(new Erro { Codigo = 12, Mensagem = "Email ou Password Incorreta." });
-                }*/
+                }
             }
             return new Tuple<IList<Erro>,string>( erros,resultToken);
         }
