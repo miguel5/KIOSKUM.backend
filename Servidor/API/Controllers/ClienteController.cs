@@ -20,7 +20,7 @@ namespace API.Controllers
         private IClienteService _clienteService;
         private IEmailSenderService _emailSenderService;
 
-        public ClienteController(IClienteService clienteService,IEmailSenderService emailSenderService)
+        public ClienteController(IClienteService clienteService, IEmailSenderService emailSenderService)
         {
             _clienteService = clienteService;
             _emailSenderService = emailSenderService;
@@ -48,7 +48,8 @@ namespace API.Controllers
                 await _emailSenderService.SendEmail(model.Email, emails.Item2);
                 return Ok();
 
-            } catch (ArgumentNullException e)
+            }
+            catch (ArgumentNullException e)
             {
                 return BadRequest(e.Message);
             }
@@ -60,12 +61,12 @@ namespace API.Controllers
         [HttpPost("validar")]
         public IActionResult ValidarConta([FromBody] ValidarClienteDTO model)
         {
-            if(model is null)
+            if (model is null)
                 return BadRequest(nameof(model));
 
             try
             {
-                IList<Erro>  erros = _clienteService.ValidarConta(model.Email, model.Codigo);
+                IList<Erro> erros = _clienteService.ValidarConta(model.Email, model.Codigo);
 
                 if (erros.Any())
                 {

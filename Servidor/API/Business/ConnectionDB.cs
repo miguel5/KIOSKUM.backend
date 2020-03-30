@@ -4,7 +4,7 @@ using MySql.Data.MySqlClient;
 
 namespace API.Data
 {
-    public interface IDBConnection
+    public interface IConnectionDB
     {
         MySqlConnection Connection { get; }
 
@@ -12,12 +12,12 @@ namespace API.Data
         bool CloseConnection();
     }
 
-    public class DBConnection : IDBConnection
+    public class ConnectionDB : IConnectionDB
     {
         public MySqlConnection Connection { get; private set; }
         private DBSettings _dbSettings;
 
-        public DBConnection(IOptions<AppSettings> appSettings)
+        public ConnectionDB(IOptions<AppSettings> appSettings)
         {
             _dbSettings = appSettings.Value.DBSettings;
             Initialize();
