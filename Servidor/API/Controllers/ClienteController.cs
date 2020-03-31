@@ -85,7 +85,7 @@ namespace API.Controllers
             try
             {
                 Tuple<IList<int>, TokenDTO> resultado = _clienteService.Login(model.Email, model.Password);
-                return resultado.Item1.Any() ? BadRequest(resultado) : (IActionResult)Ok(resultado.Item2);
+                return resultado.Item1.Any() ? BadRequest(new ErrosDTO { ListaErros = resultado.Item1 }) : (IActionResult)Ok(resultado.Item2);
             }
             catch (ArgumentNullException e)
             {

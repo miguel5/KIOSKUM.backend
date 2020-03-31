@@ -170,9 +170,9 @@ namespace API.Business
             {
                 erros.Add(Erros.EmailNaoExiste);
             }
-            if (_clienteDAO.ContaValida(email)) 
+            if (_clienteDAO.ContaConfirmada(email)) 
             {
-                erros.Add(Erros.ContaInvalida);
+                erros.Add(Erros.ContaJaConfirmada);
             }
             if (!_clienteDAO.GetCodigoValidacao(email).Equals(codigo))
             {
@@ -180,12 +180,12 @@ namespace API.Business
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
                 if (numTentativas <= numMaximoTentativas)
                 {
-                    erros.Add(new ErroDTO { Codigo = Erros.CodigoValidacaoErrado });
+                    erros.Add(Erros.CodigoValidacaoErrado);
                     _clienteDAO.IncrementaNumTentativas(email);
                 }
                 else
                 {
-                    erros.Add(new ErroDTO { Codigo = Erros.NumTentativasExcedido});
+                    erros.Add(Erros.NumTentativasExcedido);
                     _clienteDAO.RemoverContaInvalida(email);
                 }*/
             }
@@ -213,13 +213,13 @@ namespace API.Business
             IList<int> erros = new List<int>();
             TokenDTO resultToken = null;
 
-            if (!_clienteDAO.ContaValida(email))
+            if (!_clienteDAO.ContaConfirmada(email))
             {
-                erros.Add(Erros.ContaInvalida);
+                erros.Add(Erros.ContaNaoConfirmada);
             }
             if (!erros.Any())
             {
-                /*Cliente cliente = _clienteDAO.GetClienteEmail(email);
+                Cliente cliente = _clienteDAO.GetClienteEmail(email);
                 if (cliente != null && cliente.Password.Equals(HashPassword(password)))
                 {
                     // authentication successful so generate jwt token
@@ -240,8 +240,8 @@ namespace API.Business
                 }
                 else
                 {
-                     erros.Add(new ErroDTO { Codigo = Erros.EmailPasswordIncorreta});
-                }*/
+                     erros.Add(Erros.EmailPasswordIncorreta);
+                }
             }
             return new Tuple<IList<int>, TokenDTO>(erros, resultToken);
         }
