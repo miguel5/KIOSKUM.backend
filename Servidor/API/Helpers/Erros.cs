@@ -11,8 +11,8 @@
         public const int EmailNaoExiste = 7;
         public const int CodigoValidacaoErrado = 8;
         public const int NumTentativasExcedido = 9;
-        public const int ContaInvalida = 10;
-        public const int ContaValida = 11;
+        public const int ContaNaoConfirmada = 10;
+        public const int ContaJaConfirmada = 11;
         public const int EmailPasswordIncorreta = 12;
         public const int TokenInvalido = 13;
     }

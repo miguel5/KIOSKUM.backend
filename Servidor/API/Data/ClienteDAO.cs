@@ -11,9 +11,10 @@ namespace API.Data
         bool ExisteNumTelemovel(int numTelemovel);
         void InserirCliente(Cliente cliente, string codigoValidacao);
         string GetCodigoValidacao(string email);
-        bool ContaValida(string email);
+        bool ContaConfirmada(string email);
         void ValidarConta(string email);
         void EditarConta(Cliente cliente);
+        Cliente GetClienteEmail(string email);
     }
 
 
@@ -129,12 +130,11 @@ namespace API.Data
             return null;
         }
 
-        public bool ContaValida(string email)
+        public bool ContaConfirmada(string email)
         {
             MySqlCommand cmd;
             if (_connectionDB.OpenConnection())
             {
-                Console.WriteLine(email);
                 cmd = new MySqlCommand();
                 cmd.Connection = _connectionDB.Connection;
 
@@ -188,9 +188,38 @@ namespace API.Data
             }
         }
 
-        internal Cliente GetClienteEmail(string email)
+        public Cliente GetClienteEmail(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "get_cliente_mail";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                MySqlDataReader var = cmd.ExecuteReader();
+
+                Cliente cliente = null;
+                try
+                {
+                    while (var.Read())
+                    {
+                        cliente = new Cliente { IdCliente = var.GetInt32(0), Nome = var.GetString(1), Email = email, Password = var.GetString(2), NumTelemovel = var.GetInt32(3) };
+                    }
+                    return cliente;
+                }
+                catch (Exception) { }
+
+                _connectionDB.CloseConnection();
+
+                
+            }
+            return null;
         }
 
         internal Cliente GetClienteId(int idCliente)
