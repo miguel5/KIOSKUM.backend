@@ -12,9 +12,10 @@ namespace API.Data
         void InserirCliente(Cliente cliente, string codigoValidacao);
         string GetCodigoValidacao(string email);
         bool ContaConfirmada(string email);
+        Cliente GetClienteEmail(string email);
+        Cliente GetClienteId(int idCliente);
         void ValidarConta(string email);
         void EditarConta(Cliente cliente);
-        Cliente GetClienteEmail(string email);
     }
 
 
@@ -46,7 +47,7 @@ namespace API.Data
                 
                 _connectionDB.CloseConnection();
                 
-                return (val != null ? Convert.ToBoolean(val) : false);
+                return Convert.ToBoolean(val);
             }
             return false;
         }
@@ -138,7 +139,7 @@ namespace API.Data
                 cmd = new MySqlCommand();
                 cmd.Connection = _connectionDB.Connection;
 
-                cmd.CommandText = "conta_valida";
+                cmd.CommandText = "conta_confirmada";
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 cmd.Parameters.AddWithValue("?mail", email);
@@ -214,17 +215,47 @@ namespace API.Data
                     return cliente;
                 }
                 catch (Exception) { }
+                finally
+                {
+                    _connectionDB.CloseConnection();
+                }
 
-                _connectionDB.CloseConnection();
-
-                
             }
             return null;
         }
 
-        internal Cliente GetClienteId(int idCliente)
+        public Cliente GetClienteId(int idCliente)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "get_cliente_id";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?id", idCliente);
+                cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                MySqlDataReader rdr = cmd.ExecuteReader();
+                
+                try
+                {
+                    Cliente cliente = null;
+                    while (rdr.Read())
+                    {
+                        cliente = new Cliente { IdCliente = idCliente, Nome = rdr.GetString(0), Password = rdr.GetString(1), Email = rdr.GetString(2), NumTelemovel = rdr.GetInt32(3) };
+                    }
+                    return cliente;
+                }
+                catch (Exception) { }
+                finally
+                {
+                    _connectionDB.CloseConnection();
+                }
+            }
+            return null;
         }
 
         public void EditarConta(Cliente cliente)
@@ -237,6 +268,9 @@ namespace API.Data
 
                 cmd.CommandText = "editar_dados";
                 cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?id", cliente.IdCliente);
+                cmd.Parameters["?id"].Direction = ParameterDirection.Input;
 
                 cmd.Parameters.AddWithValue("?nome", cliente.Nome);
                 cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
@@ -254,6 +288,11 @@ namespace API.Data
 
                 _connectionDB.CloseConnection();
             }
+        }
+
+        public bool ContaAtiva(string email)
+        {
+            throw new NotImplementedException();
         }
     }
 }

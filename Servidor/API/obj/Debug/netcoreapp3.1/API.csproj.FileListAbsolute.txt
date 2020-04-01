@@ -54,3 +54,4 @@
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/System.Security.Cryptography.ProtectedData.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/System.Xml.XPath.XmlDocument.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/mono_crash.42f6ec1fa.0.json

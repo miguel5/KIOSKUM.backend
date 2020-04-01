@@ -56,15 +56,15 @@ namespace API.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost("validar")]
-        public IActionResult ValidarConta([FromBody] ValidarClienteDTO model)
+        [HttpPost("confirmar")]
+        public IActionResult ConfirmarConta([FromBody] ValidarClienteDTO model)
         {
             if (model is null)
                 return BadRequest(nameof(model));
 
             try
             {
-                IList<int> erros = _clienteService.ValidarConta(model.Email, model.Codigo);
+                IList<int> erros = _clienteService.ConfirmarConta(model.Email, model.Codigo);
                 return erros.Any() ? BadRequest(erros) : (IActionResult)Ok();
             }
             catch (ArgumentNullException e)
@@ -102,12 +102,9 @@ namespace API.Controllers
             try
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
-                {
-                    IList<int> erros = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
-                    return erros.Any() ? BadRequest(erros) : (IActionResult)Ok();
-                }
-                return BadRequest(new ErrosDTO { ListaErros = new List<int> { Erros.TokenInvalido } });
+                int idCliente = int.Parse(nameIdentifier);
+                IList<int> erros = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
+                return erros.Any() ? BadRequest(erros) : (IActionResult)Ok();
 
             }
             catch (ArgumentNullException e)
@@ -121,16 +118,10 @@ namespace API.Controllers
         public IActionResult GetCliente()
         {
             string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (nameIdentifier != null && int.TryParse(nameIdentifier, out int idCliente))
-            {
-                Cliente cliente = _clienteService.GetCliente(idCliente);
-                if (cliente != null)
-                {
-                    ClienteDTO clienteDTO = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
-                    return Ok(clienteDTO);
-                }
-            }
-            return BadRequest(new ErrosDTO { ListaErros = new List<int> { Erros.TokenInvalido } });
+            int idCliente = int.Parse(nameIdentifier);
+            ClienteDTO clienteDTO = _clienteService.GetCliente(idCliente);
+            return Ok(clienteDTO);
         }
+
     }
 }

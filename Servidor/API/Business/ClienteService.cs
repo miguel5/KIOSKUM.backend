@@ -22,10 +22,10 @@ namespace API.Business
     {
         IList<int> CriarConta(string nome, string email, string password, int numTelemovel);
         Tuple<Email, Email> GetEmails(string email);
-        IList<int> ValidarConta(string email, string codigo);
+        IList<int> ConfirmarConta(string email, string codigo);
         Tuple<IList<int>, TokenDTO> Login(string email, string password);
         IList<int> EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel);
-        Cliente GetCliente(int idCliente);
+        ClienteDTO GetCliente(int idCliente);
     }
 
 
@@ -153,7 +153,7 @@ namespace API.Business
             return new Tuple<Email, Email>(emailBoasVindas, emailGerarCodigo);
         }
 
-       public IList<int> ValidarConta(string email, string codigo)
+       public IList<int> ConfirmarConta(string email, string codigo)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -217,12 +217,15 @@ namespace API.Business
             {
                 erros.Add(Erros.ContaNaoConfirmada);
             }
+            /*if (!_clienteDAO.ContaAtiva(email))
+            {
+                erros.Add(Erros.ContaDesativada);
+            }*/
             if (!erros.Any())
             {
                 Cliente cliente = _clienteDAO.GetClienteEmail(email);
                 if (cliente != null && cliente.Password.Equals(HashPassword(password)))
                 {
-                    // authentication successful so generate jwt token
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
                     var tokenDescriptor = new SecurityTokenDescriptor
@@ -264,13 +267,17 @@ namespace API.Business
             }
 
             IList<int> erros = new List<int>();
-
-            if (_clienteDAO.ExisteEmail(novoEmail))
+            Cliente cliente = _clienteDAO.GetClienteId(idCliente);
+            if (cliente == null)
+            {
+                Console.WriteLine("Erro");
+            }
+            if (_clienteDAO.ExisteEmail(novoEmail) && !novoEmail.Equals(cliente.Email))
             {
                 erros.Add(Erros.EmailJaExiste);
             }
 
-            if (_clienteDAO.ExisteNumTelemovel(numTelemovel))
+            if (_clienteDAO.ExisteNumTelemovel(numTelemovel) && numTelemovel != cliente.NumTelemovel)
             {
                 erros.Add(Erros.NumTelemovelJaExiste);
             }
@@ -294,24 +301,27 @@ namespace API.Business
 
             if (!erros.Any())
             {
-                /*Cliente cliente = _clienteDAO.GetClienteId(idCliente);
-
                 cliente.Nome = novoNome;
                 cliente.Email = novoEmail;
                 cliente.Password = HashPassword(novaPassword);
                 cliente.NumTelemovel = numTelemovel;
 
-                _clienteDAO.EditarConta(cliente);*/
+                _clienteDAO.EditarConta(cliente);
             }
             return erros;
         }
 
 
-        public Cliente GetCliente(int idCliente)
+        public ClienteDTO GetCliente(int idCliente)
         {
-            return null;
-            //return _clienteDAO.GetClienteId(idCliente);
+            Cliente cliente = _clienteDAO.GetClienteId(idCliente);
+            return new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
         }
 
+
+        public void DesativarConta(int idCliente)
+        {
+            //ClienteDAO.DesativarConta(idCliente);
+        }
     }
 }
