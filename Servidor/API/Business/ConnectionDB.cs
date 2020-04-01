@@ -1,4 +1,5 @@
-﻿using API.Helpers;
+﻿using System;
+using API.Helpers;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -47,7 +48,6 @@ namespace API.Data
             }
             catch (MySqlException)
             {
-
                 return false;
             }
         }
