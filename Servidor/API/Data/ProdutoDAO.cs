@@ -1,9 +1,13 @@
 ﻿using System;
+using API.Entities;
+
 namespace API.Data
 {
     public interface IProdutoDAO
     {
-
+        bool ExisteNome(string nome);
+        void AddProduto(Produto produto);
+        bool ExisteIdProduto(int IdProduto);
     }
 
     public class ProdutoDAO : IProdutoDAO
@@ -14,14 +18,19 @@ namespace API.Data
         {
         }
 
-        internal bool ExisteNome(string nome)
+        bool IProdutoDAO.ExisteNome(string nome)
         {
             throw new NotImplementedException();
         }
 
-        internal void AddProduto(object produto)
+        public void AddProduto(Produto produto)
         {
             throw new NotImplementedException();
+        }
+
+        public bool ExisteIdProduto(int IdProduto)
+        {
+            return true;//throw new NotImplementedException();
         }
     }
 }

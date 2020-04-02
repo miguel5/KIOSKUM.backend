@@ -4,7 +4,7 @@ namespace API.Data
 {
     public interface ICategoriaDAO
     {
-
+        int GetIdCategoria(string nomeCategoria);
     }
 
     public class CategoriaDAO : ICategoriaDAO
@@ -13,7 +13,7 @@ namespace API.Data
         {
         }
 
-        internal int GetIdCategoria(string nomeCategoria)
+        public int GetIdCategoria(string nomeCategoria)
         {
             throw new NotImplementedException();
         }

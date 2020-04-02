@@ -318,7 +318,7 @@ namespace API.Business
 
 
         public void DesativarConta(int idCliente)
-        {
+        { 
             //ClienteDAO.DesativarConta(idCliente);
         }
     }
