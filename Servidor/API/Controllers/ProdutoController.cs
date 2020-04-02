@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using API.Business;
 using API.Models;
@@ -33,12 +34,12 @@ namespace API.Controllers
             }
             try
             {
-                bool res = _produtoService.AddProduto(model.Nome, model.NomeCategoria, model.Preco, model.Ingredientes, model.Alergenios);
-                if (res == false)
+                IList<int> erros = _produtoService.AddProduto(model.Nome, model.NomeCategoria, model.Preco, model.Ingredientes, model.Alergenios);
+                if (erros.Any())
                 {
-                    return BadRequest(new { message = "Dados Inseridos inválidos" });
+                    return BadRequest(new ErrosDTO { ListaErros = erros});
                 }
-                return Ok("Adicionou");
+                return Ok();
             }
             catch (ArgumentNullException e)
             {
@@ -54,9 +55,14 @@ namespace API.Controllers
         [HttpPost("upload/imagem")]
         public async Task<IActionResult> UploadImagem([FromForm] ImagemDTO model)
         {
-           
-            return Ok( await _produtoService.UploadImagem(model.IdProduto, model.File));
+            IList<int> erros = await _produtoService.UploadImagem(model.IdProduto, model.File);
+            if (erros.Any())
+            {
+                return BadRequest(new ErrosDTO { ListaErros = erros });
+            }
+            return Ok();
         }
+
 
 
         [AllowAnonymous]

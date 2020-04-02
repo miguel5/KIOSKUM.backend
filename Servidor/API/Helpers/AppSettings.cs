@@ -9,6 +9,8 @@
 
         public DBSettings DBSettings { get; set; }
 
+        public ImageSettings ImageSettings { get; set; }
+
         public int NumTentativasCodigoValidacao { get; set; }
     }
 }
