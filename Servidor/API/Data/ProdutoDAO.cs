@@ -1,8 +1,15 @@
 ﻿using System;
 namespace API.Data
 {
-    public class ProdutoDAO
+    public interface IProdutoDAO
     {
+
+    }
+
+    public class ProdutoDAO : IProdutoDAO
+    {
+        
+
         public ProdutoDAO()
         {
         }

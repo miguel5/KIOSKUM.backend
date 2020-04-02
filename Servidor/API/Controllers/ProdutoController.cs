@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using API.Business;
 using API.Models;
 using API.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -45,30 +48,16 @@ namespace API.Controllers
         }
 
 
+
+
         [AllowAnonymous]
         [HttpPost("upload/imagem")]
-        public IActionResult UploadImagem()
+        public async Task<IActionResult> UploadImagem([FromForm] ImagemDTO model)
         {
-            var files = HttpContext.Request.Form.Files;
-            if (files != null)
-            {
-                bool sucesso;
-                if(files[0].Length > 0)
-                {
-                    sucesso = _produtoService.UploadImagem(files[0]);
-                    if (sucesso)
-                    {
-                        return Ok("Adicionado");
-                    }
-                    else
-                    {
-                        return BadRequest("Extensão não é compatível");
-                    }
-                }
-                
-            }
-            return BadRequest("Ficheiro Inválido");
+           
+            return Ok( await _produtoService.UploadImagem(model.IdProduto, model.File));
         }
+
 
         [AllowAnonymous]
         [HttpGet("todos")]

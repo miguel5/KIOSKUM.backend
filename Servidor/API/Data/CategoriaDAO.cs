@@ -2,7 +2,12 @@
 
 namespace API.Data
 {
-    public class CategoriaDAO
+    public interface ICategoriaDAO
+    {
+
+    }
+
+    public class CategoriaDAO : ICategoriaDAO
     {
         public CategoriaDAO()
         {

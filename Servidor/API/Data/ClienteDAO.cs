@@ -9,13 +9,14 @@ namespace API.Data
     {
         public bool ExisteEmail(string email);
         bool ExisteNumTelemovel(int numTelemovel);
-        void InserirCliente(Cliente cliente, string codigoValidacao);
+        void InserirCliente(Cliente cliente, string codigoValidacao, int numMaxTentativas);
         string GetCodigoValidacao(string email);
         bool ContaConfirmada(string email);
         Cliente GetClienteEmail(string email);
         Cliente GetClienteId(int idCliente);
         void ValidarConta(string email);
         void EditarConta(Cliente cliente);
+        int GetNumTentativas(string email);
     }
 
 
@@ -76,7 +77,7 @@ namespace API.Data
             return false;
         }
 
-        public void InserirCliente(Cliente cliente, string codigoValidacao)
+        public void InserirCliente(Cliente cliente, string codigoValidacao, int numMaxTentativas)
         {
             MySqlCommand cmd;
             if (_connectionDB.OpenConnection())
@@ -154,20 +155,29 @@ namespace API.Data
             return false;
         }
 
-        internal int GetNumTentativas(string email)
+        public int GetNumTentativas(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "num_tentativas";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                int val = (byte)cmd.ExecuteScalar();
+
+                _connectionDB.CloseConnection();
+
+                return val;
+            }
+            return -1;
         }
 
-        internal void IncrementaNumTentativas(string email)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void RemoverContaInvalida(string email)
-        {
-            throw new NotImplementedException();
-        }
 
         public void ValidarConta(string email)
         {
