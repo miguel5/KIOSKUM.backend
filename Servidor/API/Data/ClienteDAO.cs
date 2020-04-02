@@ -156,12 +156,43 @@ namespace API.Data
 
         internal int GetNumTentativas(string email)
         {
-            throw new NotImplementedException();
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "num_tentativas";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                int val = (Int64)cmd.ExecuteScalar();
+
+                _connectionDB.CloseConnection();
+
+                return val;
+            }
         }
 
         internal void IncrementaNumTentativas(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "incrementa_tentativas";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                cmd.ExecuteNonQuery();
+
+                _connectionDB.CloseConnection();
+            }
         }
 
         internal void RemoverContaInvalida(string email)
