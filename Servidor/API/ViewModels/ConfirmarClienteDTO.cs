@@ -2,7 +2,7 @@
 
 namespace API.ViewModels
 {
-    public class ValidarClienteDTO
+    public class ConfirmarClienteDTO
     {
         [Required]
         public string Email { get; set; }

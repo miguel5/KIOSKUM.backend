@@ -58,6 +58,9 @@ namespace API
             services.AddScoped<IClienteDAO, ClienteDAO>();
             services.AddScoped<IConnectionDB, ConnectionDB>();
             services.AddScoped<IProdutoService, ProdutoService>();
+            services.AddScoped<IProdutoDAO, ProdutoDAO>();
+            services.AddScoped<ICategoriaDAO, CategoriaDAO>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

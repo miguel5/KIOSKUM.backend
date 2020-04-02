@@ -127,9 +127,10 @@ namespace API.Business
 
             if (!erros.Any()) { 
                 string codigoValidacao = GerarCodigo();
+                int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
                 Cliente cliente = new Cliente { Nome = nome, Email = email, NumTelemovel = numTelemovel };
                 cliente.Password = HashPassword(password);
-                _clienteDAO.InserirCliente(cliente, codigoValidacao);
+                _clienteDAO.InserirCliente(cliente, codigoValidacao, numMaximoTentativas);
             }
             return erros;
         }
@@ -176,18 +177,15 @@ namespace API.Business
             }
             if (!_clienteDAO.GetCodigoValidacao(email).Equals(codigo))
             {
-                /*int numTentativas = _clienteDAO.GetNumTentativas(email)+1;
-                int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
-                if (numTentativas <= numMaximoTentativas)
+                int numTentativas = _clienteDAO.GetNumTentativas(email) + 1;
+                if(numTentativas > 0)
                 {
                     erros.Add(Erros.CodigoValidacaoErrado);
-                    _clienteDAO.IncrementaNumTentativas(email);
                 }
                 else
                 {
                     erros.Add(Erros.NumTentativasExcedido);
-                    _clienteDAO.RemoverContaInvalida(email);
-                }*/
+                }
             }
 
             if (!erros.Any())

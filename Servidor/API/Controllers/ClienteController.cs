@@ -57,7 +57,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("confirmar")]
-        public IActionResult ConfirmarConta([FromBody] ValidarClienteDTO model)
+        public IActionResult ConfirmarConta([FromBody] ConfirmarClienteDTO model)
         {
             if (model is null)
                 return BadRequest(nameof(model));

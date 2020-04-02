@@ -3,28 +3,36 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
+using API.Helpers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace API.Business
 {
     public interface IProdutoService
     {
         public bool AddProduto(string nome, string nomeCategoria, double preco, IList<string> ingredientes, IList<string> alergenios);
-        public bool UploadImagem(IFormFile file);
+        Task<bool> UploadImagem(int IdProduto, IFormFile file);
     }
 
 
     public class ProdutoService : IProdutoService
     {
-        private ProdutoDAO produtoDAO;
-        private CategoriaDAO categoriaDAO;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly AppSettings _appSettings;
+        private IProdutoDAO _produtoDAO;
+        private ICategoriaDAO _categoriaDAO;
 
-        public ProdutoService()
+        public ProdutoService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
         {
-            produtoDAO = new ProdutoDAO();
-            categoriaDAO = new CategoriaDAO();
+            _webHostEnvironment = webHostEnviroment;
+            _appSettings = appSettings.Value;
+            _produtoDAO = produtoDAO;
+            _categoriaDAO = categoriaDAO;
         }
 
 
@@ -47,35 +55,38 @@ namespace API.Business
                 throw new ArgumentNullException("NomeCategoria", "Parametro não pode ser nulo");
             }
             
-            if (validaPreco(preco) && !produtoDAO.ExisteNome(nome))
+            /*if (validaPreco(preco) && !_produtoDAO.ExisteNome(nome))
             {
-                int idCategoria = categoriaDAO.GetIdCategoria(nomeCategoria);
+                int idCategoria = _categoriaDAO.GetIdCategoria(nomeCategoria);
                 Produto produto = new Produto { Nome = nome, IdCategoria = idCategoria, Preco = preco, Ingredientes = ingredientes, Alergenios = alergenios };
-                produtoDAO.AddProduto(produto);
+                _produtoDAO.AddProduto(produto);
                 sucesso = true;
-            }
+            }*/
             return sucesso;
         }
 
 
-        public bool UploadImagem(IFormFile file)
+        public async Task<bool> UploadImagem(int IdProduto, IFormFile file)
         {
             bool sucesso = false;
-            string fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-            string fileExtension = Path.GetExtension(fileName.Trim('.'));
+            string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"').Trim('.'));
             if (fileExtension.Equals(".png"))
             {
-                fileName = Path.Combine("/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/wwwroot/Images/Produtos", "1.png");
-
-                using (FileStream fs = File.Create(fileName))
+                if (file.Length > 0)
                 {
-                    file.CopyTo(fs);
-                    fs.Flush();
+                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produtos",IdProduto+".png");
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileStream);
+                    }
                 }
-                sucesso = true;
             }
             return sucesso;
         }
+
+
+       
+
     }
 
 }
