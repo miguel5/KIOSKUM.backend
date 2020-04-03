@@ -9,13 +9,14 @@ namespace API.Data
     {
         public bool ExisteEmail(string email);
         bool ExisteNumTelemovel(int numTelemovel);
-        void InserirCliente(Cliente cliente, string codigoValidacao);
+        void InserirCliente(Cliente cliente, string codigoValidacao, int numMaxTentativas);
         string GetCodigoValidacao(string email);
         bool ContaConfirmada(string email);
         Cliente GetClienteEmail(string email);
         Cliente GetClienteId(int idCliente);
         void ValidarConta(string email);
         void EditarConta(Cliente cliente);
+        int GetNumTentativas(string email);
     }
 
 
@@ -76,7 +77,7 @@ namespace API.Data
             return false;
         }
 
-        public void InserirCliente(Cliente cliente, string codigoValidacao)
+        public void InserirCliente(Cliente cliente, string codigoValidacao, int numMaxTentativas)
         {
             MySqlCommand cmd;
             if (_connectionDB.OpenConnection())
@@ -154,8 +155,9 @@ namespace API.Data
             return false;
         }
 
-        internal int GetNumTentativas(string email)
+        public int GetNumTentativas(string email)
         {
+            MySqlCommand cmd;
             if (_connectionDB.OpenConnection())
             {
                 cmd = new MySqlCommand();
@@ -167,37 +169,13 @@ namespace API.Data
                 cmd.Parameters.AddWithValue("?mail", email);
                 cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
 
-                int val = (Int64)cmd.ExecuteScalar();
+                int val = (byte)cmd.ExecuteScalar();
 
                 _connectionDB.CloseConnection();
 
                 return val;
             }
-        }
-
-        internal void IncrementaNumTentativas(string email)
-        {
-            MySqlCommand cmd;
-            if (_connectionDB.OpenConnection())
-            {
-                cmd = new MySqlCommand();
-                cmd.Connection = _connectionDB.Connection;
-
-                cmd.CommandText = "incrementa_tentativas";
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("?mail", email);
-                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
-
-                cmd.ExecuteNonQuery();
-
-                _connectionDB.CloseConnection();
-            }
-        }
-
-        internal void RemoverContaInvalida(string email)
-        {
-            throw new NotImplementedException();
+            return -1;
         }
 
         public void ValidarConta(string email)
@@ -323,7 +301,24 @@ namespace API.Data
 
         public bool ContaAtiva(string email)
         {
-            throw new NotImplementedException();
+            MySqlCommand cmd;
+            if (_connectionDB.OpenConnection())
+            {
+                cmd = new MySqlCommand();
+                cmd.Connection = _connectionDB.Connection;
+
+                cmd.CommandText = "conta_ativa";
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("?mail", email);
+                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+                object val = cmd.ExecuteScalar();
+
+                _connectionDB.CloseConnection();
+
+                return (val != null ? Convert.ToBoolean(val) : false);
+            }
+            return false;
         }
-    }
 }
