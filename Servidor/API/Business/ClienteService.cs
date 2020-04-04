@@ -20,12 +20,12 @@ namespace API.Business
 {
     public interface IClienteService
     {
-        IList<int> CriarConta(string nome, string email, string password, int numTelemovel);
-        Tuple<Email, Email> GetEmails(string email);
-        IList<int> ConfirmarConta(string email, string codigo);
-        Tuple<IList<int>, TokenDTO> Login(string email, string password);
-        IList<int> EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel);
-        ClienteDTO GetCliente(int idCliente);
+        ServiceResult CriarConta(ClienteDTO model);
+        ServiceResult<Tuple<Email, Email>> GetEmails(string email);
+        ServiceResult ConfirmarConta(ConfirmarClienteDTO model);
+        ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
+        ServiceResult EditarDados(int idCliente, ClienteDTO model);
+        ServiceResult<ClienteDTO> GetCliente(int idCliente);
     }
 
 
@@ -86,41 +86,41 @@ namespace API.Business
 
 
 
-        public IList<int> CriarConta(string nome, string email, string password, int numTelemovel)
+        public ServiceResult CriarConta(ClienteDTO model)
         {
-            if (string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(model.Email))
             {
                 throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
             }
-            if (string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(model.Password))
             {
                 throw new ArgumentNullException("Password","Campo não poder ser nulo.");
             }
 
             IList<int> erros = new List<int>();
 
-            if (_clienteDAO.ExisteEmail(email))
+            if (_clienteDAO.ExisteEmail(model.Email))
             {
                erros.Add(Erros.EmailJaExiste);
 
             }
-            if (_clienteDAO.ExisteNumTelemovel(numTelemovel))
+            if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel))
             {
                 erros.Add(Erros.NumTelemovelJaExiste);
             }
-            if (!ValidaNome(nome))
+            if (!ValidaNome(model.Nome))
             {
                 erros.Add(Erros.NomeInvalido);
             }
-            if (!ValidaEmail(email))
+            if (!ValidaEmail(model.Email))
             {
                 erros.Add(Erros.EmailInvalido);
             }
-            if (!ValidaPassword(password))
+            if (!ValidaPassword(model.Password))
             {
                 erros.Add(Erros.PasswordInvalida);
             }
-            if (!ValidaNumTelemovel(numTelemovel))
+            if (!ValidaNumTelemovel(model.NumTelemovel))
             {
                 erros.Add(Erros.NumTelemovelInvalido);
             }
@@ -128,82 +128,100 @@ namespace API.Business
             if (!erros.Any()) { 
                 string codigoValidacao = GerarCodigo();
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
-                Cliente cliente = new Cliente { Nome = nome, Email = email, NumTelemovel = numTelemovel };
-                cliente.Password = HashPassword(password);
+                Cliente cliente = new Cliente { Nome = model.Nome, Email = model.Email, NumTelemovel = model.NumTelemovel };
+                cliente.Password = HashPassword(model.Password);
                 _clienteDAO.InserirCliente(cliente, codigoValidacao, numMaximoTentativas);
             }
-            return erros;
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
-        public Tuple<Email, Email> GetEmails(string email)
-        {
-            string codigoValidacao = _clienteDAO.GetCodigoValidacao(email);
-
-            string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
-            StreamReader sr = new StreamReader(pathEmailBoasVindas);
-            string json = sr.ReadToEnd();
-            Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
-
-            string pathEmailgerarCodigo = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailGerarCodigo.json");
-            sr = new StreamReader(pathEmailgerarCodigo);
-            json = sr.ReadToEnd();
-            Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
-            emailGerarCodigo.AdcionaCodigo(codigoValidacao);
-
-            return new Tuple<Email, Email>(emailBoasVindas, emailGerarCodigo);
-        }
-
-       public IList<int> ConfirmarConta(string email, string codigo)
+        public ServiceResult<Tuple<Email, Email>> GetEmails(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
+                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
+            }
+
+            IList<int> erros = new List<int>();
+            Tuple<Email, Email> emails = null;
+            string codigoValidacao = _clienteDAO.GetCodigoValidacao(email);
+
+            if(codigoValidacao != null)
+            {
+                string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
+                StreamReader sr = new StreamReader(pathEmailBoasVindas);
+                string json = sr.ReadToEnd();
+                Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
+
+                string pathEmailgerarCodigo = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailGerarCodigo.json");
+                sr = new StreamReader(pathEmailgerarCodigo);
+                json = sr.ReadToEnd();
+                Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
+                emailGerarCodigo.AdcionaCodigo(codigoValidacao);
+
+
+                emails = new Tuple<Email, Email>(emailBoasVindas, emailGerarCodigo);
+            }
+            else
+            {
+                erros.Add(Erros.EmailNaoExiste);
+            }
+            return new ServiceResult<Tuple<Email, Email>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emails };
+        }
+
+       public ServiceResult ConfirmarConta(ConfirmarClienteDTO model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
                 throw new ArgumentNullException("Email", "Campo não poder ser nulo!");
             }
-            if (string.IsNullOrWhiteSpace(codigo))
+            if (string.IsNullOrWhiteSpace(model.Codigo))
             {
                 throw new ArgumentNullException("Codigo", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
 
-            if (!_clienteDAO.ExisteEmail(email))
+            if (!_clienteDAO.ExisteEmail(model.Email))
             {
                 erros.Add(Erros.EmailNaoExiste);
             }
-            if (_clienteDAO.ContaConfirmada(email)) 
+            else
             {
-                erros.Add(Erros.ContaJaConfirmada);
-            }
-            if (!_clienteDAO.GetCodigoValidacao(email).Equals(codigo))
-            {
-                int numTentativas = _clienteDAO.GetNumTentativas(email) + 1;
-                if(numTentativas > 0)
+                if (_clienteDAO.ContaConfirmada(model.Email))
                 {
-                    erros.Add(Erros.CodigoValidacaoErrado);
+                    erros.Add(Erros.ContaJaConfirmada);
                 }
-                else
+                if (!_clienteDAO.GetCodigoValidacao(model.Email).Equals(model.Codigo))
                 {
-                    erros.Add(Erros.NumTentativasExcedido);
+                    int numTentativas = _clienteDAO.GetNumTentativas(model.Email);
+                    if (numTentativas > 0)
+                    {
+                        erros.Add(Erros.CodigoValidacaoErrado);
+                    }
+                    else
+                    {
+                        erros.Add(Erros.NumTentativasExcedido);
+                    }
+                }
+                if (!erros.Any())
+                {
+                    _clienteDAO.ValidarConta(model.Email);
                 }
             }
-
-            if (!erros.Any())
-            {
-                _clienteDAO.ValidarConta(email);
-            }
-            return erros;
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
 
-        public Tuple<IList<int>,TokenDTO> Login(string email, string password)
+        public ServiceResult<TokenDTO> Login(AutenticacaoDTO model)
         {
-            if (string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(model.Email))
             {
                 throw new ArgumentNullException("Email", "FieldNull");
             }
-            if (string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(model.Password))
             {
                 throw new ArgumentNullException("Password", "FieldNull");
             }
@@ -211,7 +229,7 @@ namespace API.Business
             IList<int> erros = new List<int>();
             TokenDTO resultToken = null;
 
-            if (!_clienteDAO.ContaConfirmada(email))
+            if (!_clienteDAO.ContaConfirmada(model.Email))
             {
                 erros.Add(Erros.ContaNaoConfirmada);
             }
@@ -221,8 +239,8 @@ namespace API.Business
             }*/
             if (!erros.Any())
             {
-                Cliente cliente = _clienteDAO.GetClienteEmail(email);
-                if (cliente != null && cliente.Password.Equals(HashPassword(password)))
+                Cliente cliente = _clienteDAO.GetClienteEmail(model.Email);
+                if (cliente != null && cliente.Password.Equals(HashPassword(model.Password)))
                 {
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -244,22 +262,28 @@ namespace API.Business
                      erros.Add(Erros.EmailPasswordIncorreta);
                 }
             }
-            return new Tuple<IList<int>, TokenDTO>(erros, resultToken);
+
+            ServiceResult<TokenDTO> result = new ServiceResult<TokenDTO>();
+            result.Erros = new ErrosDTO { Erros = erros };
+            result.Sucesso = !erros.Any();
+            result.Resultado = resultToken;
+
+            return result;
         }
 
 
 
-        public IList<int> EditarDados(int idCliente, string novoNome, string novoEmail, string novaPassword, int numTelemovel)
+        public ServiceResult EditarDados(int idCliente, ClienteDTO model)
         {
-            if (string.IsNullOrWhiteSpace(novoNome))
+            if (string.IsNullOrWhiteSpace(model.Nome))
             {
                 throw new ArgumentNullException("Nome", "FieldNull");
             }
-            if (string.IsNullOrWhiteSpace(novoEmail))
+            if (string.IsNullOrWhiteSpace(model.Email))
             {
                 throw new ArgumentNullException("Email", "FieldNull");
             }
-            if (string.IsNullOrWhiteSpace(novaPassword))
+            if (string.IsNullOrWhiteSpace(model.Password))
             {
                 throw new ArgumentNullException("Password", "FieldNull");
             }
@@ -270,50 +294,64 @@ namespace API.Business
             {
                 Console.WriteLine("Erro");
             }
-            if (_clienteDAO.ExisteEmail(novoEmail) && !novoEmail.Equals(cliente.Email))
+            if (_clienteDAO.ExisteEmail(model.Email) && !model.Email.Equals(cliente.Email))
             {
                 erros.Add(Erros.EmailJaExiste);
             }
 
-            if (_clienteDAO.ExisteNumTelemovel(numTelemovel) && numTelemovel != cliente.NumTelemovel)
+            if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel) && model.NumTelemovel != cliente.NumTelemovel)
             {
                 erros.Add(Erros.NumTelemovelJaExiste);
             }
-            if (!ValidaNome(novoNome))
+            if (!ValidaNome(model.Nome))
             {
                 erros.Add(Erros.NomeInvalido);
             }
-            if (!ValidaEmail(novoEmail))
+            if (!ValidaEmail(model.Email))
             {
                 erros.Add(Erros.EmailInvalido);
             }
-            if (!ValidaPassword(novaPassword))
+            if (!ValidaPassword(model.Password))
             {
                 erros.Add(Erros.PasswordInvalida);
             }
-            if (!ValidaNumTelemovel(numTelemovel))
+            if (!ValidaNumTelemovel(model.NumTelemovel))
             {
                 erros.Add(Erros.NumTelemovelInvalido);
             }
 
 
             if (!erros.Any())
-            {
-                cliente.Nome = novoNome;
-                cliente.Email = novoEmail;
-                cliente.Password = HashPassword(novaPassword);
-                cliente.NumTelemovel = numTelemovel;
+            { 
+                cliente.Nome = model.Nome;
+                cliente.Email = model.Email;
+                cliente.Password = HashPassword(model.Password);
+                cliente.NumTelemovel = model.NumTelemovel;
 
                 _clienteDAO.EditarConta(cliente);
             }
-            return erros;
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros}, Sucesso = !erros.Any() };
         }
 
 
-        public ClienteDTO GetCliente(int idCliente)
+        public ServiceResult<ClienteDTO> GetCliente(int idCliente)
         {
+
+            IList<int> erros = new List<int>();
+            ClienteDTO clienteDTO = null;
+
             Cliente cliente = _clienteDAO.GetClienteId(idCliente);
-            return new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel };
+            if(cliente == null)
+            {
+                erros.Add(Erros.ClienteNaoExiste);
+            }
+
+            if (!erros.Any())
+            {
+                clienteDTO = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel }; 
+            }
+
+            return new ServiceResult<ClienteDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = erros.Any(), Resultado = clienteDTO };
         }
 
 

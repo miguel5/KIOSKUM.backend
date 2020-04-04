@@ -15,10 +15,12 @@
         public const int ContaJaConfirmada = 11;
         public const int ContaDesativada = 12;
         public const int EmailPasswordIncorreta = 14;
+        public const int ClienteNaoExiste = 15;
 
 
         public const int NomeProdutoJaExiste = 20;
         public const int PrecoInvalido = 21;
         public const int ProdutoNaoExiste = 22;
+        public const int FormatoImagemInvalido = 23;
     }
 }

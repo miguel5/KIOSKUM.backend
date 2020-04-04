@@ -36,15 +36,24 @@ namespace API.Controllers
 
             try
             {
-                IList<int> erros = _clienteService.CriarConta(model.Nome, model.Email, model.Password, model.NumTelemovel);
-                if (erros.Any())
+                ServiceResult resultado = _clienteService.CriarConta(model);
+                if (!resultado.Sucesso)
                 {
-                    return BadRequest(new ErrosDTO { ListaErros = erros });
+                    return BadRequest(resultado.Erros);
                 }
-                Tuple<Email, Email> emails = _clienteService.GetEmails(model.Email);
-                await _emailSenderService.SendEmail(model.Email, emails.Item1);
-                await _emailSenderService.SendEmail(model.Email, emails.Item2);
-                return Ok();
+
+
+                ServiceResult<Tuple<Email,Email>> resultadoEmails = _clienteService.GetEmails(model.Email);
+                if (resultado.Sucesso)
+                {
+                    await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item1);
+                    await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item2);
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
 
             }
             catch (ArgumentNullException e)
@@ -64,8 +73,8 @@ namespace API.Controllers
 
             try
             {
-                IList<int> erros = _clienteService.ConfirmarConta(model.Email, model.Codigo);
-                return erros.Any() ? BadRequest(erros) : (IActionResult)Ok();
+                ServiceResult resultado = _clienteService.ConfirmarConta(model);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
             {
@@ -84,8 +93,8 @@ namespace API.Controllers
 
             try
             {
-                Tuple<IList<int>, TokenDTO> resultado = _clienteService.Login(model.Email, model.Password);
-                return resultado.Item1.Any() ? BadRequest(new ErrosDTO { ListaErros = resultado.Item1 }) : (IActionResult)Ok(resultado.Item2);
+                ServiceResult<TokenDTO> resultado = _clienteService.Login(model);
+                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
             {
@@ -103,8 +112,8 @@ namespace API.Controllers
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 int idCliente = int.Parse(nameIdentifier);
-                IList<int> erros = _clienteService.EditarDados(idCliente, model.Nome, model.Email, model.Password, model.NumTelemovel);
-                return erros.Any() ? BadRequest(erros) : (IActionResult)Ok();
+                ServiceResult resultado = _clienteService.EditarDados(idCliente, model);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
 
             }
             catch (ArgumentNullException e)
@@ -119,8 +128,8 @@ namespace API.Controllers
         {
             string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idCliente = int.Parse(nameIdentifier);
-            ClienteDTO clienteDTO = _clienteService.GetCliente(idCliente);
-            return Ok(clienteDTO);
+            ServiceResult<ClienteDTO> resultado = _clienteService.GetCliente(idCliente);
+            return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
         }
 
 

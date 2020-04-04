@@ -7,6 +7,6 @@ namespace API.ViewModels
     public class ErrosDTO
     {
         [Required]
-        public IList<int> ListaErros { get; set; }
+        public IList<int> Erros { get; set; }
     }
 }
