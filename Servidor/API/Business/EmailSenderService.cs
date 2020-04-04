@@ -22,7 +22,7 @@ namespace API.Business
             _emailSettings = appSettings.Value.EmailSettings;
             _smtp = new SmtpClient
             {
-                Host = _emailSettings.ServerAdressSMTP, //Or Your SMTP Server Address
+                Host = _emailSettings.ServerAddressSMTP, //Or Your SMTP Server Address
                 Credentials = new System.Net.NetworkCredential
                  (_emailSettings.MyEmail, _emailSettings.MyPassword), // ***use valid credentials***
                 Port = _emailSettings.Port,

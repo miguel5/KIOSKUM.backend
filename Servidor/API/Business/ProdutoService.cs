@@ -7,12 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
-using API.Helpers;
-using API.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace API.Business
 {
@@ -26,14 +22,12 @@ namespace API.Business
     public class ProdutoService : IProdutoService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ImageSettings _imageSettings;
         private IProdutoDAO _produtoDAO;
         private ICategoriaDAO _categoriaDAO;
 
-        public ProdutoService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
+        public ProdutoService(IWebHostEnvironment webHostEnviroment, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
         {
             _webHostEnvironment = webHostEnviroment;
-            _imageSettings = appSettings.Value.ImageSettings;
             _produtoDAO = produtoDAO;
             _categoriaDAO = categoriaDAO;
         }
@@ -88,11 +82,11 @@ namespace API.Business
             if (!erros.Any())
             {
                 string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"').Trim('.'));
-                if (fileExtension.Equals("." + _imageSettings.Extensao))
+                if (fileExtension.Equals("." + "png"))
                 {
                     if (file.Length > 0)
                     {
-                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produtos", IdProduto + "." + _imageSettings.Extensao);
+                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produtos", IdProduto + "." + "png");
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {
                             await file.CopyToAsync(fileStream);
