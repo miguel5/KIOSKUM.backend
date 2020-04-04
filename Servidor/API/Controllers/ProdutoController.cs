@@ -37,7 +37,7 @@ namespace API.Controllers
                 IList<int> erros = _produtoService.AddProduto(model.Nome, model.NomeCategoria, model.Preco, model.Ingredientes, model.Alergenios);
                 if (erros.Any())
                 {
-                    return BadRequest(new ErrosDTO { ListaErros = erros});
+                    return BadRequest(new ErrosDTO { Erros = erros });
                 }
                 return Ok();
             }
@@ -55,10 +55,10 @@ namespace API.Controllers
         [HttpPost("upload/imagem")]
         public async Task<IActionResult> UploadImagem([FromForm] ImagemDTO model)
         {
-            IList<int> erros = await _produtoService.UploadImagem(model.IdProduto, model.File);
+            IList<int> erros = await _produtoService.UploadImagem(model.Id, model.File);
             if (erros.Any())
             {
-                return BadRequest(new ErrosDTO { ListaErros = erros });
+                return BadRequest(new ErrosDTO { Erros = erros });
             }
             return Ok();
         }

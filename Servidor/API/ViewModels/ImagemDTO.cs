@@ -7,7 +7,7 @@ namespace API.ViewModels
     public class ImagemDTO
     {
         [Required]
-        public int IdProduto { get; set; }
+        public int Id { get; set; }
 
         [Required]
         [DataType(DataType.Upload)]

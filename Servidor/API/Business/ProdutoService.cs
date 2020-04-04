@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using API.Helpers;
+using API.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -68,7 +69,7 @@ namespace API.Business
             }
 
             if (!erros.Any())
-            { 
+            {
                 int idCategoria = _categoriaDAO.GetIdCategoria(nomeCategoria);
                 Produto produto = new Produto { Nome = nome, IdCategoria = idCategoria, Preco = preco, Ingredientes = ingredientes, Alergenios = alergenios };
                 _produtoDAO.AddProduto(produto);
@@ -84,7 +85,8 @@ namespace API.Business
             {
                 erros.Add(Erros.ProdutoNaoExiste);
             }
-            if(!erros.Any()){
+            if (!erros.Any())
+            {
                 string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"').Trim('.'));
                 if (fileExtension.Equals("." + _imageSettings.Extensao))
                 {
@@ -97,11 +99,13 @@ namespace API.Business
                         }
                     }
                 }
+                else
+                {
+                    erros.Add(Erros.FormatoImagemInvalido);
+                }
             }
             return erros;
         }
-
-
 
 
 

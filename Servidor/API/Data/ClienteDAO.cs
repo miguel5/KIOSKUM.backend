@@ -103,6 +103,9 @@ namespace API.Data
                 cmd.Parameters.AddWithValue("?codigo_validacao", codigoValidacao);
                 cmd.Parameters["?codigo_validacao"].Direction = ParameterDirection.Input;
 
+                cmd.Parameters.AddWithValue("?numMaxTentativas", numMaxTentativas);
+                cmd.Parameters["?numMaxTentativas"].Direction = ParameterDirection.Input;
+
                 cmd.ExecuteNonQuery();
 
                 _connectionDB.CloseConnection();
