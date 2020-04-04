@@ -10,6 +10,7 @@ using API.Data;
 using API.Entities;
 using API.Helpers;
 using API.ViewModels;
+using AutoMapper;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -31,14 +32,17 @@ namespace API.Business
 
     public class ClienteService : IClienteService
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
+
         private readonly AppSettings _appSettings;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IMapper _mapper;
         private readonly IClienteDAO _clienteDAO;
 
-        public ClienteService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IClienteDAO clienteDAO)
+        public ClienteService(IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IMapper mapper, IClienteDAO clienteDAO)
         {
-            _webHostEnvironment = webHostEnviroment;
             _appSettings = appSettings.Value;
+            _webHostEnvironment = webHostEnviroment;
+            _mapper = mapper;
             _clienteDAO = clienteDAO;
         }
 
@@ -255,20 +259,15 @@ namespace API.Business
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
                     var token = tokenHandler.CreateToken(tokenDescriptor);
-                    resultToken = new TokenDTO{Token = tokenHandler.WriteToken(token)};
+                    resultToken = new TokenDTO { Token = tokenHandler.WriteToken(token) };
                 }
                 else
                 {
-                     erros.Add(Erros.EmailPasswordIncorreta);
+                    erros.Add(Erros.EmailPasswordIncorreta);
                 }
             }
 
-            ServiceResult<TokenDTO> result = new ServiceResult<TokenDTO>();
-            result.Erros = new ErrosDTO { Erros = erros };
-            result.Sucesso = !erros.Any();
-            result.Resultado = resultToken;
-
-            return result;
+            return new ServiceResult<TokenDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = resultToken };
         }
 
 
@@ -322,15 +321,14 @@ namespace API.Business
 
 
             if (!erros.Any())
-            { 
+            {
                 cliente.Nome = model.Nome;
                 cliente.Email = model.Email;
                 cliente.Password = HashPassword(model.Password);
                 cliente.NumTelemovel = model.NumTelemovel;
-
                 _clienteDAO.EditarConta(cliente);
             }
-            return new ServiceResult { Erros = new ErrosDTO { Erros = erros}, Sucesso = !erros.Any() };
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
@@ -348,10 +346,10 @@ namespace API.Business
 
             if (!erros.Any())
             {
-                clienteDTO = new ClienteDTO { Nome = cliente.Nome, Email = cliente.Email, Password = cliente.Password, NumTelemovel = cliente.NumTelemovel }; 
+                clienteDTO = _mapper.Map<ClienteDTO>(cliente);
             }
 
-            return new ServiceResult<ClienteDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = erros.Any(), Resultado = clienteDTO };
+            return new ServiceResult<ClienteDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = clienteDTO };
         }
 
 

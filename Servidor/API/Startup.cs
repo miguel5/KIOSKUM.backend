@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Text;
 using API.Business;
 using API.Data;
 using API.Helpers;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -60,6 +62,16 @@ namespace API
             services.AddScoped<IProdutoService, ProdutoService>();
             services.AddScoped<IProdutoDAO, ProdutoDAO>();
             services.AddScoped<ICategoriaDAO, CategoriaDAO>();
+
+
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ViewModels.ClienteDTO, Entities.Cliente>();
+                cfg.CreateMap<Entities.Cliente, ViewModels.ClienteDTO>();
+            });
+            IMapper mapper = config.CreateMapper();
+            services.AddSingleton(mapper);
 
         }
 
