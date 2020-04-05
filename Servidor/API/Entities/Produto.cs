@@ -10,5 +10,6 @@ namespace API.Entities
         public double Preco { get; set; }
         public IList<string> Ingredientes { get; set; }
         public IList<string> Alergenios { get; set; }
+        public string ExtensaoImagem { get; set; }
     }
 }

@@ -105,34 +105,34 @@ namespace API.Business
 
             if (_clienteDAO.ExisteEmail(model.Email))
             {
-               erros.Add(Erros.EmailJaExiste);
+               erros.Add((int)ErrosEnumeration.EmailJaExiste);
 
             }
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel))
             {
-                erros.Add(Erros.NumTelemovelJaExiste);
+                erros.Add((int)ErrosEnumeration.NumTelemovelJaExiste);
             }
             if (!ValidaNome(model.Nome))
             {
-                erros.Add(Erros.NomeInvalido);
+                erros.Add((int)ErrosEnumeration.NomeInvalido);
             }
             if (!ValidaEmail(model.Email))
             {
-                erros.Add(Erros.EmailInvalido);
+                erros.Add((int)ErrosEnumeration.EmailInvalido);
             }
             if (!ValidaPassword(model.Password))
             {
-                erros.Add(Erros.PasswordInvalida);
+                erros.Add((int)ErrosEnumeration.PasswordInvalida);
             }
             if (!ValidaNumTelemovel(model.NumTelemovel))
             {
-                erros.Add(Erros.NumTelemovelInvalido);
+                erros.Add((int)ErrosEnumeration.NumTelemovelInvalido);
             }
 
             if (!erros.Any()) { 
                 string codigoValidacao = GerarCodigo();
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
-                Cliente cliente = new Cliente { Nome = model.Nome, Email = model.Email, NumTelemovel = model.NumTelemovel };
+                Cliente cliente = _mapper.Map<Cliente>(model);
                 cliente.Password = HashPassword(model.Password);
                 _clienteDAO.InserirCliente(cliente, codigoValidacao, numMaximoTentativas);
             }
@@ -169,7 +169,7 @@ namespace API.Business
             }
             else
             {
-                erros.Add(Erros.EmailNaoExiste);
+                erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
             return new ServiceResult<Tuple<Email, Email>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emails };
         }
@@ -189,24 +189,24 @@ namespace API.Business
 
             if (!_clienteDAO.ExisteEmail(model.Email))
             {
-                erros.Add(Erros.EmailNaoExiste);
+                erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
             else
             {
                 if (_clienteDAO.ContaConfirmada(model.Email))
                 {
-                    erros.Add(Erros.ContaJaConfirmada);
+                    erros.Add((int)ErrosEnumeration.ContaJaConfirmada);
                 }
                 if (!_clienteDAO.GetCodigoValidacao(model.Email).Equals(model.Codigo))
                 {
                     int numTentativas = _clienteDAO.GetNumTentativas(model.Email);
                     if (numTentativas > 0)
                     {
-                        erros.Add(Erros.CodigoValidacaoErrado);
+                        erros.Add((int)ErrosEnumeration.CodigoValidacaoErrado);
                     }
                     else
                     {
-                        erros.Add(Erros.NumTentativasExcedido);
+                        erros.Add((int)ErrosEnumeration.NumTentativasExcedido);
                     }
                 }
                 if (!erros.Any())
@@ -232,38 +232,44 @@ namespace API.Business
 
             IList<int> erros = new List<int>();
             TokenDTO resultToken = null;
-
-            if (!_clienteDAO.ContaConfirmada(model.Email))
+            if (!_clienteDAO.ExisteEmail(model.Email))
             {
-                erros.Add(Erros.ContaNaoConfirmada);
+                erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
-            /*if (!_clienteDAO.ContaAtiva(email))
+            else
             {
-                erros.Add(Erros.ContaDesativada);
-            }*/
-            if (!erros.Any())
-            {
-                Cliente cliente = _clienteDAO.GetClienteEmail(model.Email);
-                if (cliente != null && cliente.Password.Equals(HashPassword(model.Password)))
+                if (!_clienteDAO.ContaConfirmada(model.Email))
                 {
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                    var tokenDescriptor = new SecurityTokenDescriptor
+                    erros.Add((int)ErrosEnumeration.ContaNaoConfirmada);
+                }
+                if (!_clienteDAO.ContaAtiva(model.Email))
+                {
+                    erros.Add((int)ErrosEnumeration.ContaDesativada);
+                }
+                if (!erros.Any())
+                {
+                    Cliente cliente = _clienteDAO.GetClienteEmail(model.Email);
+                    if (cliente != null && cliente.Password.Equals(HashPassword(model.Password)))
                     {
-                        Subject = new ClaimsIdentity(new Claim[]
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                        var tokenDescriptor = new SecurityTokenDescriptor
                         {
+                            Subject = new ClaimsIdentity(new Claim[]
+                            {
                     new Claim(ClaimTypes.NameIdentifier, cliente.IdCliente.ToString()),
                     new Claim(ClaimTypes.Role, "Cliente")
-                        }),
-                        Expires = DateTime.UtcNow.AddDays(7),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                    };
-                    var token = tokenHandler.CreateToken(tokenDescriptor);
-                    resultToken = new TokenDTO { Token = tokenHandler.WriteToken(token) };
-                }
-                else
-                {
-                    erros.Add(Erros.EmailPasswordIncorreta);
+                            }),
+                            Expires = DateTime.UtcNow.AddDays(7),
+                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                        };
+                        var token = tokenHandler.CreateToken(tokenDescriptor);
+                        resultToken = new TokenDTO { Token = tokenHandler.WriteToken(token) };
+                    }
+                    else
+                    {
+                        erros.Add((int)ErrosEnumeration.EmailPasswordIncorreta);
+                    }
                 }
             }
 
@@ -295,28 +301,28 @@ namespace API.Business
             }
             if (_clienteDAO.ExisteEmail(model.Email) && !model.Email.Equals(cliente.Email))
             {
-                erros.Add(Erros.EmailJaExiste);
+                erros.Add((int)ErrosEnumeration.EmailJaExiste);
             }
 
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel) && model.NumTelemovel != cliente.NumTelemovel)
             {
-                erros.Add(Erros.NumTelemovelJaExiste);
+                erros.Add((int)ErrosEnumeration.NumTelemovelJaExiste);
             }
             if (!ValidaNome(model.Nome))
             {
-                erros.Add(Erros.NomeInvalido);
+                erros.Add((int)ErrosEnumeration.NomeInvalido);
             }
             if (!ValidaEmail(model.Email))
             {
-                erros.Add(Erros.EmailInvalido);
+                erros.Add((int)ErrosEnumeration.EmailInvalido);
             }
             if (!ValidaPassword(model.Password))
             {
-                erros.Add(Erros.PasswordInvalida);
+                erros.Add((int)ErrosEnumeration.PasswordInvalida);
             }
             if (!ValidaNumTelemovel(model.NumTelemovel))
             {
-                erros.Add(Erros.NumTelemovelInvalido);
+                erros.Add((int)ErrosEnumeration.NumTelemovelInvalido);
             }
 
 
@@ -341,10 +347,9 @@ namespace API.Business
             Cliente cliente = _clienteDAO.GetClienteId(idCliente);
             if(cliente == null)
             {
-                erros.Add(Erros.ClienteNaoExiste);
+                erros.Add((int)ErrosEnumeration.ClienteNaoExiste);
             }
-
-            if (!erros.Any())
+            else
             {
                 clienteDTO = _mapper.Map<ClienteDTO>(cliente);
             }
@@ -354,8 +359,15 @@ namespace API.Business
 
 
         public void DesativarConta(int idCliente)
-        { 
-            //ClienteDAO.DesativarConta(idCliente);
+        {
+            /*IList<int> erros = new List<int>();
+
+            Cliente cliente = _clienteDAO.GetClienteId(idCliente);
+
+            if(cliente == null)
+            {
+
+            }*/
         }
     }
 }
