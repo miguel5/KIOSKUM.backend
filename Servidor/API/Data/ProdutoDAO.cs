@@ -8,7 +8,10 @@ namespace API.Data
     {
         bool ExisteNome(string nome);
         void AddProduto(Produto produto);
-        bool ExisteIdProduto(int IdProduto);
+        IList<Produto> GetProdutos(int idCategoria);
+        Produto GetProdutoId(int id);
+        Produto GetProdutoNome(string nome);
+        void EditarProduto(Produto produto);
     }
 
     public class ProdutoDAO : IProdutoDAO
@@ -29,9 +32,29 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        public bool ExisteIdProduto(int IdProduto)
+        public bool ExisteProduto(int IdProduto)
         {
             return true;//throw new NotImplementedException();
+        }
+
+        public IList<Produto> GetProdutos(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Produto GetProdutoId(int idProduto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Produto GetProdutoNome(string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EditarProduto(Produto produto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

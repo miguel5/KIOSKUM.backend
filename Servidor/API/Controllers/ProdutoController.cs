@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Business;
+using API.Entities;
 using API.Models;
 using API.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +25,7 @@ namespace API.Controllers
             _produtoService = produtoService;
         }
 
-
+        [Authorize(Roles = "Administrador")]
         [HttpPost("add")]
         public IActionResult AddProduto([FromBody] ProdutoDTO model)
         {
@@ -34,12 +35,12 @@ namespace API.Controllers
             }
             try
             {
-                IList<int> erros = _produtoService.AddProduto(model.Nome, model.NomeCategoria, model.Preco, model.Ingredientes, model.Alergenios);
-                if (erros.Any())
+                ServiceResult resultado = _produtoService.AddProduto(model);
+                if (resultado.Sucesso)
                 {
-                    return BadRequest(new ErrosDTO { Erros = erros });
+                    return Ok();
                 }
-                return Ok();
+                return BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
             {
@@ -55,12 +56,17 @@ namespace API.Controllers
         [HttpPost("upload/imagem")]
         public async Task<IActionResult> UploadImagem([FromForm] ImagemDTO model)
         {
-            IList<int> erros = await _produtoService.UploadImagem(model.Id, model.File);
-            if (erros.Any())
+            if (model is null)
             {
-                return BadRequest(new ErrosDTO { Erros = erros });
+                return BadRequest(nameof(model));
             }
-            return Ok();
+
+            ServiceResult resultado = await _produtoService.UploadImagem(model);
+            if (resultado.Sucesso)
+            {
+                return Ok();
+            }
+            return BadRequest(resultado.Erros);
         }
 
 

@@ -46,7 +46,6 @@ namespace API.Business
             }
             catch (SmtpException)
             {
-                Console.WriteLine("Deu merda");
             }
         }
 
