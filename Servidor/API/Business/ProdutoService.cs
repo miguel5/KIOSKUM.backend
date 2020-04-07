@@ -19,6 +19,7 @@ namespace API.Business
         ServiceResult AddProduto(ProdutoDTO model);
         Task<ServiceResult> UploadImagem(ImagemDTO model);
         ServiceResult<IList<ProdutoDTO>> GetProdutosCategoria(string nomeCategoria);
+        ServiceResult<ProdutoDTO> GetProdutoId(int idProduto);
     }
 
 
@@ -38,7 +39,7 @@ namespace API.Business
         }
 
 
-        public bool ValidaPreco(double preco)
+        private bool ValidaPreco(double preco)
         {
             Regex rx = new Regex("^\\d{1,6}(.\\d{1,2})?$");
             return rx.IsMatch(preco.ToString());
@@ -162,7 +163,7 @@ namespace API.Business
             return new ServiceResult<IList<ProdutoDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosDTO };
         }
 
-        public ServiceResult<ProdutoDTO> GetProduto(int idProduto)
+        public ServiceResult<ProdutoDTO> GetProdutoId(int idProduto)
         {
             IList<int> erros = new List<int>();
             ProdutoDTO produtoDTO = null;
@@ -184,47 +185,7 @@ namespace API.Business
         }
 
 
-        public ServiceResult EditarProduto(ProdutoDTO model)
-        {
-            if (string.IsNullOrWhiteSpace(model.Nome))
-            {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
-            if (string.IsNullOrWhiteSpace(model.NomeCategoria))
-            {
-                throw new ArgumentNullException("NomeCategoria", "Parametro não pode ser nulo");
-            }
-
-            IList<int> erros = new List<int>();
-            Produto produto = _produtoDAO.GetProdutoNome(model.Nome);
-
-            if (_produtoDAO.ExisteNome(model.Nome) && !produto.Nome.Equals(model.Nome))
-            {
-                erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
-            }
-
-            if (!ValidaPreco(model.Preco))
-            {
-                erros.Add((int)ErrosEnumeration.PrecoInvalido);
-            }
-
-            int idCategoria = _categoriaDAO.GetIdCategoria(model.NomeCategoria);
-            if (idCategoria < 0)
-            {
-                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
-            }
-
-            if (!erros.Any())
-            {
-                produto.Nome = model.Nome;
-                produto.IdCategoria = idCategoria;
-                produto.Preco = model.Preco;
-                produto.Ingredientes = model.Ingredientes;
-                produto.Alergenios = model.Alergenios;
-                _produtoDAO.EditarProduto(produto);
-            }
-            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
-        }
+        
     }
 
 }
