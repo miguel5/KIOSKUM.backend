@@ -92,6 +92,10 @@ namespace API.Business
 
         public ServiceResult CriarConta(ClienteDTO model)
         {
+            if (string.IsNullOrWhiteSpace(model.Nome))
+            {
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
+            }
             if (string.IsNullOrWhiteSpace(model.Email))
             {
                 throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
@@ -105,7 +109,7 @@ namespace API.Business
 
             if (_clienteDAO.ExisteEmail(model.Email))
             {
-               erros.Add((int)ErrosEnumeration.EmailJaExiste);
+               erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
 
             }
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel))
@@ -301,7 +305,7 @@ namespace API.Business
             }
             if (_clienteDAO.ExisteEmail(model.Email) && !model.Email.Equals(cliente.Email))
             {
-                erros.Add((int)ErrosEnumeration.EmailJaExiste);
+                erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
             }
 
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel) && model.NumTelemovel != cliente.NumTelemovel)

@@ -22,5 +22,9 @@
         FormatoImagemInvalido = 23,
         ImagemVazia = 24,
         CategoriaNaoExiste = 25,
+
+        NumFuncionarioJaExiste = 30,
+        NumFuncionarioInvalido = 32,
+
     }
 }

@@ -70,6 +70,7 @@ namespace API
                 cfg.CreateMap<ViewModels.ClienteDTO, Entities.Cliente>();
                 cfg.CreateMap<Entities.Cliente, ViewModels.ClienteDTO>();
                 cfg.CreateMap<ViewModels.ProdutoDTO, Entities.Produto>();
+                cfg.CreateMap<Entities.Produto, ViewModels.ProdutoDTO>();
             });
             IMapper mapper = config.CreateMapper();
             services.AddSingleton(mapper);
