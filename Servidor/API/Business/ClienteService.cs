@@ -246,10 +246,6 @@ namespace API.Business
                 {
                     erros.Add((int)ErrosEnumeration.ContaNaoConfirmada);
                 }
-                if (!_clienteDAO.ContaAtiva(model.Email))
-                {
-                    erros.Add((int)ErrosEnumeration.ContaDesativada);
-                }
                 if (!erros.Any())
                 {
                     Cliente cliente = _clienteDAO.GetClienteEmail(model.Email);
@@ -359,19 +355,6 @@ namespace API.Business
             }
 
             return new ServiceResult<ClienteDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = clienteDTO };
-        }
-
-
-        public void DesativarConta(int idCliente)
-        {
-            /*IList<int> erros = new List<int>();
-
-            Cliente cliente = _clienteDAO.GetClienteId(idCliente);
-
-            if(cliente == null)
-            {
-
-            }*/
         }
     }
 }

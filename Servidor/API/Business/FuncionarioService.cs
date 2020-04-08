@@ -13,19 +13,17 @@ namespace API.Business
 {
     public interface IFuncionarioService
     {
-
+        ServiceResult CriarConta(FuncionarioDTO model);
     }
 
 
     public class FuncionarioService
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
         private readonly IFuncionarioDAO _funcionarioDAO;
 
-        public FuncionarioService(IWebHostEnvironment webHostEnviroment, IMapper mapper, IFuncionarioDAO funcionarioDAO)
+        public FuncionarioService(IMapper mapper, IFuncionarioDAO funcionarioDAO)
         {
-            _webHostEnvironment = webHostEnviroment;
             _mapper = mapper;
             _funcionarioDAO = funcionarioDAO;
         }
@@ -47,7 +45,7 @@ namespace API.Business
         {
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
             }
 
             IList<int> erros = new List<int>();
@@ -57,7 +55,6 @@ namespace API.Business
                 erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
 
             }
-
             if (!ValidaNome(model.Nome))
             {
                 erros.Add((int)ErrosEnumeration.NomeInvalido);
@@ -75,5 +72,42 @@ namespace API.Business
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
+
+
+        public ServiceResult EditarConta(FuncionarioDTO model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Nome))
+            {
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
+            }
+
+            IList<int> erros = new List<int>();
+            Funcionario funcionario = _funcionarioDAO.GetFuncionario(model.NumFuncionario);
+
+            if(funcionario == null)
+            {
+                erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
+            }
+            else
+            {
+                if (_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario) && funcionario.NumFuncionario != model.NumFuncionario)
+                {
+                    erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
+
+                }
+                if (!ValidaNome(model.Nome))
+                {
+                    erros.Add((int)ErrosEnumeration.NomeInvalido);
+                }
+
+                if (!erros.Any())
+                {
+                    _funcionarioDAO.EditarNomeFuncionario(model.Nome);
+                }
+            }
+            
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
+
     }
 }
