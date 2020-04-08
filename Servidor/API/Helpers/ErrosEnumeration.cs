@@ -16,6 +16,7 @@
         ContaDesativada = 12,
         EmailPasswordIncorreta = 14,
         ClienteNaoExiste = 15,
+
         NomeProdutoJaExiste = 20,
         PrecoInvalido = 21,
         ProdutoNaoExiste = 22,
@@ -24,6 +25,7 @@
         CategoriaNaoExiste = 25,
 
         NumFuncionarioJaExiste = 30,
+        NumFuncionarioNaoExiste = 31,
         NumFuncionarioInvalido = 32,
 
     }

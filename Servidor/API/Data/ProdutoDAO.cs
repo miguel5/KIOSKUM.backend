@@ -10,7 +10,6 @@ namespace API.Data
         void AddProduto(Produto produto);
         IList<Produto> GetProdutos(int idCategoria);
         Produto GetProdutoId(int id);
-        Produto GetProdutoNome(string nome);
         void EditarProduto(Produto produto);
     }
 
@@ -43,11 +42,6 @@ namespace API.Data
         }
 
         public Produto GetProdutoId(int idProduto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Produto GetProdutoNome(string nome)
         {
             throw new NotImplementedException();
         }

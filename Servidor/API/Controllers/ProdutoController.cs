@@ -32,11 +32,7 @@ namespace API.Controllers
             try
             {
                 ServiceResult resultado = _produtoService.AddProduto(model);
-                if (resultado.Sucesso)
-                {
-                    return Ok();
-                }
-                return BadRequest(resultado.Erros);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
             {
@@ -58,11 +54,7 @@ namespace API.Controllers
             }
 
             ServiceResult resultado = await _produtoService.UploadImagem(model);
-            if (resultado.Sucesso)
-            {
-                return Ok();
-            }
-            return BadRequest(resultado.Erros);
+            return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
         }
 
 
@@ -73,11 +65,7 @@ namespace API.Controllers
             try
             {
                 ServiceResult<IList<ProdutoDTO>> resultado = _produtoService.GetProdutosCategoria(nomeCategoria);
-                if (resultado.Sucesso)
-                {
-                    return Ok(resultado.Resultado);
-                }
-                return BadRequest(resultado.Erros);
+                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
             {
@@ -92,11 +80,7 @@ namespace API.Controllers
             try
             {
                 ServiceResult<ProdutoDTO> resultado = _produtoService.GetProdutoId(idProduto);
-                if (resultado.Sucesso)
-                {
-                    return Ok(resultado.Resultado);
-                }
-                return BadRequest(resultado.Erros);
+                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
             {
