@@ -17,7 +17,6 @@ namespace API.Data
         void ValidarConta(string email);
         void EditarConta(Cliente cliente);
         int GetNumTentativas(string email);
-        bool ContaAtiva(string email);
     }
 
 
@@ -302,29 +301,6 @@ namespace API.Data
 
                 _connectionDB.CloseConnection();
             }
-        }
-
-        public bool ContaAtiva(string email)
-        {
-            MySqlCommand cmd;
-            if (_connectionDB.OpenConnection())
-            {
-                cmd = new MySqlCommand();
-                cmd.Connection = _connectionDB.Connection;
-
-                cmd.CommandText = "conta_ativa";
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("?mail", email);
-                cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
-
-                object val = cmd.ExecuteScalar();
-
-                _connectionDB.CloseConnection();
-
-                return (val != null ? Convert.ToBoolean(val) : false);
-            }
-            return false;
         }
     }
 }
