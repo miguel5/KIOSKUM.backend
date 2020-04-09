@@ -31,11 +31,6 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        public bool ExisteProduto(int IdProduto)
-        {
-            return true;//throw new NotImplementedException();
-        }
-
         public IList<Produto> GetProdutos(int idCategoria)
         {
             throw new NotImplementedException();

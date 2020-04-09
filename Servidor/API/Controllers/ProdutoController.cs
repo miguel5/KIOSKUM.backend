@@ -72,7 +72,7 @@ namespace API.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador,Cliente")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IActionResult GetProduto(int idProduto)
         {
