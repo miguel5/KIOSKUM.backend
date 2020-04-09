@@ -31,8 +31,7 @@ namespace API.Business
 
 
     public class ClienteService : IClienteService
-    {
-
+    { 
         private readonly AppSettings _appSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
@@ -136,9 +135,9 @@ namespace API.Business
             if (!erros.Any()) { 
                 string codigoValidacao = GerarCodigo();
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
-                Cliente c = _mapper.Map<Cliente>(model);
-                c.Password = HashPassword(model.Password);
-                _clienteDAO.InserirCliente(c, codigoValidacao, numMaximoTentativas);
+                Cliente cliente = _mapper.Map<Cliente>(model);
+                cliente.Password = HashPassword(model.Password);
+                _clienteDAO.InserirCliente(cliente, codigoValidacao, numMaximoTentativas);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
