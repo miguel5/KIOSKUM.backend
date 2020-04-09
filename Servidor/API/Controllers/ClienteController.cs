@@ -41,18 +41,16 @@ namespace API.Controllers
                 {
                     return BadRequest(resultado.Erros);
                 }
-
-
                 ServiceResult<Tuple<Email,Email>> resultadoEmails = _clienteService.GetEmails(model.Email);
-                if (resultado.Sucesso)
+                if (resultadoEmails.Sucesso)
                 {
                     await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item1);
                     await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item2);
                     return Ok();
                 }
                 else
-                {
-                    return BadRequest(resultado.Erros);
+                { 
+                    return BadRequest(resultadoEmails.Erros);
                 }
 
             }

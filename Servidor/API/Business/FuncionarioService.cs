@@ -7,13 +7,13 @@ using API.Entities;
 using API.Helpers;
 using API.ViewModels;
 using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
 
 namespace API.Business
 {
     public interface IFuncionarioService
     {
         ServiceResult CriarConta(FuncionarioDTO model);
+        ServiceResult EditarConta(FuncionarioDTO model);
     }
 
 

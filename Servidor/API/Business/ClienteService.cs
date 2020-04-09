@@ -109,7 +109,7 @@ namespace API.Business
 
             if (_clienteDAO.ExisteEmail(model.Email))
             {
-               erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
+               erros.Add((int)ErrosEnumeration.EmailJaExiste);
 
             }
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel))
@@ -136,7 +136,7 @@ namespace API.Business
             if (!erros.Any()) { 
                 string codigoValidacao = GerarCodigo();
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
-                Cliente cliente = _mapper.Map<Cliente>(model);
+                Cliente cliente = new Cliente { Nome = model.Nome, Email = model.Email, NumTelemovel = model.NumTelemovel };
                 cliente.Password = HashPassword(model.Password);
                 _clienteDAO.InserirCliente(cliente, codigoValidacao, numMaximoTentativas);
             }
@@ -204,8 +204,8 @@ namespace API.Business
                 if (!_clienteDAO.GetCodigoValidacao(model.Email).Equals(model.Codigo))
                 {
                     int numTentativas = _clienteDAO.GetNumTentativas(model.Email);
-                    if (numTentativas > 0)
-                    {
+                    if (numTentativas > 1)
+                    { 
                         erros.Add((int)ErrosEnumeration.CodigoValidacaoErrado);
                     }
                     else

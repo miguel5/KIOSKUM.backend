@@ -107,7 +107,6 @@ namespace API.Data
                 cmd.Parameters["?numMaxTentativas"].Direction = ParameterDirection.Input;
 
                 cmd.ExecuteNonQuery();
-
                 _connectionDB.CloseConnection();
             }
         }
