@@ -136,9 +136,9 @@ namespace API.Business
             if (!erros.Any()) { 
                 string codigoValidacao = GerarCodigo();
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
-                Cliente cliente = new Cliente { Nome = model.Nome, Email = model.Email, NumTelemovel = model.NumTelemovel };
-                cliente.Password = HashPassword(model.Password);
-                _clienteDAO.InserirCliente(cliente, codigoValidacao, numMaximoTentativas);
+                Cliente c = _mapper.Map<Cliente>(model);
+                c.Password = HashPassword(model.Password);
+                _clienteDAO.InserirCliente(c, codigoValidacao, numMaximoTentativas);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
@@ -301,7 +301,7 @@ namespace API.Business
             }
             if (_clienteDAO.ExisteEmail(model.Email) && !model.Email.Equals(cliente.Email))
             {
-                erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
+                erros.Add((int)ErrosEnumeration.EmailJaExiste);
             }
 
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel) && model.NumTelemovel != cliente.NumTelemovel)
@@ -328,11 +328,10 @@ namespace API.Business
 
             if (!erros.Any())
             {
-                cliente.Nome = model.Nome;
-                cliente.Email = model.Email;
-                cliente.Password = HashPassword(model.Password);
-                cliente.NumTelemovel = model.NumTelemovel;
-                _clienteDAO.EditarConta(cliente);
+                Cliente c = _mapper.Map<Cliente>(model);
+                c.Password = HashPassword(model.Password);
+                c.IdCliente = idCliente;
+                _clienteDAO.EditarConta(c);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }

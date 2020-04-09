@@ -110,6 +110,7 @@ namespace API.Controllers
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 int idCliente = int.Parse(nameIdentifier);
+                Console.WriteLine(model.Email);
                 ServiceResult resultado = _clienteService.EditarDados(idCliente, model);
                 return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
 
