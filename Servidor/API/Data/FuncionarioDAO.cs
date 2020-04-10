@@ -6,9 +6,9 @@ namespace API.Data
     public interface IFuncionarioDAO
     {
         bool ExisteNumFuncionario(int numFuncionario);
-        void EditarNomeFuncionario(string nome);
-        Funcionario GetFuncionario(int numFuncionario);
-        void InserirFuncionario(Funcionario funcionario);
+        void EditarNome(string nome);
+        Funcionario GetContaNumFuncionario(int numFuncionario);
+        void InserirConta(Funcionario funcionario);
     }
 
     public class FuncionarioDAO : IFuncionarioDAO
@@ -21,7 +21,7 @@ namespace API.Data
             _connectionDB = connectionDB;
         }
 
-        public void EditarNomeFuncionario(string nome)
+        public void EditarNome(string nome)
         {
             throw new NotImplementedException();
         }
@@ -31,12 +31,12 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        public Funcionario GetFuncionario(int numFuncionario)
+        public Funcionario GetContaNumFuncionario(int numFuncionario)
         {
             throw new NotImplementedException();
         }
 
-        public void InserirFuncionario(Funcionario funcionario)
+        public void InserirConta(Funcionario funcionario)
         {
             throw new NotImplementedException();
         }

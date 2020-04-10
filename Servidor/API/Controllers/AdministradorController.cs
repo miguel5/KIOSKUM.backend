@@ -1,58 +1,95 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Security.Claims;
+using API.Business;
 using API.Entities;
+using API.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     [ApiController]
     [Route("api/administrador")]
     public class AdministradorController : ControllerBase
     {
-        private List<Administrador> administradores;
-        private readonly ILogger<AdministradorController> _logger;
+        private IAdministradorService _administradorService;
 
-        public AdministradorController(ILogger<AdministradorController> logger)
+
+        public AdministradorController(IAdministradorService administradorService)
         {
-            _logger = logger;
-            administradores = new List<Administrador>();
-            Administrador a;
-            for (int i = 0; i < 5; i++)
+            _administradorService = administradorService;
+        }
+
+        [HttpPost("criar")]
+        public IActionResult CriarConta([FromBody] AdministradorDTO model)
+        {
+            if (model is null)
+                return BadRequest(nameof(model));
+
+            try
             {
-                a = new Administrador();
-                a.IdFuncionario = 1;
-                a.Nome = "Antonio";
-                a.NumFuncionario = 123;
-                a.Email = "tone_biclas@gmail.com";
-                a.Password = "12345";
-                administradores.Add(a);
+                ServiceResult resultado = _administradorService.CriarConta(model);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(e.Message);
             }
         }
 
 
-
-        [HttpGet]
-        [Route("todos")]
-        public IList<Administrador> Get()
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] AutenticacaoDTO model)
         {
-            return administradores;
+            if (model is null)
+                return BadRequest(nameof(model));
 
+            try
+            {
+                ServiceResult<TokenDTO> resultado = _administradorService.Login(model);
+                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
 
 
-        [HttpPost]
-        public void AdicionaCliente(string Nome, string Email, string Password, int NumFuncionario)
+        [HttpPost("editar")]
+        public IActionResult EditarDados([FromBody] AdministradorDTO model)
         {
-            Administrador a = new Administrador();
-            a.IdFuncionario = 1;
-            a.Nome = Nome;
-            a.NumFuncionario = NumFuncionario;
-            a.Email = Email;
-            a.Password = Password;
-            administradores.Add(a);
-            Console.WriteLine(a.ToString());
+            if (model is null)
+                return BadRequest(nameof(model));
+
+            try
+            {
+                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                int idAdministrador = int.Parse(nameIdentifier);
+                ServiceResult resultado = _administradorService.EditarDados(idAdministrador, model);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
         }
+
+
+        [HttpGet("get")]
+        public IActionResult GetCliente()
+        {
+            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            int idAdministrador = int.Parse(nameIdentifier);
+            ServiceResult<AdministradorDTO> resultado = _administradorService.GetAdministrador(idAdministrador);
+            return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+        }
+
+
     }
 }

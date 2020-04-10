@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Business;
@@ -41,18 +39,20 @@ namespace API.Controllers
                 {
                     return BadRequest(resultado.Erros);
                 }
-                ServiceResult<Tuple<Email,Email>> resultadoEmails = _clienteService.GetEmails(model.Email);
-                if (resultadoEmails.Sucesso)
-                {
-                    await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item1);
-                    await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item2);
-                    return Ok();
-                }
                 else
-                { 
-                    return BadRequest(resultadoEmails.Erros);
+                {
+                    ServiceResult<Tuple<Email, Email>> resultadoEmails = _clienteService.GetEmails(model.Email);
+                    if (resultadoEmails.Sucesso)
+                    {
+                        await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item1);
+                        await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item2);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest(resultadoEmails.Erros);
+                    }
                 }
-
             }
             catch (ArgumentNullException e)
             {
@@ -110,7 +110,6 @@ namespace API.Controllers
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 int idCliente = int.Parse(nameIdentifier);
-                Console.WriteLine(model.Email);
                 ServiceResult resultado = _clienteService.EditarDados(idCliente, model);
                 return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
 

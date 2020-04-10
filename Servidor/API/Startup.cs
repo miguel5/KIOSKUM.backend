@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Text;
 using API.Business;
 using API.Data;
@@ -11,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using API.ViewModels;
+using API.Entities;
 
 namespace API
 {
@@ -55,22 +56,35 @@ namespace API
             });
 
             // configure DI for application services
-            services.AddScoped<IClienteService, ClienteService>();
-            services.AddScoped<IEmailSenderService, EmailSenderService>();
-            services.AddScoped<IClienteDAO, ClienteDAO>();
+
             services.AddScoped<IConnectionDB, ConnectionDB>();
-            services.AddScoped<IProdutoService, ProdutoService>();
-            services.AddScoped<IProdutoDAO, ProdutoDAO>();
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
+
+            services.AddScoped<IAdministradorDAO, AdministradorDAO>();
             services.AddScoped<ICategoriaDAO, CategoriaDAO>();
+            services.AddScoped<IClienteDAO, ClienteDAO>();
+            services.AddScoped<IFuncionarioDAO, FuncionarioDAO>();
+            services.AddScoped<IProdutoDAO, ProdutoDAO>();
+
+            services.AddScoped<IAdministradorService, AdministradorService>();
+            services.AddScoped<IClienteService, ClienteService>();
+            services.AddScoped<IFuncionarioService, FuncionarioService>();
+            services.AddScoped<IProdutoService, ProdutoService>();
 
 
 
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<ViewModels.ClienteDTO, Entities.Cliente>();
-                cfg.CreateMap<Entities.Cliente, ViewModels.ClienteDTO>();
-                cfg.CreateMap<ViewModels.ProdutoDTO, Entities.Produto>();
-                cfg.CreateMap<Entities.Produto, ViewModels.ProdutoDTO>();
+                cfg.CreateMap<Administrador, AdministradorDTO>();
+                cfg.CreateMap<AdministradorDTO, Administrador>();
+                //cfg.CreateMap<Categoria, CategoriaDTO>();
+                //cfg.CreateMap<CategoriaDTO, Categoria>();
+                cfg.CreateMap<Cliente, ClienteDTO>();
+                cfg.CreateMap<ClienteDTO, Cliente>();
+                cfg.CreateMap<Funcionario, FuncionarioDTO>();
+                cfg.CreateMap<FuncionarioDTO, Funcionario>();
+                cfg.CreateMap<Produto, ProdutoDTO>();
+                cfg.CreateMap<ProdutoDTO, Produto>();
             });
             IMapper mapper = config.CreateMapper();
             services.AddSingleton(mapper);
