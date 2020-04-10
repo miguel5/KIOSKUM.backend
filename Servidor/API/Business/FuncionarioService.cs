@@ -17,7 +17,7 @@ namespace API.Business
     }
 
 
-    public class FuncionarioService
+    public class FuncionarioService : IFuncionarioService
     {
         private readonly IMapper _mapper;
         private readonly IFuncionarioDAO _funcionarioDAO;
@@ -35,10 +35,10 @@ namespace API.Business
         }
 
 
-        private bool ValidaNumFuncionario(int numTelemovel)
+        private bool ValidaNumFuncionario(int numFuncionario)
         {
             Regex rx = new Regex("^[0-9]{5}$");
-            return rx.IsMatch(numTelemovel.ToString());
+            return rx.IsMatch(numFuncionario.ToString());
         }
 
         public ServiceResult CriarConta(FuncionarioDTO model)
@@ -68,7 +68,7 @@ namespace API.Business
             if (!erros.Any())
             {
                 Funcionario funcionario = _mapper.Map<Funcionario>(model);
-                _funcionarioDAO.InserirFuncionario(funcionario);
+                _funcionarioDAO.InserirConta(funcionario);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
@@ -82,7 +82,7 @@ namespace API.Business
             }
 
             IList<int> erros = new List<int>();
-            Funcionario funcionario = _funcionarioDAO.GetFuncionario(model.NumFuncionario);
+            Funcionario funcionario = _funcionarioDAO.GetContaNumFuncionario(model.NumFuncionario);
 
             if(funcionario == null)
             {
@@ -102,7 +102,7 @@ namespace API.Business
 
                 if (!erros.Any())
                 {
-                    _funcionarioDAO.EditarNomeFuncionario(model.Nome);
+                    _funcionarioDAO.EditarNome(model.Nome);
                 }
             }
             

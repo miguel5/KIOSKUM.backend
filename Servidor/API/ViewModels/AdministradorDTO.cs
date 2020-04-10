@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API.Business
+namespace API.ViewModels
 {
     public class AdministradorDTO
     {

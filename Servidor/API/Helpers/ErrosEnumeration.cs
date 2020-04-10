@@ -13,15 +13,16 @@
         NumTentativasExcedido = 9,
         ContaNaoConfirmada = 10,
         ContaJaConfirmada = 11,
-        ContaDesativada = 12,
-        EmailPasswordIncorreta = 14,
-        ClienteNaoExiste = 15,
+        ContaNaoExiste = 12,
+        EmailPasswordIncorreta = 13,
 
         NomeProdutoJaExiste = 20,
         PrecoInvalido = 21,
         ProdutoNaoExiste = 22,
+
         FormatoImagemInvalido = 23,
         ImagemVazia = 24,
+
         CategoriaNaoExiste = 25,
 
         NumFuncionarioJaExiste = 30,

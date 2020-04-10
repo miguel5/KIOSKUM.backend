@@ -9,11 +9,11 @@ namespace API.Data
     {
         public bool ExisteEmail(string email);
         bool ExisteNumTelemovel(int numTelemovel);
-        void InserirCliente(Cliente cliente, string codigoValidacao, int numMaxTentativas);
+        void InserirConta(Cliente cliente, string codigoValidacao, int numMaxTentativas);
         string GetCodigoValidacao(string email);
         bool ContaConfirmada(string email);
-        Cliente GetClienteEmail(string email);
-        Cliente GetClienteId(int idCliente);
+        Cliente GetContaEmail(string email);
+        Cliente GetContaId(int idCliente);
         void ValidarConta(string email);
         void EditarConta(Cliente cliente);
         int GetNumTentativas(string email);
@@ -77,7 +77,7 @@ namespace API.Data
             return false;
         }
 
-        public void InserirCliente(Cliente cliente, string codigoValidacao, int numMaxTentativas)
+        public void InserirConta(Cliente cliente, string codigoValidacao, int numMaxTentativas)
         {
             MySqlCommand cmd;
             if (_connectionDB.OpenConnection())
@@ -201,7 +201,7 @@ namespace API.Data
             }
         }
 
-        public Cliente GetClienteEmail(string email)
+        public Cliente GetContaEmail(string email)
         {
             MySqlCommand cmd;
             if (_connectionDB.OpenConnection())
@@ -236,7 +236,7 @@ namespace API.Data
             return null;
         }
 
-        public Cliente GetClienteId(int idCliente)
+        public Cliente GetContaId(int idCliente)
         {
             MySqlCommand cmd;
             if (_connectionDB.OpenConnection())

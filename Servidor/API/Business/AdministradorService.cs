@@ -18,10 +18,13 @@ namespace API.Business
 {
     public interface IAdministradorService
     {
-
+        ServiceResult CriarConta(AdministradorDTO model);
+        ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
+        ServiceResult EditarDados(int idFuncionario, AdministradorDTO model);
+        ServiceResult<AdministradorDTO> GetAdministrador(int idAdministrador);
     }
 
-    public class AdministradorService
+    public class AdministradorService : IAdministradorService
     {
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
@@ -62,10 +65,10 @@ namespace API.Business
             return password.Length >= 8 && password.Length <= 45;
         }
 
-        private bool ValidaNumFuncionario(int numTelemovel)
+        private bool ValidaNumFuncionario(int numFuncionario)
         {
             Regex rx = new Regex("^[0-9]{5}$");
-            return rx.IsMatch(numTelemovel.ToString());
+            return rx.IsMatch(numFuncionario.ToString());
         }
 
 
@@ -116,7 +119,7 @@ namespace API.Business
             {
                 Administrador administrador = _mapper.Map<Administrador>(model);
                 administrador.Password = HashPassword(model.Password);
-                _administradorDAO.InserirAdministrador(administrador);
+                _administradorDAO.InserirConta(administrador);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
@@ -143,7 +146,7 @@ namespace API.Business
             { 
                 if (!erros.Any())
                 {
-                    Administrador administrador = _administradorDAO.GetAdministradorEmail(model.Email);
+                    Administrador administrador = _administradorDAO.GetContaEmail(model.Email);
                     if (administrador != null && administrador.Password.Equals(HashPassword(model.Password)))
                     {
                         var tokenHandler = new JwtSecurityTokenHandler();
@@ -172,5 +175,87 @@ namespace API.Business
         }
 
 
+
+        public ServiceResult EditarDados(int idFuncionario, AdministradorDTO model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Nome))
+            {
+                throw new ArgumentNullException("Nome", "FieldNull");
+            }
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                throw new ArgumentNullException("Email", "FieldNull");
+            }
+            if (string.IsNullOrWhiteSpace(model.Password))
+            {
+                throw new ArgumentNullException("Password", "FieldNull");
+            }
+
+            IList<int> erros = new List<int>();
+            Administrador administrador = _administradorDAO.GetContaId(idFuncionario);
+            if (administrador == null)
+            {
+                erros.Add((int)ErrosEnumeration.ContaNaoExiste);
+            }
+            else
+            {
+                if (_administradorDAO.ExisteEmail(model.Email) && !model.Email.Equals(administrador.Email))
+                {
+                    erros.Add((int)ErrosEnumeration.EmailJaExiste);
+                }
+
+                if (_administradorDAO.ExisteNumFuncionario(model.NumFuncionario) && model.NumFuncionario != administrador.NumFuncionario)
+                {
+                    erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
+                }
+                if (!ValidaNome(model.Nome))
+                {
+                    erros.Add((int)ErrosEnumeration.NomeInvalido);
+                }
+                if (!ValidaEmail(model.Email))
+                {
+                    erros.Add((int)ErrosEnumeration.EmailInvalido);
+                }
+                if (!ValidaPassword(model.Password))
+                {
+                    erros.Add((int)ErrosEnumeration.PasswordInvalida);
+                }
+                if (!ValidaNumFuncionario(model.NumFuncionario))
+                {
+                    erros.Add((int)ErrosEnumeration.NumFuncionarioInvalido);
+                }
+
+
+                if (!erros.Any())
+                {
+                    Administrador a = _mapper.Map<Administrador>(model);
+                    a.Password = HashPassword(model.Password);
+                    a.IdFuncionario = idFuncionario;
+                    _administradorDAO.EditarConta(a);
+                }
+            }
+            
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
+
+
+        public ServiceResult<AdministradorDTO> GetAdministrador(int idAdministrador)
+        {
+
+            IList<int> erros = new List<int>();
+            AdministradorDTO administradorDTO = null;
+
+            Administrador administrador = _administradorDAO.GetContaId(idAdministrador);
+            if (administrador == null)
+            {
+                erros.Add((int)ErrosEnumeration.ContaNaoExiste);
+            }
+            else
+            {
+                administradorDTO = _mapper.Map<AdministradorDTO>(administrador);
+            }
+
+            return new ServiceResult<AdministradorDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = administradorDTO };
+        }
     }
 }
