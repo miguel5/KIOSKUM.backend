@@ -14,10 +14,12 @@ namespace API.Models
     {
         private IFuncionarioService _funcionarioService;
 
+
         public FuncionarioController(IFuncionarioService funcionarioService)
         {
             _funcionarioService = funcionarioService;
         }
+
 
         [Authorize(Roles = "Administrador")]
         [HttpPost("criar")]
@@ -38,6 +40,22 @@ namespace API.Models
         }
 
 
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("editar")]
+        public IActionResult EditarConta([FromBody] FuncionarioDTO model)
+        {
+            if (model is null) 
+                return BadRequest(nameof(model));
 
+            try
+            {
+                ServiceResult resultado = _funcionarioService.EditarConta(model);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Threading.Tasks;
 using API.Entities;
 using API.Helpers;
@@ -12,24 +11,25 @@ namespace API.Business
         Task SendEmail(string email, Email mensagem);
     }
 
+
     public class EmailSenderService : IEmailSenderService
     {
         private readonly SmtpClient _smtp;
         private readonly EmailSettings _emailSettings;
+
 
         public EmailSenderService(IOptions<AppSettings> appSettings)
         {
             _emailSettings = appSettings.Value.EmailSettings;
             _smtp = new SmtpClient
             {
-                Host = _emailSettings.ServerAddressSMTP, //Or Your SMTP Server Address
+                Host = _emailSettings.ServerAddressSMTP, 
                 Credentials = new System.Net.NetworkCredential
-                 (_emailSettings.MyEmail, _emailSettings.MyPassword), // ***use valid credentials***
+                 (_emailSettings.MyEmail, _emailSettings.MyPassword),
                 Port = _emailSettings.Port,
                 EnableSsl = false
             };
         }
-
 
 
         public async Task SendEmail(string email, Email mensagem)
@@ -48,6 +48,5 @@ namespace API.Business
             {
             }
         }
-
     }
 }

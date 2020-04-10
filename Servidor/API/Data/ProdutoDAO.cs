@@ -1,27 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using API.Business;
 using API.Entities;
 
 namespace API.Data
 {
     public interface IProdutoDAO
     {
-        bool ExisteNome(string nome);
+        bool ExisteNomeProduto(string nome);
         void AddProduto(Produto produto);
         IList<Produto> GetProdutos(int idCategoria);
-        Produto GetProdutoId(int id);
         void EditarProduto(Produto produto);
+        Produto GetProdutoNome(string nome);
     }
 
     public class ProdutoDAO : IProdutoDAO
     {
-        
+        private readonly IConnectionDB _connectionDB;
 
-        public ProdutoDAO()
+        public ProdutoDAO(IConnectionDB connectionDB)
         {
+            _connectionDB = connectionDB;
         }
 
-        bool IProdutoDAO.ExisteNome(string nome)
+        bool IProdutoDAO.ExisteNomeProduto(string nome)
         {
             throw new NotImplementedException();
         }
@@ -36,12 +38,12 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        public Produto GetProdutoId(int idProduto)
+        public void EditarProduto(Produto produto)
         {
             throw new NotImplementedException();
         }
 
-        public void EditarProduto(Produto produto)
+        public Produto GetProdutoNome(string nome)
         {
             throw new NotImplementedException();
         }

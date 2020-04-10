@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using API.ViewModels;
+﻿using API.ViewModels;
 
 namespace API.Entities
 {

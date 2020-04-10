@@ -18,6 +18,7 @@ namespace API.Controllers
         private IClienteService _clienteService;
         private IEmailSenderService _emailSenderService;
 
+
         public ClienteController(IClienteService clienteService, IEmailSenderService emailSenderService)
         {
             _clienteService = clienteService;
@@ -61,7 +62,6 @@ namespace API.Controllers
         }
 
 
-
         [AllowAnonymous]
         [HttpPost("confirmar")]
         public IActionResult ConfirmarConta([FromBody] ConfirmarClienteDTO model)
@@ -81,7 +81,6 @@ namespace API.Controllers
         }
 
 
-
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] AutenticacaoDTO model)
@@ -99,6 +98,7 @@ namespace API.Controllers
                 return BadRequest(new { message = e.Message });
             }
         }
+
 
         [HttpPost("editar")]
         public IActionResult EditarDados([FromBody] ClienteDTO model)
@@ -129,8 +129,5 @@ namespace API.Controllers
             ServiceResult<ClienteDTO> resultado = _clienteService.GetCliente(idCliente);
             return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
         }
-
-
-
     }
 }

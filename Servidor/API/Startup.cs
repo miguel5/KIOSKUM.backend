@@ -77,8 +77,8 @@ namespace API
             {
                 cfg.CreateMap<Administrador, AdministradorDTO>();
                 cfg.CreateMap<AdministradorDTO, Administrador>();
-                //cfg.CreateMap<Categoria, CategoriaDTO>();
-                //cfg.CreateMap<CategoriaDTO, Categoria>();
+                cfg.CreateMap<Categoria, CategoriaDTO>();
+                cfg.CreateMap<CategoriaDTO, Categoria>();
                 cfg.CreateMap<Cliente, ClienteDTO>();
                 cfg.CreateMap<ClienteDTO, Cliente>();
                 cfg.CreateMap<Funcionario, FuncionarioDTO>();

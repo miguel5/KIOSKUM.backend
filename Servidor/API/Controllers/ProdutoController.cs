@@ -37,10 +37,7 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
-
         }
-
-
 
 
         [Authorize(Roles = "Administrador")]
@@ -51,15 +48,42 @@ namespace API.Controllers
             {
                 return BadRequest(nameof(model));
             }
+            try
+            {
+                ServiceResult resultado = await _produtoService.UploadImagem(model);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
 
-            ServiceResult resultado = await _produtoService.UploadImagem(model);
-            return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("editar")]
+        public IActionResult EditarProduto([FromBody] ProdutoDTO model)
+        {
+            if (model is null)
+            {
+                return BadRequest(nameof(model));
+            }
+            try
+            {
+                ServiceResult resultado = _produtoService.EditarProduto(model);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+
         }
 
 
         [Authorize(Roles = "Administrador,Cliente")]
         [HttpGet("todos")]
-        public IActionResult GetProdutos(string nomeCategoria)
+        public IActionResult GetProdutosCategoria(string nomeCategoria)
         {
             try
             {
@@ -73,12 +97,12 @@ namespace API.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpGet]
-        public IActionResult GetProduto(int idProduto)
+        [HttpGet("especifico")]
+        public IActionResult GetProduto(string nome)
         {
             try
             {
-                ServiceResult<ProdutoDTO> resultado = _produtoService.GetProdutoId(idProduto);
+                ServiceResult<ProdutoDTO> resultado = _produtoService.GetProdutoNome(nome);
                 return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
