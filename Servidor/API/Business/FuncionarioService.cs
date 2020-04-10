@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using API.Data;
 using API.Entities;
-using API.Helpers;
 using API.ViewModels;
 using AutoMapper;
 
@@ -21,6 +20,7 @@ namespace API.Business
     {
         private readonly IMapper _mapper;
         private readonly IFuncionarioDAO _funcionarioDAO;
+
 
         public FuncionarioService(IMapper mapper, IFuncionarioDAO funcionarioDAO)
         {
@@ -40,6 +40,7 @@ namespace API.Business
             Regex rx = new Regex("^[0-9]{5}$");
             return rx.IsMatch(numFuncionario.ToString());
         }
+
 
         public ServiceResult CriarConta(FuncionarioDTO model)
         {
@@ -64,12 +65,12 @@ namespace API.Business
                 erros.Add((int)ErrosEnumeration.NumFuncionarioInvalido);
             }
            
-
             if (!erros.Any())
             {
                 Funcionario funcionario = _mapper.Map<Funcionario>(model);
                 _funcionarioDAO.InserirConta(funcionario);
             }
+
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
@@ -105,9 +106,8 @@ namespace API.Business
                     _funcionarioDAO.EditarNome(model.Nome);
                 }
             }
-            
+
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
-
     }
 }

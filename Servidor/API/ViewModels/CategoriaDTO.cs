@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Policy;
 
 namespace API.ViewModels
 {
-    public class FuncionarioDTO
+    public class CategoriaDTO
     {
         [Required]
         public string Nome { get; set; }
 
-        [Required]
-        public int NumFuncionario { get; set; }
+        public Url Url { get; set; }
     }
 }

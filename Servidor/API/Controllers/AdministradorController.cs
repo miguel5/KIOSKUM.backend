@@ -22,6 +22,7 @@ namespace API.Controllers
             _administradorService = administradorService;
         }
 
+
         [HttpPost("criar")]
         public IActionResult CriarConta([FromBody] AdministradorDTO model)
         {
@@ -32,7 +33,6 @@ namespace API.Controllers
             {
                 ServiceResult resultado = _administradorService.CriarConta(model);
                 return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
-
             }
             catch (ArgumentNullException e)
             {
@@ -72,7 +72,6 @@ namespace API.Controllers
                 int idAdministrador = int.Parse(nameIdentifier);
                 ServiceResult resultado = _administradorService.EditarDados(idAdministrador, model);
                 return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
-
             }
             catch (ArgumentNullException e)
             {
@@ -89,7 +88,5 @@ namespace API.Controllers
             ServiceResult<AdministradorDTO> resultado = _administradorService.GetAdministrador(idAdministrador);
             return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
         }
-
-
     }
 }

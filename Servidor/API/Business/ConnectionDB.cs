@@ -1,28 +1,29 @@
-﻿using System;
-using API.Helpers;
+﻿using API.Helpers;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
-namespace API.Data
+namespace API.Business
 {
     public interface IConnectionDB
     {
         MySqlConnection Connection { get; }
-
         bool OpenConnection();
         bool CloseConnection();
     }
+
 
     public class ConnectionDB : IConnectionDB
     {
         public MySqlConnection Connection { get; private set; }
         private DBSettings _dbSettings;
 
+
         public ConnectionDB(IOptions<AppSettings> appSettings)
         {
             _dbSettings = appSettings.Value.DBSettings;
             Initialize();
         }
+
 
         private void Initialize()
         {
@@ -52,6 +53,7 @@ namespace API.Data
             }
         }
 
+
         public bool CloseConnection()
         {
             try
@@ -61,7 +63,6 @@ namespace API.Data
             }
             catch (MySqlException)
             {
-
                 return false;
             }
         }

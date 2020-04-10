@@ -1,4 +1,5 @@
-﻿using API.Entities;
+﻿using API.Business;
+using API.Entities;
 
 namespace API.Data
 {
@@ -9,7 +10,7 @@ namespace API.Data
         Administrador GetContaEmail(string email);
         bool ExisteNumFuncionario(int numFuncionario);
         Administrador GetContaId(int idFuncionario);
-        void EditarConta(Administrador a);
+        void EditarConta(Administrador administrador);
     }
 
     public class AdministradorDAO : IAdministradorDAO
@@ -21,32 +22,32 @@ namespace API.Data
             _connectionDB = connectionDB;
         }
 
-        void IAdministradorDAO.EditarConta(Administrador a)
+        public void EditarConta(Administrador administrador)
         {
             throw new System.NotImplementedException();
         }
 
-        bool IAdministradorDAO.ExisteEmail(string email)
+        public bool ExisteEmail(string email)
         {
             throw new System.NotImplementedException();
         }
 
-        bool IAdministradorDAO.ExisteNumFuncionario(int numFuncionario)
+        public bool ExisteNumFuncionario(int numFuncionario)
         {
             throw new System.NotImplementedException();
         }
 
-        Administrador IAdministradorDAO.GetContaEmail(string email)
+        public Administrador GetContaEmail(string email)
         {
             throw new System.NotImplementedException();
         }
 
-        Administrador IAdministradorDAO.GetContaId(int idFuncionario)
+        public Administrador GetContaId(int idFuncionario)
         {
             throw new System.NotImplementedException();
         }
 
-        void IAdministradorDAO.InserirConta(Administrador administrador)
+        public void InserirConta(Administrador administrador)
         {
             throw new System.NotImplementedException();
         }

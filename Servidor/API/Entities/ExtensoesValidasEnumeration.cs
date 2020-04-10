@@ -1,5 +1,4 @@
-﻿using System;
-namespace API.Entities
+﻿namespace API.Entities
 {
     public enum ExtensoesValidasEnumeration
     {

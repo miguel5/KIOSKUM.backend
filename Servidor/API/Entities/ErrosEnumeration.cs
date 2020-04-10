@@ -1,4 +1,4 @@
-﻿namespace API.Helpers
+﻿namespace API.Entities
 {
     public enum ErrosEnumeration
     {
@@ -16,18 +16,21 @@
         ContaNaoExiste = 12,
         EmailPasswordIncorreta = 13,
 
-        NomeProdutoJaExiste = 20,
-        PrecoInvalido = 21,
-        ProdutoNaoExiste = 22,
 
-        FormatoImagemInvalido = 23,
-        ImagemVazia = 24,
+        NumFuncionarioJaExiste = 20,
+        NumFuncionarioNaoExiste = 21,
+        NumFuncionarioInvalido = 22,
 
-        CategoriaNaoExiste = 25,
+        NomeProdutoJaExiste = 30,
+        PrecoInvalido = 31,
+        ProdutoNaoExiste = 32,
 
-        NumFuncionarioJaExiste = 30,
-        NumFuncionarioNaoExiste = 31,
-        NumFuncionarioInvalido = 32,
+        CategoriaNaoExiste = 40,
+        NomeCategoriaJaExiste = 41,
 
+        FormatoImagemInvalido = 50,
+        ImagemVazia = 51,
+
+        
     }
 }
