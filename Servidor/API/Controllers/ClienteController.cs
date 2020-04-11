@@ -6,7 +6,7 @@ using API.Entities;
 using API.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
@@ -15,12 +15,14 @@ namespace API.Controllers
     [Route("api/cliente")]
     public class ClienteController : ControllerBase
     {
+        private readonly ILogger _logger;
         private IClienteService _clienteService;
         private IEmailSenderService _emailSenderService;
 
 
-        public ClienteController(IClienteService clienteService, IEmailSenderService emailSenderService)
+        public ClienteController(ILogger<ClienteController> logger, IClienteService clienteService, IEmailSenderService emailSenderService)
         {
+            _logger = logger;
             _clienteService = clienteService;
             _emailSenderService = emailSenderService;
         }
@@ -59,6 +61,10 @@ namespace API.Controllers
             {
                 return BadRequest(e.Message);
             }
+            catch(Exception)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
 
@@ -78,6 +84,10 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
 
@@ -96,6 +106,10 @@ namespace API.Controllers
             catch (ArgumentNullException e)
             {
                 return BadRequest(new { message = e.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal Server Error");
             }
         }
 
@@ -118,6 +132,10 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
 
@@ -126,8 +144,15 @@ namespace API.Controllers
         {
             string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idCliente = int.Parse(nameIdentifier);
-            ServiceResult<ClienteDTO> resultado = _clienteService.GetCliente(idCliente);
-            return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+            try
+            {
+                ServiceResult<ClienteDTO> resultado = _clienteService.GetCliente(idCliente);
+                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

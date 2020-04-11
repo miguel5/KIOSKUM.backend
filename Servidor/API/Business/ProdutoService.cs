@@ -128,7 +128,7 @@ namespace API.Business
                         if (model.File.Length > 0)
                         {
                             produto.ExtensaoImagem = fileExtension;
-                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produtos", produto.Nome + "." + produto.ExtensaoImagem);
+                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", produto.Nome + "." + produto.ExtensaoImagem);
                             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
                             await model.File.CopyToAsync(fileStream);
                             _produtoDAO.EditarProduto(produto);
@@ -223,7 +223,7 @@ namespace API.Business
                 IList<Produto> produtos = _produtoDAO.GetProdutos(idCategoria);
                 if (produtos != null)
                 {
-                    string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produtos");
+                    string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto");
                     foreach (Produto produto in produtos)
                     {
                         ProdutoDTO produtoDTO = _mapper.Map<ProdutoDTO>(produto);
@@ -249,7 +249,7 @@ namespace API.Business
             else
             {
                 produtoDTO = _mapper.Map<ProdutoDTO>(produto);
-                string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produtos");
+                string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto");
                 produtoDTO.Url = new System.Security.Policy.Url(Path.Combine(pathImagem, produto.IdProduto + "." + produto.ExtensaoImagem));
             }
 

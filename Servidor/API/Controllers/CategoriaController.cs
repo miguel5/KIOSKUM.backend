@@ -109,5 +109,22 @@ namespace API.Controllers
                 return BadRequest(new { message = e.Message });
             }
         }
+
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
+        [HttpPost("remover")]
+        public async Task<IActionResult> RemoverCategoria(string nome)
+        { 
+            try
+            {
+                ServiceResult resultado = await _categoriaService.RemoverCategoria(nome);
+                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
     }
 }

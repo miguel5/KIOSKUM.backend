@@ -19,9 +19,10 @@ namespace API.Business
         ServiceResult EditarCategoria(CategoriaDTO model);
         ServiceResult<IList<CategoriaDTO>> GetTodasCategorias();
         ServiceResult<CategoriaDTO> GetCategoriaNome(string nome);
+        Task<ServiceResult> RemoverCategoria(string nome);
     }
 
-    public class CategoriaService
+    public class CategoriaService : ICategoriaService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
@@ -89,7 +90,7 @@ namespace API.Business
                         if (model.File.Length > 0)
                         {
                             categoria.ExtensaoImagem = fileExtension;
-                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Categorias", categoria.Nome + "." + categoria.ExtensaoImagem);
+                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Categoria", categoria.Nome + "." + categoria.ExtensaoImagem);
                             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
                             await model.File.CopyToAsync(fileStream);
                             _categoriaDAO.EditarCategoria(categoria);
@@ -149,7 +150,7 @@ namespace API.Business
             IList<Categoria> categorias = _categoriaDAO.GetTodasCategorias();
             if (categorias != null)
             {
-                string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Categorias");
+                string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Categoria");
                 foreach (Categoria categoria in categorias)
                 {
                     CategoriaDTO categoriaDTO = _mapper.Map<CategoriaDTO>(categoria);
@@ -182,11 +183,40 @@ namespace API.Business
             else
             {
                 categoriaDTO = _mapper.Map<CategoriaDTO>(categoria);
-                string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Categorias");
+                string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Categoria");
                 categoriaDTO.Url = new System.Security.Policy.Url(Path.Combine(pathImagem, categoria.Nome + "." + categoria.ExtensaoImagem));
             }
 
             return new ServiceResult<CategoriaDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = categoriaDTO };
         }
+
+
+        public async Task<ServiceResult> RemoverCategoria(string nome)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+            }
+
+            IList<int> erros = new List<int>();
+            Categoria categoria = _categoriaDAO.GetCategoriaNome(nome);
+
+            if (categoria == null)
+            {
+                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+            }
+            else
+            {
+                if (_categoriaDAO.CategoriaIsEmpty(nome))
+                {
+                    _categoriaDAO.RemoverCategoria(nome);
+
+                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Categoria", nome + "." + categoria.ExtensaoImagem);
+                    await Task.Factory.StartNew(() => File.Delete(filePath));
+                }
+            }
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
+
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using API.ViewModels;
 using API.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace API
 {
@@ -67,6 +68,7 @@ namespace API
             services.AddScoped<IProdutoDAO, ProdutoDAO>();
 
             services.AddScoped<IAdministradorService, AdministradorService>();
+            services.AddScoped<ICategoriaService, CategoriaService>();
             services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IFuncionarioService, FuncionarioService>();
             services.AddScoped<IProdutoService, ProdutoService>();
@@ -92,8 +94,10 @@ namespace API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddFile("Logs/mylog-{Date}.txt");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
