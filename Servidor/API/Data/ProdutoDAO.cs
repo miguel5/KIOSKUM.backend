@@ -12,6 +12,7 @@ namespace API.Data
         IList<Produto> GetProdutos(int idCategoria);
         void EditarProduto(Produto produto);
         Produto GetProdutoNome(string nome);
+        void RemoverProduto(string nome);
     }
 
     public class ProdutoDAO : IProdutoDAO
@@ -44,6 +45,11 @@ namespace API.Data
         }
 
         public Produto GetProdutoNome(string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoverProduto(string nome)
         {
             throw new NotImplementedException();
         }

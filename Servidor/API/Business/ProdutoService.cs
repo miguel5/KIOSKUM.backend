@@ -255,5 +255,30 @@ namespace API.Business
 
             return new ServiceResult<ProdutoDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtoDTO };
         }
+
+
+        public async Task<ServiceResult> RemoverProduto(string nome)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+            {
+                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+            }
+
+            IList<int> erros = new List<int>();
+            Produto produto = _produtoDAO.GetProdutoNome(nome);
+
+            if (produto == null)
+            {
+                erros.Add((int)ErrosEnumeration.ProdutoNaoExiste);
+            }
+            else
+            {
+                _produtoDAO.RemoverProduto(nome);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", nome + "." + produto.ExtensaoImagem);
+                await Task.Factory.StartNew(() => File.Delete(filePath));
+            }
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
+
     }
 }
