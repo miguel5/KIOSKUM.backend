@@ -86,7 +86,7 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
 
@@ -109,7 +109,7 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
 
@@ -134,7 +134,7 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
 
@@ -151,7 +151,7 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
     }
