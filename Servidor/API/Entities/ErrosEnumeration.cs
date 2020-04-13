@@ -15,6 +15,7 @@
         ContaJaConfirmada = 11,
         ContaNaoExiste = 12,
         EmailPasswordIncorreta = 13,
+        PasswordsNaoCorrespondem = 14,
 
 
         NumFuncionarioJaExiste = 20,

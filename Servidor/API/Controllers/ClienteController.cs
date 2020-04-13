@@ -115,7 +115,7 @@ namespace API.Controllers
 
 
         [HttpPost("editar")]
-        public IActionResult EditarDados([FromBody] ClienteDTO model)
+        public IActionResult EditarDados([FromBody] EditarClienteDTO model)
         {
             if (model is null)
                 return BadRequest(nameof(model));

@@ -2,14 +2,8 @@
 
 namespace API.ViewModels
 {
-    public class AdministradorDTO
+    public class AdministradorDTO : FuncionarioDTO
     {
-        [Required]
-        public string Nome { get; set; }
-
-        [Required]
-        public int NumFuncionario { get; set; }
-
         [Required]
         public string Email { get; set; }
 

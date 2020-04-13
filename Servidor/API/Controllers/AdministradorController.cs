@@ -61,7 +61,7 @@ namespace API.Controllers
 
 
         [HttpPost("editar")]
-        public IActionResult EditarDados([FromBody] AdministradorDTO model)
+        public IActionResult EditarDados([FromBody] EditarAdministradorDTO model)
         {
             if (model is null)
                 return BadRequest(nameof(model));
