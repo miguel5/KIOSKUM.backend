@@ -12,6 +12,7 @@ namespace API.Data
         bool ExisteNumTelemovel(int numTelemovel);
         void InserirConta(Cliente cliente, string codigoValidacao, int numMaxTentativas);
         string GetCodigoValidacao(string email);
+        void DecrementaTentativas(string email);
         bool ContaConfirmada(string email);
         Cliente GetContaEmail(string email);
         Cliente GetContaId(int idCliente);
@@ -162,6 +163,24 @@ namespace API.Data
             _connectionDB.CloseConnection();
 
             return val;
+        }
+
+
+        public void DecrementaTentativas(string email)
+        {
+            _connectionDB.OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "decrementa_tentativas";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?mail", email);
+            cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
+
+            cmd.ExecuteNonQuery();
+            _connectionDB.CloseConnection();
         }
 
 
