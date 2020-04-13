@@ -132,10 +132,10 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
-            catch (Exception)
+            /*catch (Exception)
             {
                 return StatusCode(500, "Internal Server Error");
-            }
+            }*/
         }
 
 
