@@ -203,9 +203,10 @@ namespace API.Business
                 if (!_clienteDAO.GetCodigoValidacao(model.Email).Equals(model.Codigo))
                 {
                     int numTentativas = _clienteDAO.GetNumTentativas(model.Email);
-                    if (numTentativas > 1)
+                    if (numTentativas > 0)
                     { 
                         erros.Add((int)ErrosEnumeration.CodigoValidacaoErrado);
+                        _clienteDAO.DecrementaTentativas(model.Email);
                     }
                     else
                     {

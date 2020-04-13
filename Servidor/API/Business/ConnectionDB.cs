@@ -7,8 +7,8 @@ namespace API.Business
     public interface IConnectionDB
     {
         MySqlConnection Connection { get; }
-        bool OpenConnection();
-        bool CloseConnection();
+        void OpenConnection();
+        void CloseConnection();
     }
 
 
@@ -40,31 +40,15 @@ namespace API.Business
         }
 
 
-        public bool OpenConnection()
+        public void OpenConnection()
         {
-            try
-            {
-                Connection.Open();
-                return true;
-            }
-            catch (MySqlException)
-            {
-                return false;
-            }
+            Connection.Open();
         }
 
 
-        public bool CloseConnection()
+        public void CloseConnection()
         {
-            try
-            {
-                Connection.Close();
-                return true;
-            }
-            catch (MySqlException)
-            {
-                return false;
-            }
+            Connection.Close();
         }
     }
 }
