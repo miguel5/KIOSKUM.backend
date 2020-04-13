@@ -25,7 +25,7 @@ namespace API.Business
         ServiceResult<Tuple<Email, Email>> GetEmails(string email);
         ServiceResult ConfirmarConta(ConfirmarClienteDTO model);
         ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
-        ServiceResult EditarDados(int idCliente, ClienteDTO model);
+        ServiceResult EditarDados(int idCliente, EditarClienteDTO model);
         ServiceResult<ClienteDTO> GetCliente(int idCliente);
     }
 
@@ -278,7 +278,7 @@ namespace API.Business
 
 
 
-        public ServiceResult EditarDados(int idCliente, ClienteDTO model)
+        public ServiceResult EditarDados(int idCliente, EditarClienteDTO model)
         {
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
@@ -291,6 +291,10 @@ namespace API.Business
             if (string.IsNullOrWhiteSpace(model.Password))
             {
                 throw new ArgumentNullException("Password", "FieldNull");
+            }
+            if (string.IsNullOrWhiteSpace(model.NovaPassword))
+            {
+                throw new ArgumentNullException("Nova Password", "FieldNull");
             }
 
             IList<int> erros = new List<int>();
@@ -318,7 +322,7 @@ namespace API.Business
                 {
                     erros.Add((int)ErrosEnumeration.EmailInvalido);
                 }
-                if (!ValidaPassword(model.Password))
+                if (!ValidaPassword(model.NovaPassword))
                 {
                     erros.Add((int)ErrosEnumeration.PasswordInvalida);
                 }
@@ -326,12 +330,15 @@ namespace API.Business
                 {
                     erros.Add((int)ErrosEnumeration.NumTelemovelInvalido);
                 }
-
+                if (!HashPassword(model.Password).Equals(cliente.Password))
+                {
+                    erros.Add((int)ErrosEnumeration.PasswordsNaoCorrespondem);
+                }
 
                 if (!erros.Any())
                 {
                     Cliente c = _mapper.Map<Cliente>(model);
-                    c.Password = HashPassword(model.Password);
+                    c.Password = HashPassword(model.NovaPassword);
                     c.IdCliente = idCliente;
                     _clienteDAO.EditarConta(c);
                 }

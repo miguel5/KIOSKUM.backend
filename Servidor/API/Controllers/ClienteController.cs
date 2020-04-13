@@ -86,7 +86,7 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
 
@@ -109,13 +109,13 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
 
 
         [HttpPost("editar")]
-        public IActionResult EditarDados([FromBody] ClienteDTO model)
+        public IActionResult EditarDados([FromBody] EditarClienteDTO model)
         {
             if (model is null)
                 return BadRequest(nameof(model));
@@ -134,7 +134,7 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
 
@@ -151,7 +151,7 @@ namespace API.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Internal Server Error");
+                return StatusCode(500);
             }
         }
     }

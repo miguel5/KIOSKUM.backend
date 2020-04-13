@@ -20,7 +20,7 @@ namespace API.Business
     {
         ServiceResult CriarConta(AdministradorDTO model);
         ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
-        ServiceResult EditarDados(int idFuncionario, AdministradorDTO model);
+        ServiceResult EditarDados(int idFuncionario, EditarAdministradorDTO model);
         ServiceResult<AdministradorDTO> GetAdministrador(int idAdministrador);
     }
 
@@ -176,7 +176,7 @@ namespace API.Business
 
 
 
-        public ServiceResult EditarDados(int idFuncionario, AdministradorDTO model)
+        public ServiceResult EditarDados(int idFuncionario, EditarAdministradorDTO model)
         {
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
@@ -186,7 +186,12 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Email", "FieldNull");
             }
-            if (string.IsNullOrWhiteSpace(model.Password))
+            if (string.IsNullOrWhiteSpace(model.PasswordAtual))
+            {
+                throw new ArgumentNullException("Password", "FieldNull");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.NovaPassword))
             {
                 throw new ArgumentNullException("Password", "FieldNull");
             }
@@ -216,7 +221,7 @@ namespace API.Business
                 {
                     erros.Add((int)ErrosEnumeration.EmailInvalido);
                 }
-                if (!ValidaPassword(model.Password))
+                if (!ValidaPassword(model.NovaPassword))
                 {
                     erros.Add((int)ErrosEnumeration.PasswordInvalida);
                 }
@@ -224,12 +229,16 @@ namespace API.Business
                 {
                     erros.Add((int)ErrosEnumeration.NumFuncionarioInvalido);
                 }
+                if (!HashPassword(model.PasswordAtual).Equals(administrador.Password))
+                {
+                    erros.Add((int)ErrosEnumeration.PasswordsNaoCorrespondem);
+                }
 
 
                 if (!erros.Any())
                 {
                     Administrador a = _mapper.Map<Administrador>(model);
-                    a.Password = HashPassword(model.Password);
+                    a.Password = HashPassword(model.NovaPassword);
                     a.IdFuncionario = idFuncionario;
                     _administradorDAO.EditarConta(a);
                 }
