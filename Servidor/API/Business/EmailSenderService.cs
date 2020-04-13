@@ -1,4 +1,5 @@
-﻿using System.Net.Mail;
+﻿using System;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using API.Entities;
 using API.Helpers;
@@ -34,19 +35,13 @@ namespace API.Business
 
         public async Task SendEmail(string email, Email mensagem)
         {
-            try
-            {
-                MailMessage mail = new MailMessage();
-                mail.To.Add(email);
-                mail.From = new MailAddress(_emailSettings.MyEmail);
-                mail.Subject = mensagem.Assunto;
-                mail.Body = mensagem.Conteudo;
-                mail.IsBodyHtml = true;
-                await _smtp.SendMailAsync(mail);
-            }
-            catch (SmtpException)
-            {
-            }
+            MailMessage mail = new MailMessage();
+            mail.To.Add(email);
+            mail.From = new MailAddress(_emailSettings.MyEmail);
+            mail.Subject = mensagem.Assunto;
+            mail.Body = mensagem.Conteudo;
+            mail.IsBodyHtml = true;
+            await _smtp.SendMailAsync(mail);
         }
     }
 }
