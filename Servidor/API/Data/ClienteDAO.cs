@@ -2,6 +2,7 @@
 using System.Data;
 using API.Business;
 using API.Entities;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace API.Data
@@ -24,16 +25,20 @@ namespace API.Data
 
     public class ClienteDAO : IClienteDAO
     {
+        private readonly ILogger _logger;
         private readonly IConnectionDB _connectionDB;
 
-        public ClienteDAO(IConnectionDB connectionDB)
+        public ClienteDAO(ILogger<ClienteDAO> logger, IConnectionDB connectionDB)
         {
+            _logger = logger;
             _connectionDB = connectionDB;
         }
 
 
         public bool ExisteEmail(string email)
         {
+            _logger.LogInformation("O método ExisteEmail foi invocado!");
+
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();

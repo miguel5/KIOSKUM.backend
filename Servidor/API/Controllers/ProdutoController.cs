@@ -110,6 +110,5 @@ namespace API.Controllers
                 return BadRequest(new { message = e.Message });
             }
         }
-
     }
 }
