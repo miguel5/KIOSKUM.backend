@@ -51,6 +51,7 @@ namespace API.Business
 
         public void CloseConnection()
         {
+            _logger.LogInformation("O método CloseConnection foi invocado!");
             Connection.Close();
         }
     }
