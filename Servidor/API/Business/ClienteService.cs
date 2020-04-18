@@ -51,7 +51,6 @@ namespace API.Business
 
         private string HashPassword(string password)
         {
-            _logger.LogInformation("O método HashPassword foi invocado!");
             return Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,
                 salt: new byte[0],
@@ -63,7 +62,6 @@ namespace API.Business
 
         private string GerarCodigo()
         {
-            _logger.LogInformation("O método GerarCodigo foi invocado!");
             Random random = new Random();
             const string carateres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(carateres, 8).Select(s => s[random.Next(s.Length)]).ToArray());
@@ -72,26 +70,22 @@ namespace API.Business
 
         private bool ValidaNome(string nome)
         {
-            _logger.LogInformation("O método ValidaNome foi invocado!");
             return nome.Length <= 100;
         }
 
         private bool ValidaEmail(string email)
         {
-            _logger.LogInformation("O método ValidaEmail foi invocado!");
             Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
             return rx.IsMatch(email) && email.Length <= 100;
         }
 
         private bool ValidaPassword(string password)
         {
-            _logger.LogInformation("O método ValidaPassword foi invocado!");
             return password.Length >= 8 && password.Length <= 45;
         }
 
         private bool ValidaNumTelemovel(int numTelemovel)
         {
-            _logger.LogInformation("O método ValidaNumTelemovel foi invocado!");
             Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
             return rx.IsMatch(numTelemovel.ToString());
         }
@@ -101,7 +95,6 @@ namespace API.Business
         public ServiceResult CriarConta(ClienteDTO model)
         {
             _logger.LogInformation("O método CriarConta foi invocado!");
-
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
                 throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
@@ -119,33 +112,26 @@ namespace API.Business
 
             if (_clienteDAO.ExisteEmail(model.Email))
             {
-                _logger.LogWarning($"O email : {model.Email} já se encontra associado a uma  cliente!");
                 erros.Add((int)ErrosEnumeration.EmailJaExiste);
-
             }
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel))
             {
-                _logger.LogWarning($"O Número de Telemóvel : {model.NumTelemovel} já se encontra associado a uma  cliente!");
                 erros.Add((int)ErrosEnumeration.NumTelemovelJaExiste);
             }
             if (!ValidaNome(model.Nome))
             {
-                _logger.LogWarning($"O Nome : {model.Nome} não está dentro das normas!");
                 erros.Add((int)ErrosEnumeration.NomeInvalido);
             }
             if (!ValidaEmail(model.Email))
             {
-                _logger.LogWarning($"O Email : {model.Email} não está dentro das normas!");
                 erros.Add((int)ErrosEnumeration.EmailInvalido);
             }
             if (!ValidaPassword(model.Password))
             {
-                _logger.LogWarning("A Password não está dentro das normas!");
                 erros.Add((int)ErrosEnumeration.PasswordInvalida);
             }
             if (!ValidaNumTelemovel(model.NumTelemovel))
             {
-                _logger.LogWarning($"O Número de Telemóvel : {model.NumTelemovel} não está dentro das normas!");
                 erros.Add((int)ErrosEnumeration.NumTelemovelInvalido);
             }
 

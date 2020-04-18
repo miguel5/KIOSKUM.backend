@@ -49,7 +49,7 @@ namespace API.Controllers
                 }
                 else
                 {
-                    _logger.LogInformation($"O {model.Nome} registou-se com sucesso!");
+                    _logger.LogInformation($"O {model.Nome}, com {model.Email} e {model.NumTelemovel} registou-se com sucesso!");
                     ServiceResult<Tuple<Email, Email>> resultadoEmails = _clienteService.GetEmails(model.Email);
                     if (resultadoEmails.Sucesso)
                     {
@@ -61,7 +61,6 @@ namespace API.Controllers
                     }
                     else
                     {
-                        _logger.LogWarning("Ocorreu um erro ao ler os emails!");
                         return BadRequest(resultadoEmails.Erros);
                     }
                 }
@@ -83,20 +82,35 @@ namespace API.Controllers
         [HttpPost("confirmar")]
         public IActionResult ConfirmarConta([FromBody] ConfirmarClienteDTO model)
         {
+            _logger.LogInformation("A executar api/cliente/confirmar -> Post");
             if (model is null)
+            {
+                _logger.LogWarning("O objeto ClienteDTO é null!");
                 return BadRequest(nameof(model));
+            }
 
             try
             {
                 ServiceResult resultado = _clienteService.ConfirmarConta(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation("Confirmação da conta realizada com sucesso!");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogWarning("Ocorreu um erro ao confirmar conta!");
+                    return BadRequest(resultado.Erros);
+                }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.LogError(e, e.Message);
                 return StatusCode(500);
             }
         }

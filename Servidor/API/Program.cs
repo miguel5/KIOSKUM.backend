@@ -16,9 +16,9 @@ namespace API
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureLogging(logBuilder =>
                     {
-                        logBuilder.ClearProviders(); // removes all providers from LoggerFactory
+                        logBuilder.ClearProviders();
                         logBuilder.AddConsole();
-                        logBuilder.AddTraceSource("Information, ActivityTracing"); // Add Trace listener provider
+                        logBuilder.AddTraceSource("Information, ActivityTracing");
                     })
                 .UseStartup<Startup>();
     }

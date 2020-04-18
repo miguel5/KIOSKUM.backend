@@ -73,7 +73,7 @@ namespace API
             services.AddScoped<IClienteService, ClienteService>();
             services.AddScoped<IFuncionarioService, FuncionarioService>();
             services.AddScoped<IProdutoService, ProdutoService>();
-
+            
 
 
             var config = new MapperConfiguration(cfg =>

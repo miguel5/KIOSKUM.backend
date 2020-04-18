@@ -44,14 +44,12 @@ namespace API.Business
 
         public void OpenConnection()
         {
-            _logger.LogInformation("O método OpenConnection foi invocado!");
             Connection.Open();
         }
 
 
         public void CloseConnection()
         {
-            _logger.LogInformation("O método CloseConnection foi invocado!");
             Connection.Close();
         }
     }

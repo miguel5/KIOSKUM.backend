@@ -37,6 +37,9 @@
     <None Remove="mono_crash.mem.9613.70000a63c000.blob" />
     <None Remove="mono_crash.mem.9613.700009827000.blob" />
     <None Remove="mono_crash.mem.9651.1.blob" />
+    <None Remove="Logs\mylog-20200414.txt" />
+    <None Remove="Logs\mylog-20200417.txt" />
+    <None Remove="Logs\mylog-20200418.txt" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="wwwroot\Images\Categorias\app.png" />
