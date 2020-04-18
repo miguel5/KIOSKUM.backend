@@ -25,16 +25,20 @@ namespace API.Data
 
     public class ClienteDAO : IClienteDAO
     {
+        private readonly ILogger _logger;
         private readonly IConnectionDB _connectionDB;
 
-        public ClienteDAO(IConnectionDB connectionDB)
+        public ClienteDAO(ILogger logger, IConnectionDB connectionDB)
         {
+            _logger = logger;
             _connectionDB = connectionDB;
         }
 
 
         public bool ExisteEmail(string email)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> ExisteEmail]");
+
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -55,6 +59,7 @@ namespace API.Data
 
         public bool ExisteNumTelemovel(int numTelemovel)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> ExisteNumTelemovel]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -75,6 +80,7 @@ namespace API.Data
 
         public void InserirConta(Cliente cliente, string codigoValidacao, int numMaxTentativas)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> InserirConta]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -108,6 +114,7 @@ namespace API.Data
 
         public string GetCodigoValidacao(string email)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> GetCodigoValidacao]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -128,6 +135,7 @@ namespace API.Data
 
         public bool ContaConfirmada(string email)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> ContaConfirmada]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -148,6 +156,7 @@ namespace API.Data
 
         public int GetNumTentativas(string email)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> GetNumTentativas]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -169,6 +178,7 @@ namespace API.Data
 
         public void DecrementaTentativas(string email)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> DecrementaTentativas]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -187,6 +197,7 @@ namespace API.Data
 
         public void ValidarConta(string email)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> ValidarConta]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -204,7 +215,8 @@ namespace API.Data
         }
 
         public Cliente GetContaEmail(string email)
-        { 
+        {
+            _logger.LogDebug("A executar [ClienteDAO -> GetContaEmail]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -236,6 +248,7 @@ namespace API.Data
 
         public Cliente GetContaId(int idCliente)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> GetContaId]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -267,6 +280,7 @@ namespace API.Data
 
         public void EditarConta(Cliente cliente)
         {
+            _logger.LogDebug("A executar [ClienteDAO -> EditarConta]");
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();

@@ -44,13 +44,17 @@ namespace API.Business
 
         public void OpenConnection()
         {
+            _logger.LogDebug("A executar [ConnectionDB -> OpenConnection]");
             Connection.Open();
+            _logger.LogDebug("Conexão aberta");
         }
 
 
         public void CloseConnection()
         {
+            _logger.LogDebug("A executar [ConnectionDB -> OpenConnection]");
             Connection.Close();
+            _logger.LogDebug("Conexão fechada");
         }
     }
 }
