@@ -13,7 +13,6 @@ namespace API.Business
         Task SendEmail(string email, Email mensagem);
     }
 
-
     public class EmailSenderService : IEmailSenderService
     {
 
@@ -32,7 +31,7 @@ namespace API.Business
                 Credentials = new System.Net.NetworkCredential
                  (_emailSettings.MyEmail, _emailSettings.MyPassword),
                 Port = _emailSettings.Port,
-                EnableSsl = false
+                EnableSsl = true
             };
         }
 
