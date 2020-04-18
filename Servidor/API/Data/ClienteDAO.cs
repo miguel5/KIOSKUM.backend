@@ -28,7 +28,7 @@ namespace API.Data
         private readonly ILogger _logger;
         private readonly IConnectionDB _connectionDB;
 
-        public ClienteDAO(ILogger logger, IConnectionDB connectionDB)
+        public ClienteDAO(ILogger<ClienteDAO> logger, IConnectionDB connectionDB)
         {
             _logger = logger;
             _connectionDB = connectionDB;
