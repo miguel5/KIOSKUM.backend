@@ -23,8 +23,9 @@ namespace API.Business
     public interface IClienteService
     {
         ServiceResult CriarConta(ClienteDTO model);
-        ServiceResult<Tuple<Email, Email>> GetEmails(string email);
+        ServiceResult<Email> GetEmailCodigoValidacao(string email);
         ServiceResult ConfirmarConta(ConfirmarClienteDTO model);
+        ServiceResult<Email> GetEmailBoasVindas(string email);
         ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
         ServiceResult EditarDados(int idCliente, EditarClienteDTO model);
         ServiceResult<ClienteDTO> GetCliente(int idCliente);
@@ -158,44 +159,34 @@ namespace API.Business
         }
 
 
-        public ServiceResult<Tuple<Email, Email>> GetEmails(string email)
+        public ServiceResult<Email> GetEmailCodigoValidacao(string email)
         {
-            _logger.LogDebug("A executar [ClienteService -> GetEmails]");
+            _logger.LogDebug("A executar [ClienteService -> GetEmailCodigoValidacao]");
             if (string.IsNullOrWhiteSpace(email))
             {
                 throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
             }
 
             IList<int> erros = new List<int>();
-            Tuple<Email, Email> emails = null;
+            Email emailCodigoValidacao = null;
             string codigoValidacao = _clienteDAO.GetCodigoValidacao(email);
 
             if(codigoValidacao != null)
             {
-                _logger.LogDebug("Início da leitura do ficheiro de EmailBoasVindas.json");
-                string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
-                StreamReader sr = new StreamReader(pathEmailBoasVindas);
-                string json = sr.ReadToEnd();
-                _logger.LogDebug("Fim da leitura do ficheiro de EmailBoasVindas.json");
-                Email emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
-
                 _logger.LogDebug("Início da leitura do ficheiro de EmailGerarCodigo.json");
                 string pathEmailgerarCodigo = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailGerarCodigo.json");
-                sr = new StreamReader(pathEmailgerarCodigo);
-                json = sr.ReadToEnd();
+                StreamReader sr = new StreamReader(pathEmailgerarCodigo);
+                string json = sr.ReadToEnd();
                 _logger.LogDebug("Fim da leitura do ficheiro de EmailGerarCodigo.json");
-                Email emailGerarCodigo = JsonConvert.DeserializeObject<Email>(json);
-                emailGerarCodigo.AdcionaCodigo(codigoValidacao);
-
-
-                emails = new Tuple<Email, Email>(emailBoasVindas, emailGerarCodigo);
+                emailCodigoValidacao = JsonConvert.DeserializeObject<Email>(json);
+                emailCodigoValidacao.AdicionaCodigo(codigoValidacao);
             }
             else
             {
                 _logger.LogWarning($"Não existe código de validação associado ao email {email}!");
                 erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
-            return new ServiceResult<Tuple<Email, Email>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emails };
+            return new ServiceResult<Email> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emailCodigoValidacao };
         }
 
        public ServiceResult ConfirmarConta(ConfirmarClienteDTO model)
@@ -247,7 +238,33 @@ namespace API.Business
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
+        public ServiceResult<Email> GetEmailBoasVindas(string email)
+        {
+            _logger.LogDebug("A executar [ClienteService -> GetEmailBoasVindas]");
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
+            }
 
+            IList<int> erros = new List<int>();
+            Email emailBoasVindas = null;
+
+            if (_clienteDAO.ExisteEmail(email))
+            {
+                _logger.LogDebug("Início da leitura do ficheiro de EmailBoasVindas.json");
+                string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
+                StreamReader sr = new StreamReader(pathEmailBoasVindas);
+                string json = sr.ReadToEnd();
+                _logger.LogDebug("Fim da leitura do ficheiro de EmailBoasVindas.json");
+                emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
+            }
+            else
+            {
+                _logger.LogWarning($"Não existe código de validação associado ao email {email}!");
+                erros.Add((int)ErrosEnumeration.EmailNaoExiste);
+            }
+            return new ServiceResult<Email> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emailBoasVindas };
+        }
 
         public ServiceResult<TokenDTO> Login(AutenticacaoDTO model)
         {
