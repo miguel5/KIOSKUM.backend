@@ -98,7 +98,7 @@ namespace API.Controllers
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
-                        _logger.LogDebug("Email do Código de Confirmação enviado com sucesso!");
+                        _logger.LogDebug("Email de Boas Vindas enviado com sucesso!");
                         return Ok();
                     }
                     else
