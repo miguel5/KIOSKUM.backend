@@ -42,20 +42,13 @@ namespace API.Controllers
             try
             {
                 ServiceResult resultado = _clienteService.CriarConta(model);
-                if (!resultado.Sucesso)
-                {
-                    _logger.LogDebug("Ocorreu um erro ao criar conta!");
-                    return BadRequest(resultado.Erros);
-                }
-                else
+                if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome}, com {model.Email} e {model.NumTelemovel} registou-se com sucesso!");
-                    ServiceResult<Tuple<Email, Email>> resultadoEmails = _clienteService.GetEmails(model.Email);
+                    ServiceResult<Email> resultadoEmails = _clienteService.GetEmailCodigoValidacao(model.Email);
                     if (resultadoEmails.Sucesso)
                     {
-                        await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item1);
-                        _logger.LogDebug("Email de Boas Vindas enviado com sucesso!");
-                        await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado.Item2);
+                        await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
                         _logger.LogDebug("Email do Código de Confirmação enviado com sucesso!");
                         return Ok();
                     }
@@ -64,6 +57,11 @@ namespace API.Controllers
                         _logger.LogDebug("Ocorreu um erro na leitura dos emails!");
                         return BadRequest(resultadoEmails.Erros);
                     }
+                }
+                else
+                {
+                    _logger.LogDebug("Ocorreu um erro ao criar conta!");
+                    return BadRequest(resultado.Erros);
                 }
             }
             catch (ArgumentNullException e)
@@ -81,7 +79,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("confirmar")]
-        public IActionResult ConfirmarConta([FromBody] ConfirmarClienteDTO model)
+        public async Task<IActionResult> ConfirmarConta([FromBody] ConfirmarClienteDTO model)
         {
             _logger.LogDebug("A executar api/cliente/confirmar -> Post");
             if (model is null)
@@ -96,7 +94,18 @@ namespace API.Controllers
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O cliente com email {model.Email} conmfirmou a sua conta com sucesso!");
-                    return Ok();
+                    ServiceResult<Email> resultadoEmails = _clienteService.GetEmailBoasVindas(model.Email);
+                    if (resultadoEmails.Sucesso)
+                    {
+                        await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
+                        _logger.LogDebug("Email de Boas Vindas enviado com sucesso!");
+                        return Ok();
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Ocorreu um erro na leitura dos emails!");
+                        return BadRequest(resultadoEmails.Erros);
+                    }
                 }
                 else
                 {
