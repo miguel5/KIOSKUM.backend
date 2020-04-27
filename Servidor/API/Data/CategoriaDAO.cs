@@ -15,6 +15,7 @@ namespace API.Data
         IList<Categoria> GetTodasCategorias();
         bool CategoriaIsEmpty(string nome);
         void RemoverCategoria(string nome);
+        string GetNomeCategoria(int idCategoria);
     }
 
     public class CategoriaDAO : ICategoriaDAO
@@ -52,6 +53,11 @@ namespace API.Data
         }
 
         public int GetIdCategoria(string nomeCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetNomeCategoria(int idCategoria)
         {
             throw new NotImplementedException();
         }

@@ -20,7 +20,8 @@ namespace API.Controllers
             _produtoService = produtoService;
         }
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("add")]
         public IActionResult AddProduto([FromBody] ProdutoDTO model)
         {
@@ -40,7 +41,8 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("upload/imagem")]
         public async Task<IActionResult> UploadImagem([FromForm] ImagemDTO model)
         {
@@ -96,7 +98,8 @@ namespace API.Controllers
             }
         }
 
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("especifico")]
         public IActionResult GetProduto(string nome)
         {
