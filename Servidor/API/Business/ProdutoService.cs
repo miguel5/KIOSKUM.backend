@@ -79,7 +79,7 @@ namespace API.Business
 
             int idCategoria = _categoriaDAO.GetIdCategoria(model.NomeCategoria);
 
-            if(idCategoria < 0)
+            if(idCategoria <= 0)
             {
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
@@ -127,11 +127,18 @@ namespace API.Business
                     {
                         if (model.File.Length > 0)
                         {
+                            string extensaoAnterior = produto.ExtensaoImagem;
                             produto.ExtensaoImagem = fileExtension;
                             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", produto.Nome + "." + produto.ExtensaoImagem);
                             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
                             await model.File.CopyToAsync(fileStream);
                             _produtoDAO.EditarProduto(produto);
+
+                            if (!produto.ExtensaoImagem.Equals(extensaoAnterior))
+                            {
+                                filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", produto.Nome + "." + extensaoAnterior);
+                                await Task.Factory.StartNew(() => File.Delete(filePath));
+                            }
                         }
                         else
                         {
@@ -227,7 +234,9 @@ namespace API.Business
                     foreach (Produto produto in produtos)
                     {
                         ProdutoDTO produtoDTO = _mapper.Map<ProdutoDTO>(produto);
-                        produtoDTO.Url = new System.Security.Policy.Url(Path.Combine(pathImagem, produto.Nome + "." + produto.ExtensaoImagem));
+                        produtoDTO.Url = new Uri(Path.Combine(pathImagem, produto.Nome + "." + produto.ExtensaoImagem));
+                        produtoDTO.NomeCategoria = _categoriaDAO.GetNomeCategoria(produto.IdCategoria);
+                        produtosDTO.Add(produtoDTO);
                     }
                 }
             }
@@ -250,7 +259,9 @@ namespace API.Business
             {
                 produtoDTO = _mapper.Map<ProdutoDTO>(produto);
                 string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto");
-                produtoDTO.Url = new System.Security.Policy.Url(Path.Combine(pathImagem, produto.IdProduto + "." + produto.ExtensaoImagem));
+                produtoDTO.NomeCategoria = "prato";//_categoriaDAO.GetNomeCategoria(produto.IdCategoria);
+                produtoDTO.Url = new Uri(Path.Combine(pathImagem, produto.Nome + "." + produto.ExtensaoImagem));
+                Console.WriteLine(produtoDTO.Url.LocalPath);
             }
 
             return new ServiceResult<ProdutoDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtoDTO };
