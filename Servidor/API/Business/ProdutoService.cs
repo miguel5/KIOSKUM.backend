@@ -7,9 +7,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
+using API.Helpers;
 using API.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace API.Business
 {
@@ -27,14 +29,16 @@ namespace API.Business
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
+        private readonly AppSettings _appSettings;
         private readonly IProdutoDAO _produtoDAO;
         private readonly ICategoriaDAO _categoriaDAO;
 
 
-        public ProdutoService(IWebHostEnvironment webHostEnviroment, IMapper mapper, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
+        public ProdutoService(IWebHostEnvironment webHostEnviroment, IMapper mapper, IOptions<AppSettings> appSettings, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
         {
             _webHostEnvironment = webHostEnviroment;
             _mapper = mapper;
+            _appSettings = appSettings.Value;
             _produtoDAO = produtoDAO;
             _categoriaDAO = categoriaDAO;
         }
@@ -128,15 +132,16 @@ namespace API.Business
                         if (model.File.Length > 0)
                         {
                             string extensaoAnterior = produto.ExtensaoImagem;
+                            string nomeImagem = produto.Nome.Replace(" ", "_");
                             produto.ExtensaoImagem = fileExtension;
-                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", produto.Nome + "." + produto.ExtensaoImagem);
+                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{nomeImagem}.{produto.ExtensaoImagem}");
                             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
                             await model.File.CopyToAsync(fileStream);
                             _produtoDAO.EditarProduto(produto);
 
                             if (!produto.ExtensaoImagem.Equals(extensaoAnterior))
                             {
-                                filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", produto.Nome + "." + extensaoAnterior);
+                                filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{nomeImagem}.{produto.ExtensaoImagem}");
                                 await Task.Factory.StartNew(() => File.Delete(filePath));
                             }
                         }
@@ -230,11 +235,11 @@ namespace API.Business
                 IList<Produto> produtos = _produtoDAO.GetProdutos(idCategoria);
                 if (produtos != null)
                 {
-                    string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto");
+                    string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Produto");
                     foreach (Produto produto in produtos)
                     {
                         ProdutoDTO produtoDTO = _mapper.Map<ProdutoDTO>(produto);
-                        produtoDTO.Url = new Uri(Path.Combine(pathImagem, produto.Nome + "." + produto.ExtensaoImagem));
+                        produtoDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.Nome.Replace(" ", "_")}.{produto.ExtensaoImagem}"));
                         produtoDTO.NomeCategoria = _categoriaDAO.GetNomeCategoria(produto.IdCategoria);
                         produtosDTO.Add(produtoDTO);
                     }
@@ -258,10 +263,8 @@ namespace API.Business
             else
             {
                 produtoDTO = _mapper.Map<ProdutoDTO>(produto);
-                string pathImagem = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto");
-                produtoDTO.NomeCategoria = "prato";//_categoriaDAO.GetNomeCategoria(produto.IdCategoria);
-                produtoDTO.Url = new Uri(Path.Combine(pathImagem, produto.Nome + "." + produto.ExtensaoImagem));
-                Console.WriteLine(produtoDTO.Url.LocalPath);
+                produtoDTO.NomeCategoria = "Massas";//_categoriaDAO.GetNomeCategoria(produto.IdCategoria);
+                produtoDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl,"Images", "Produto", $"{produto.Nome.Replace(" ", "_")}.{produto.ExtensaoImagem}"));
             }
 
             return new ServiceResult<ProdutoDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtoDTO };
@@ -285,7 +288,7 @@ namespace API.Business
             else
             {
                 _produtoDAO.RemoverProduto(nome);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", nome + "." + produto.ExtensaoImagem);
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{produto.Nome.Replace(" ", "_")}.{produto.ExtensaoImagem}");
                 await Task.Factory.StartNew(() => File.Delete(filePath));
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
