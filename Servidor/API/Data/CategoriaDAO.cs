@@ -8,7 +8,7 @@ namespace API.Data
     public interface ICategoriaDAO
     {
         Categoria GetCategoriaNome(string nome);
-        void EditarCategoria(Categoria c);
+        void EditarCategoria(Categoria categoria);
         void AddCategoria(Categoria categoria);
         bool ExisteNomeCategoria(string nome);
         int GetIdCategoria(string nomeCategoria);
@@ -37,7 +37,7 @@ namespace API.Data
             return true;//throw new NotImplementedException();
         }
 
-        public void EditarCategoria(Categoria c)
+        public void EditarCategoria(Categoria categoria)
         {
             throw new NotImplementedException();
         }
@@ -54,7 +54,7 @@ namespace API.Data
 
         public int GetIdCategoria(string nomeCategoria)
         {
-            throw new NotImplementedException();
+            return 1;
         }
 
         public string GetNomeCategoria(int idCategoria)

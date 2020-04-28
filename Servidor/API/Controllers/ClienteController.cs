@@ -44,7 +44,7 @@ namespace API.Controllers
                 ServiceResult resultado = _clienteService.CriarConta(model);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O {model.Nome}, com {model.Email} e {model.NumTelemovel} registou-se com sucesso!");
+                    _logger.LogInformation($"O {model.Nome}, com email {model.Email} e número de telemóvel {model.NumTelemovel} registou-se com sucesso!");
                     ServiceResult<Email> resultadoEmails = _clienteService.GetEmailCodigoValidacao(model.Email);
                     if (resultadoEmails.Sucesso)
                     {
