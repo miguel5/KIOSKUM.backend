@@ -65,6 +65,9 @@ namespace API.Data
             cmd.Parameters.AddWithValue("?categoria", produto.IdCategoria);
             cmd.Parameters["?categoria"].Direction = ParameterDirection.Input;
 
+            cmd.Parameters.AddWithValue("?extensao_imagem", "png");
+            cmd.Parameters["?extensao_imagem"].Direction = ParameterDirection.Input;
+
             int productId = Convert.ToInt32(cmd.ExecuteScalar());
 
             

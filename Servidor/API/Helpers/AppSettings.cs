@@ -5,6 +5,8 @@
     {
         public string Secret { get; set; }
 
+        public string ServerUrl { get; set; }
+
         public EmailSettings EmailSettings { get; set; }
 
         public DBSettings DBSettings { get; set; }
