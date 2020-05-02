@@ -10,6 +10,7 @@ using API.Data;
 using API.Entities;
 using API.Helpers;
 using API.ViewModels;
+using API.ViewModels.ClienteDTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Hosting;

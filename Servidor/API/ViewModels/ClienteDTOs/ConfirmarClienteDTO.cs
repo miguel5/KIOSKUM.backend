@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API.ViewModels
+namespace API.ViewModels.ClienteDTOs
 {
     public class ConfirmarClienteDTO
     {
