@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API.ViewModels
+namespace API.ViewModels.ClienteDTOs
 {
-    public class ClienteDTO
+    public class EditarClienteDTO
     {
         [Required]
         public string Nome { get; set; }
@@ -12,6 +12,9 @@ namespace API.ViewModels
 
         [Required]
         public string Password { get; set; }
+
+        [Required]
+        public string NovaPassword { get; set; }
 
         [Required]
         public int NumTelemovel { get; set; }

@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Policy;
 
-namespace API.ViewModels
+namespace API.ViewModels.ProdutoDTOs
 {
-    public class ProdutoDTO
+    public class RegistarProdutoDTO
     {
         [Required]
         public string Nome { get; set; }
 
         [Required]
-        public string NomeCategoria { get; set; }
+        public int IdCategoria { get; set; }
 
         [Required]
         public double Preco { get; set; }
@@ -21,6 +21,7 @@ namespace API.ViewModels
         [Required]
         public IList<string> Alergenios { get; set; }
 
-        public Uri Url { get; set; }
+        [Required]
+        public Url Url { get; set; }
     }
 }

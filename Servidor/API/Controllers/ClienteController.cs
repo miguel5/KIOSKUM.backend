@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using API.Business;
 using API.Entities;
 using API.ViewModels;
+using API.ViewModels.ClienteDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

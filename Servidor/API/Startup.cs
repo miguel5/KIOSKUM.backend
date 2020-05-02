@@ -11,8 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using API.ViewModels;
+using API.ViewModels.ClienteDTOs;
 using API.Entities;
 using Microsoft.Extensions.Logging;
+using API.ViewModels.ProdutoDTOs;
 
 namespace API
 {
