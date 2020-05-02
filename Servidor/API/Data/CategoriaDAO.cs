@@ -7,7 +7,7 @@ namespace API.Data
 {
     public interface ICategoriaDAO
     {
-        Categoria GetCategoriaNome(string nome);
+        /*Categoria GetCategoriaNome(string nome);
         void EditarCategoria(Categoria categoria);
         void AddCategoria(Categoria categoria);
         bool ExisteNomeCategoria(string nome);
@@ -15,7 +15,8 @@ namespace API.Data
         IList<Categoria> GetTodasCategorias();
         bool CategoriaIsEmpty(string nome);
         void RemoverCategoria(string nome);
-        string GetNomeCategoria(int idCategoria);
+        string GetNomeCategoria(int idCategoria);*/
+        bool ExisteCategoria(int idCategoria);
     }
 
     public class CategoriaDAO : ICategoriaDAO
@@ -27,7 +28,7 @@ namespace API.Data
             _connectionDB = connectionDB;
         }
 
-        public void AddCategoria(Categoria categoria)
+        /*public void AddCategoria(Categoria categoria)
         {
             throw new NotImplementedException();
         }
@@ -70,6 +71,6 @@ namespace API.Data
         public void RemoverCategoria(string nome)
         {
             throw new NotImplementedException();
-        }
+        }*/
     }
 }

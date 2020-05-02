@@ -8,20 +8,23 @@ using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using API.Helpers;
+using API.ViewModels.ProdutoDTOs;
 using API.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace API.Business
 {
     public interface IProdutoService
     {
-        ServiceResult AddProduto(ProdutoDTO model);
-        Task<ServiceResult> UploadImagem(ImagemDTO model);
-        ServiceResult EditarProduto(ProdutoDTO model);
-        ServiceResult<IList<ProdutoDTO>> GetProdutosCategoria(string nomeCategoria);
-        ServiceResult<ProdutoDTO> GetProdutoNome(string nome);
+        ServiceResult RegistarProduto(RegistarProdutoDTO model);
+        Task<ServiceResult> UploadImagem(int idProduto, FormFile ficheiro);
+        ServiceResult EditarProduto(EditarProdutoDTO model);
+        ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria);
+        ServiceResult<ProdutoViewDTO> GetProduto(int idProduto);
+        ServiceResult DesativarProduto(int idProduto);
     }
 
 
@@ -51,17 +54,13 @@ namespace API.Business
         }
 
 
-        public ServiceResult AddProduto(ProdutoDTO model)
+        public ServiceResult RegistarProduto(RegistarProdutoDTO model)
         {
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
                 throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
             }
-            if (string.IsNullOrWhiteSpace(model.NomeCategoria))
-            {
-                throw new ArgumentNullException("NomeCategoria", "Parametro não pode ser nulo");
-            }
-            if(model.Ingredientes == null)
+            if (model.Ingredientes == null)
             {
                 throw new ArgumentNullException("Ingredientes", "Parametro não pode ser nulo");
             }
@@ -81,9 +80,7 @@ namespace API.Business
                 erros.Add((int)ErrosEnumeration.PrecoInvalido);
             }
 
-            int idCategoria = _categoriaDAO.GetIdCategoria(model.NomeCategoria);
-
-            if(idCategoria <= 0)
+            if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
             {
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
@@ -91,22 +88,16 @@ namespace API.Business
             if (!erros.Any())
             {
                 Produto produto = _mapper.Map<Produto>(model);
-                produto.IdCategoria = idCategoria;
-                _produtoDAO.AddProduto(produto);
+                _produtoDAO.RegistarProduto(produto);
             }
-            return new ServiceResult{ Erros = new ErrosDTO { Erros = erros } , Sucesso = !erros.Any()};
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
-        public async Task<ServiceResult> UploadImagem(ImagemDTO model)
+        public async Task<ServiceResult> UploadImagem(int idProduto, FormFile ficheiro)
         {
-            if (string.IsNullOrWhiteSpace(model.Nome))
-            {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
-
             IList<int> erros = new List<int>();
-            Produto produto = _produtoDAO.GetProdutoNome(model.Nome);
+            Produto produto = _produtoDAO.GetProduto(idProduto);
 
             if (produto == null)
             {
@@ -114,7 +105,7 @@ namespace API.Business
             }
             else
             {
-                string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(model.File.ContentDisposition).FileName);
+                string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(ficheiro.ContentDisposition).FileName);
                 if (fileExtension.Contains('.'))
                 {
                     fileExtension = fileExtension.Trim('"').Trim('.');
@@ -129,19 +120,18 @@ namespace API.Business
 
                     if (Enum.IsDefined(typeof(ExtensoesValidasEnumeration), fileExtension))
                     {
-                        if (model.File.Length > 0)
+                        if (ficheiro.Length > 0)
                         {
                             string extensaoAnterior = produto.ExtensaoImagem;
-                            string nomeImagem = produto.Nome.Replace(" ", "_");
                             produto.ExtensaoImagem = fileExtension;
-                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{nomeImagem}.{produto.ExtensaoImagem}");
+                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{produto.ExtensaoImagem}");
                             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-                            await model.File.CopyToAsync(fileStream);
+                            await ficheiro.CopyToAsync(fileStream);
                             _produtoDAO.EditarProduto(produto);
 
                             if (!produto.ExtensaoImagem.Equals(extensaoAnterior))
                             {
-                                filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{nomeImagem}.{produto.ExtensaoImagem}");
+                                filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{extensaoAnterior}");
                                 await Task.Factory.StartNew(() => File.Delete(filePath));
                             }
                         }
@@ -156,19 +146,15 @@ namespace API.Business
                     }
                 }
             }
-            return new ServiceResult { Erros = new ErrosDTO { Erros = erros },Sucesso = !erros.Any() };
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
-        public ServiceResult EditarProduto(ProdutoDTO model)
+        public ServiceResult EditarProduto(EditarProdutoDTO model)
         {
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
                 throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
-            if (string.IsNullOrWhiteSpace(model.NomeCategoria))
-            {
-                throw new ArgumentNullException("NomeCategoria", "Parametro não pode ser nulo");
             }
             if (model.Ingredientes == null)
             {
@@ -180,7 +166,7 @@ namespace API.Business
             }
 
             IList<int> erros = new List<int>();
-            Produto produto = _produtoDAO.GetProdutoNome(model.Nome);
+            Produto produto = _produtoDAO.GetProduto(model.IdProduto);
 
             if (produto == null)
             {
@@ -197,64 +183,55 @@ namespace API.Business
                 {
                     erros.Add((int)ErrosEnumeration.PrecoInvalido);
                 }
-
-                int idCategoria = _categoriaDAO.GetIdCategoria(model.NomeCategoria);
-                if (idCategoria < 0)
+                
+                if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
                 {
                     erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
                 }
 
                 if (!erros.Any())
                 {
-                    Produto p = _mapper.Map<Produto>(model);
-                    p.IdCategoria = idCategoria;
-                    _produtoDAO.EditarProduto(p);
+                    Produto novoProduto = _mapper.Map<Produto>(model);
+                    _produtoDAO.EditarProduto(novoProduto);
                 }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
-        public ServiceResult<IList<ProdutoDTO>> GetProdutosCategoria(string nomeCategoria)
+        public ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria)
         {
-            if (string.IsNullOrWhiteSpace(nomeCategoria))
-            {
-                throw new ArgumentNullException("nomeCategoria", "Parametro não pode ser nulo");
-            }
-
             IList<int> erros = new List<int>();
-            IList<ProdutoDTO> produtosDTO = null;
+            IList<ProdutoViewDTO> produtosDTO = null;
 
-            int idCategoria = _categoriaDAO.GetIdCategoria(nomeCategoria);
-            if(idCategoria < 0)
+            if(_categoriaDAO.ExisteCategoria(idCategoria))
             {
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
             else
             {
-                IList<Produto> produtos = _produtoDAO.GetProdutos(idCategoria);
+                IList<Produto> produtos = _produtoDAO.GetProdutosCategoria(idCategoria);
                 if (produtos != null)
                 {
                     string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Produto");
                     foreach (Produto produto in produtos)
                     {
-                        ProdutoDTO produtoDTO = _mapper.Map<ProdutoDTO>(produto);
-                        produtoDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.Nome.Replace(" ", "_")}.{produto.ExtensaoImagem}"));
-                        produtoDTO.NomeCategoria = _categoriaDAO.GetNomeCategoria(produto.IdCategoria);
+                        ProdutoViewDTO produtoDTO = _mapper.Map<ProdutoViewDTO>(produto);
+                        produtoDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
                         produtosDTO.Add(produtoDTO);
                     }
                 }
             }
-            return new ServiceResult<IList<ProdutoDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosDTO };
+            return new ServiceResult<IList<ProdutoViewDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosDTO };
         }
 
 
-        public ServiceResult<ProdutoDTO> GetProdutoNome(string nome)
+        public ServiceResult<ProdutoViewDTO> GetProduto(int idProduto)
         {
             IList<int> erros = new List<int>();
-            ProdutoDTO produtoDTO = null;
+            ProdutoViewDTO produtoDTO = null;
 
-            Produto produto = _produtoDAO.GetProdutoNome(nome);
+            Produto produto = _produtoDAO.GetProduto(idProduto);
 
             if (produto == null)
             {
@@ -262,24 +239,18 @@ namespace API.Business
             }
             else
             {
-                produtoDTO = _mapper.Map<ProdutoDTO>(produto);
-                produtoDTO.NomeCategoria = "Massas";//_categoriaDAO.GetNomeCategoria(produto.IdCategoria);
-                produtoDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl,"Images", "Produto", $"{produto.Nome.Replace(" ", "_")}.{produto.ExtensaoImagem}"));
+                produtoDTO = _mapper.Map<ProdutoViewDTO>(produto);
+                produtoDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl, "Images", "Produto", $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
             }
 
-            return new ServiceResult<ProdutoDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtoDTO };
+            return new ServiceResult<ProdutoViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtoDTO };
         }
 
 
-        public async Task<ServiceResult> RemoverProduto(string nome)
+        public ServiceResult DesativarProduto(int idProduto)
         {
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
-            }
-
             IList<int> erros = new List<int>();
-            Produto produto = _produtoDAO.GetProdutoNome(nome);
+            Produto produto = _produtoDAO.GetProduto(idProduto);
 
             if (produto == null)
             {
@@ -287,12 +258,27 @@ namespace API.Business
             }
             else
             {
-                _produtoDAO.RemoverProduto(nome);
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{produto.Nome.Replace(" ", "_")}.{produto.ExtensaoImagem}");
-                await Task.Factory.StartNew(() => File.Delete(filePath));
+                _produtoDAO.DesativarProduto(idProduto);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
+
+        /*public ServiceResult AtivarProduto(int idProduto)
+        {
+            IList<int> erros = new List<int>();
+            Produto produto = _produtoDAO.GetProduto(idProduto);
+
+            if (produto == null)
+            {
+                erros.Add((int)ErrosEnumeration.ProdutoNaoExiste);
+            }
+            else
+            {
+                _produtoDAO.DesativarProduto(idProduto);
+            }
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }*/
     }
 }
+ 
