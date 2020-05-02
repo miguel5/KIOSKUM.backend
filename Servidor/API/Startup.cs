@@ -96,7 +96,7 @@ namespace API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddFile("Logs/mylog-{Date}.txt");
+            loggerFactory.AddFile(Configuration.GetSection("Logging"));
 
             if (env.IsDevelopment())
             {
