@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using API.Business;
 using API.Entities;
 using API.ViewModels;
+using API.ViewModels.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,10 +21,9 @@ namespace API.Controllers
             _produtoService = produtoService;
         }
 
-        //[Authorize(Roles = "Administrador")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("add")]
-        public IActionResult AddProduto([FromBody] ProdutoDTO model)
+        public async Task<IActionResult> AddProduto([FromBody] RegistarProdutoDTO model)
         {
             if (model is null)
             {
@@ -31,29 +31,23 @@ namespace API.Controllers
             }
             try
             {
-                ServiceResult resultado = _produtoService.AddProduto(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
-            }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-        }
-
-
-        //[Authorize(Roles = "Administrador")]
-        [AllowAnonymous]
-        [HttpPost("upload/imagem")]
-        public async Task<IActionResult> UploadImagem([FromForm] ImagemDTO model)
-        {
-            if (model is null)
-            {
-                return BadRequest(nameof(model));
-            }
-            try
-            {
-                ServiceResult resultado = await _produtoService.UploadImagem(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+                ServiceResult<int> resultado = _produtoService.RegistarProduto(model);
+                if (resultado.Sucesso)
+                {
+                    ServiceResult resultadoUpload = await _produtoService.UploadImagem(resultado.Resultado,model.File);
+                    if (resultado.Sucesso)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest(resultadoUpload.Erros);
+                    }
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                } 
             }
             catch (ArgumentNullException e)
             {
@@ -64,7 +58,7 @@ namespace API.Controllers
 
         [Authorize(Roles = "Administrador")]
         [HttpPost("editar")]
-        public IActionResult EditarProduto([FromBody] ProdutoDTO model)
+        public async Task<IActionResult> EditarProduto([FromBody] EditarProdutoDTO model)
         {
             if (model is null)
             {
@@ -73,7 +67,22 @@ namespace API.Controllers
             try
             {
                 ServiceResult resultado = _produtoService.EditarProduto(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+                if (resultado.Sucesso)
+                {
+                    ServiceResult resultadoUpload = await _produtoService.UploadImagem(model.IdProduto, model.File);
+                    if (resultado.Sucesso)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest(resultadoUpload.Erros);
+                    }
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
             }
             catch (ArgumentNullException e)
             {
@@ -85,12 +94,19 @@ namespace API.Controllers
 
         [Authorize(Roles = "Administrador,Cliente")]
         [HttpGet("todos")]
-        public IActionResult GetProdutosCategoria(string nomeCategoria)
+        public IActionResult GetProdutosCategoria(int idCategoria)
         {
             try
             {
-                ServiceResult<IList<ProdutoDTO>> resultado = _produtoService.GetProdutosCategoria(nomeCategoria);
-                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+                ServiceResult<IList<ProdutoViewDTO>> resultado = _produtoService.GetProdutosCategoria(idCategoria);
+                if (resultado.Sucesso)
+                {
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
             }
             catch (ArgumentNullException e)
             {
@@ -98,15 +114,95 @@ namespace API.Controllers
             }
         }
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
-        [HttpGet("especifico")]
-        public IActionResult GetProduto(string nome)
+
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("desativados")]
+        public IActionResult GetProdutosDesativados()
         {
             try
             {
-                ServiceResult<ProdutoDTO> resultado = _produtoService.GetProdutoNome(nome);
-                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+                ServiceResult<IList<ProdutoViewDTO>> resultado = _produtoService.GetProdutosDesativados();
+                if (resultado.Sucesso)
+                {
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("especifico")]
+        public IActionResult GetProduto(int idProduto)
+        {
+            try
+            {
+                ServiceResult<ProdutoViewDTO> resultado = _produtoService.GetProduto(idProduto);
+                if (resultado.Sucesso)
+                {
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("desativar")]
+        public IActionResult DesativarProduto(int idProduto)
+        {
+            try
+            {
+                ServiceResult resultado = _produtoService.DesativarProduto(idProduto);
+                if (resultado.Sucesso)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+        }
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("ativar")]
+        public IActionResult AtivarProduto(int idProduto)
+        {
+            try
+            {
+                ServiceResult resultado = _produtoService.AtivarProduto(idProduto);
+                if (resultado.Sucesso)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
             }
             catch (ArgumentNullException e)
             {

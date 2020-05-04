@@ -25,6 +25,8 @@
         NomeProdutoJaExiste = 30,
         PrecoInvalido = 31,
         ProdutoNaoExiste = 32,
+        ProdutoDesativado = 33,
+        ProdutoAtivado = 34,
 
         CategoriaNaoExiste = 40,
         NomeCategoriaJaExiste = 41,

@@ -19,12 +19,14 @@ namespace API.Business
 {
     public interface IProdutoService
     {
-        ServiceResult RegistarProduto(RegistarProdutoDTO model);
-        Task<ServiceResult> UploadImagem(int idProduto, FormFile ficheiro);
+        ServiceResult<int> RegistarProduto(RegistarProdutoDTO model);
+        Task<ServiceResult> UploadImagem(int idProduto, IFormFile ficheiro);
         ServiceResult EditarProduto(EditarProdutoDTO model);
         ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria);
+        ServiceResult<IList<ProdutoViewDTO>> GetProdutosDesativados();
         ServiceResult<ProdutoViewDTO> GetProduto(int idProduto);
         ServiceResult DesativarProduto(int idProduto);
+        ServiceResult AtivarProduto(int idProduto);
     }
 
 
@@ -54,7 +56,7 @@ namespace API.Business
         }
 
 
-        public ServiceResult RegistarProduto(RegistarProdutoDTO model)
+        public ServiceResult<int> RegistarProduto(RegistarProdutoDTO model)
         {
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
@@ -70,31 +72,46 @@ namespace API.Business
             }
 
             IList<int> erros = new List<int>();
+            int idProduto = -1;
 
             if (_produtoDAO.ExisteNomeProduto(model.Nome))
             {
-                erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
+                Produto produto = _produtoDAO.GetProdutoNome(model.Nome);
+                if (_produtoDAO.isAtivo(produto.IdProduto))
+                {
+                    erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
+                }
+                else
+                {
+                    erros.Add((int)ErrosEnumeration.ProdutoDesativado);
+                }
             }
-            if (!ValidaPreco(model.Preco))
+            else
             {
-                erros.Add((int)ErrosEnumeration.PrecoInvalido);
-            }
 
-            if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
-            {
-                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+                if (!ValidaPreco(model.Preco))
+                {
+                    erros.Add((int)ErrosEnumeration.PrecoInvalido);
+                }
+                else
+                {
+                    if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
+                    {
+                        erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+                    }
+                    else
+                    {
+                        Produto produto = _mapper.Map<Produto>(model);
+                        _produtoDAO.RegistarProduto(produto);
+                        idProduto = _produtoDAO.GetProdutoNome(produto.Nome).IdProduto;
+                    }
+                }
             }
-
-            if (!erros.Any())
-            {
-                Produto produto = _mapper.Map<Produto>(model);
-                _produtoDAO.RegistarProduto(produto);
-            }
-            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+            return new ServiceResult<int> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = idProduto };
         }
 
 
-        public async Task<ServiceResult> UploadImagem(int idProduto, FormFile ficheiro)
+        public async Task<ServiceResult> UploadImagem(int idProduto, IFormFile ficheiro)
         {
             IList<int> erros = new List<int>();
             Produto produto = _produtoDAO.GetProduto(idProduto);
@@ -105,45 +122,52 @@ namespace API.Business
             }
             else
             {
-                string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(ficheiro.ContentDisposition).FileName);
-                if (fileExtension.Contains('.'))
+                if (_produtoDAO.isAtivo(idProduto))
                 {
-                    fileExtension = fileExtension.Trim('"').Trim('.');
-                }
-                else
-                {
-                    erros.Add((int)ErrosEnumeration.FormatoImagemInvalido);
-                }
-
-                if (!erros.Any())
-                {
-
-                    if (Enum.IsDefined(typeof(ExtensoesValidasEnumeration), fileExtension))
+                    string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(ficheiro.ContentDisposition).FileName);
+                    if (fileExtension.Contains('.'))
                     {
-                        if (ficheiro.Length > 0)
-                        {
-                            string extensaoAnterior = produto.ExtensaoImagem;
-                            produto.ExtensaoImagem = fileExtension;
-                            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{produto.ExtensaoImagem}");
-                            using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-                            await ficheiro.CopyToAsync(fileStream);
-                            _produtoDAO.EditarProduto(produto);
-
-                            if (!produto.ExtensaoImagem.Equals(extensaoAnterior))
-                            {
-                                filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{extensaoAnterior}");
-                                await Task.Factory.StartNew(() => File.Delete(filePath));
-                            }
-                        }
-                        else
-                        {
-                            erros.Add((int)ErrosEnumeration.ImagemVazia);
-                        }
+                        fileExtension = fileExtension.Trim('"').Trim('.');
                     }
                     else
                     {
                         erros.Add((int)ErrosEnumeration.FormatoImagemInvalido);
                     }
+
+                    if (!erros.Any())
+                    {
+
+                        if (Enum.IsDefined(typeof(ExtensoesValidasEnumeration), fileExtension))
+                        {
+                            if (ficheiro.Length > 0)
+                            {
+                                string extensaoAnterior = produto.ExtensaoImagem;
+                                produto.ExtensaoImagem = fileExtension;
+                                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{produto.ExtensaoImagem}");
+                                using FileStream fileStream = new FileStream(filePath, FileMode.Create);
+                                await ficheiro.CopyToAsync(fileStream);
+                                _produtoDAO.EditarProduto(produto);
+
+                                if (!produto.ExtensaoImagem.Equals(extensaoAnterior))
+                                {
+                                    filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{extensaoAnterior}");
+                                    await Task.Factory.StartNew(() => File.Delete(filePath));
+                                }
+                            }
+                            else
+                            {
+                                erros.Add((int)ErrosEnumeration.ImagemVazia);
+                            }
+                        }
+                        else
+                        {
+                            erros.Add((int)ErrosEnumeration.FormatoImagemInvalido);
+                        }
+                    }
+                }
+                else
+                {
+                    erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
@@ -174,25 +198,35 @@ namespace API.Business
             }
             else
             {
-                if (!produto.Nome.Equals(model.Nome))
+                if (_produtoDAO.isAtivo(model.IdProduto))
                 {
-                    erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
+                    if (!produto.Nome.Equals(model.Nome))
+                    {
+                        erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
+                    }
+                    else
+                    {
+                        if (!ValidaPreco(model.Preco))
+                        {
+                            erros.Add((int)ErrosEnumeration.PrecoInvalido);
+                        }
+                        else
+                        {
+                            if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
+                            {
+                                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+                            }
+                            else
+                            {
+                                Produto novoProduto = _mapper.Map<Produto>(model);
+                                _produtoDAO.EditarProduto(novoProduto);
+                            }
+                        }
+                    }
                 }
-
-                if (!ValidaPreco(model.Preco))
+                else
                 {
-                    erros.Add((int)ErrosEnumeration.PrecoInvalido);
-                }
-                
-                if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
-                {
-                    erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
-                }
-
-                if (!erros.Any())
-                {
-                    Produto novoProduto = _mapper.Map<Produto>(model);
-                    _produtoDAO.EditarProduto(novoProduto);
+                    erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
@@ -202,7 +236,7 @@ namespace API.Business
         public ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria)
         {
             IList<int> erros = new List<int>();
-            IList<ProdutoViewDTO> produtosDTO = null;
+            IList<ProdutoViewDTO> produtosViewDTO = null;
 
             if(_categoriaDAO.ExisteCategoria(idCategoria))
             {
@@ -216,20 +250,42 @@ namespace API.Business
                     string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Produto");
                     foreach (Produto produto in produtos)
                     {
-                        ProdutoViewDTO produtoDTO = _mapper.Map<ProdutoViewDTO>(produto);
-                        produtoDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
-                        produtosDTO.Add(produtoDTO);
+                        ProdutoViewDTO produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
+                        produtoViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
+                        produtosViewDTO.Add(produtoViewDTO);
                     }
                 }
             }
-            return new ServiceResult<IList<ProdutoViewDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosDTO };
+            return new ServiceResult<IList<ProdutoViewDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosViewDTO };
         }
+
+
+
+        public ServiceResult<IList<ProdutoViewDTO>> GetProdutosDesativados()
+        {
+            IList<int> erros = new List<int>();
+            IList<ProdutoViewDTO> produtosViewDTO = null;
+
+            IList<Produto> produtos = _produtoDAO.GetProdutosDesativados();
+            if (produtos != null)
+            {
+                string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Produto");
+                foreach (Produto produto in produtos)
+                {
+                    ProdutoViewDTO produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
+                    produtoViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
+                    produtosViewDTO.Add(produtoViewDTO);
+                }
+            }
+            return new ServiceResult<IList<ProdutoViewDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosViewDTO };
+        }
+
 
 
         public ServiceResult<ProdutoViewDTO> GetProduto(int idProduto)
         {
             IList<int> erros = new List<int>();
-            ProdutoViewDTO produtoDTO = null;
+            ProdutoViewDTO produtoViewDTO = null;
 
             Produto produto = _produtoDAO.GetProduto(idProduto);
 
@@ -239,11 +295,18 @@ namespace API.Business
             }
             else
             {
-                produtoDTO = _mapper.Map<ProdutoViewDTO>(produto);
-                produtoDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl, "Images", "Produto", $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
+                if (_produtoDAO.isAtivo(idProduto))
+                {
+                    produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
+                    produtoViewDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl, "Images", "Produto", $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
+                }
+                else
+                {
+                    erros.Add((int)ErrosEnumeration.ProdutoDesativado);
+                }
             }
 
-            return new ServiceResult<ProdutoViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtoDTO };
+            return new ServiceResult<ProdutoViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtoViewDTO };
         }
 
 
@@ -258,13 +321,20 @@ namespace API.Business
             }
             else
             {
-                _produtoDAO.DesativarProduto(idProduto);
+                if (_produtoDAO.isAtivo(idProduto))
+                {
+                    _produtoDAO.DesativarProduto(idProduto);
+                }
+                else
+                {
+                    erros.Add((int)ErrosEnumeration.ProdutoDesativado);
+                }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
-        /*public ServiceResult AtivarProduto(int idProduto)
+        public ServiceResult AtivarProduto(int idProduto)
         {
             IList<int> erros = new List<int>();
             Produto produto = _produtoDAO.GetProduto(idProduto);
@@ -275,10 +345,17 @@ namespace API.Business
             }
             else
             {
-                _produtoDAO.DesativarProduto(idProduto);
+                if (_produtoDAO.isAtivo(idProduto))
+                {
+                    erros.Add((int)ErrosEnumeration.ProdutoAtivado);
+                }
+                else
+                {
+                    _produtoDAO.AtivarProduto(idProduto);
+                }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
-        }*/
+        }
     }
 }
  

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Policy;
+using Microsoft.AspNetCore.Http;
 
 namespace API.ViewModels.ProdutoDTOs
 {
@@ -22,6 +22,7 @@ namespace API.ViewModels.ProdutoDTOs
         public IList<string> Alergenios { get; set; }
 
         [Required]
-        public Url Url { get; set; }
+        [DataType(DataType.Upload)]
+        public IFormFile File { get; set; }
     }
 }
