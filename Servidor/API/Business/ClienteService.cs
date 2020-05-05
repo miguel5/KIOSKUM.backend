@@ -23,13 +23,13 @@ namespace API.Business
 {
     public interface IClienteService
     {
-        ServiceResult CriarConta(ClienteDTO model);
+        ServiceResult CriarConta(ClienteViewDTO model);
         ServiceResult<Email> GetEmailCodigoValidacao(string email);
         ServiceResult ConfirmarConta(ConfirmarClienteDTO model);
         ServiceResult<Email> GetEmailBoasVindas(string email);
         ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
         ServiceResult EditarDados(int idCliente, EditarClienteDTO model);
-        ServiceResult<ClienteDTO> GetCliente(int idCliente);
+        ServiceResult<ClienteViewDTO> GetCliente(int idCliente);
     }
 
 
@@ -100,7 +100,7 @@ namespace API.Business
 
 
 
-        public ServiceResult CriarConta(ClienteDTO model)
+        public ServiceResult CriarConta(ClienteViewDTO model)
         {
             _logger.LogDebug("A executar [ClienteService -> CriarConta]");
             if (string.IsNullOrWhiteSpace(model.Nome))
@@ -283,7 +283,7 @@ namespace API.Business
             TokenDTO resultToken = null;
             if (!_clienteDAO.ExisteEmail(model.Email))
             {
-                _logger.LogDebug($"O email {model.Email} não existe!");
+                _logger.LogWarning($"Não existe nenhum utilizador com o email {model.Email}");
                 erros.Add((int)ErrosEnumeration.EmailPasswordIncorreta);
             }
             else
@@ -296,11 +296,6 @@ namespace API.Business
 
 
                 Cliente cliente = _clienteDAO.GetContaEmail(model.Email);
-                if(cliente == null)
-                {
-                    _logger.LogWarning($"Não existe nenhum utilizador com o email {model.Email}");
-                }
-
                 if (!erros.Any())
                 {
                     if (cliente.Password.Equals(HashPassword(model.Password)))
@@ -411,11 +406,11 @@ namespace API.Business
         }
 
 
-        public ServiceResult<ClienteDTO> GetCliente(int idCliente)
+        public ServiceResult<ClienteViewDTO> GetCliente(int idCliente)
         {
 
             IList<int> erros = new List<int>();
-            ClienteDTO clienteDTO = null;
+            ClienteViewDTO clienteDTO = null;
 
             Cliente cliente = _clienteDAO.GetContaId(idCliente);
             if(cliente == null)
@@ -425,10 +420,10 @@ namespace API.Business
             }
             else
             {
-                clienteDTO = _mapper.Map<ClienteDTO>(cliente);
+                clienteDTO = _mapper.Map<ClienteViewDTO>(cliente);
             }
 
-            return new ServiceResult<ClienteDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = clienteDTO };
+            return new ServiceResult<ClienteViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = clienteDTO };
         }
     }
 }

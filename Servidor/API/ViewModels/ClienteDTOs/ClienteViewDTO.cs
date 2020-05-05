@@ -2,7 +2,7 @@
 
 namespace API.ViewModels.ClienteDTOs
 {
-    public class ClienteDTO
+    public class ClienteViewDTO
     {
         [Required]
         public string Nome { get; set; }

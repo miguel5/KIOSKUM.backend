@@ -93,18 +93,16 @@ namespace API.Business
                 {
                     erros.Add((int)ErrosEnumeration.PrecoInvalido);
                 }
-                else
+                if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
                 {
-                    if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
-                    {
-                        erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
-                    }
-                    else
-                    {
-                        Produto produto = _mapper.Map<Produto>(model);
-                        _produtoDAO.RegistarProduto(produto);
-                        idProduto = _produtoDAO.GetProdutoNome(produto.Nome).IdProduto;
-                    }
+                    erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+                }
+
+                if(!erros.Any())
+                {
+                    Produto produto = _mapper.Map<Produto>(model);
+                    _produtoDAO.RegistarProduto(produto);
+                    idProduto = _produtoDAO.GetProdutoNome(produto.Nome).IdProduto;
                 }
             }
             return new ServiceResult<int> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = idProduto };
@@ -210,17 +208,15 @@ namespace API.Business
                         {
                             erros.Add((int)ErrosEnumeration.PrecoInvalido);
                         }
-                        else
+                        if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
                         {
-                            if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
-                            {
-                                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
-                            }
-                            else
-                            {
-                                Produto novoProduto = _mapper.Map<Produto>(model);
-                                _produtoDAO.EditarProduto(novoProduto);
-                            }
+                            erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+                        }
+
+                        if(!erros.Any())
+                        {
+                            Produto novoProduto = _mapper.Map<Produto>(model);
+                            _produtoDAO.EditarProduto(novoProduto);
                         }
                     }
                 }

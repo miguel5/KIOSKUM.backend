@@ -14,12 +14,12 @@ namespace API.Business
 {
     public interface ICategoriaService
     {
-        ServiceResult AddCategoria(CategoriaDTO model);
-        Task<ServiceResult> UploadImagem(ImagemDTO model);
+        /*ServiceResult AddCategoria(CategoriaDTO model);
+        //Task<ServiceResult> UploadImagem(ImagemDTO model);
         ServiceResult EditarCategoria(CategoriaDTO model);
         ServiceResult<IList<CategoriaDTO>> GetTodasCategorias();
         ServiceResult<CategoriaDTO> GetCategoriaNome(string nome);
-        Task<ServiceResult> RemoverCategoria(string nome);
+        Task<ServiceResult> RemoverCategoria(string nome);*/
     }
 
     public class CategoriaService : ICategoriaService
@@ -36,7 +36,7 @@ namespace API.Business
         }
 
 
-        public ServiceResult AddCategoria(CategoriaDTO model)
+        /*public ServiceResult AddCategoria(CategoriaDTO model)
         {
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
@@ -216,7 +216,7 @@ namespace API.Business
                 }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
-        }
+        }*/
 
     }
 }
