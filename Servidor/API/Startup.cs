@@ -58,6 +58,7 @@ namespace API
 
             services.AddSingleton<IConnectionDB, ConnectionDB>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddScoped<IImagemService, ImagemService>();
 
             services.AddScoped<IAdministradorDAO, AdministradorDAO>();
             services.AddScoped<ICategoriaDAO, CategoriaDAO>();
