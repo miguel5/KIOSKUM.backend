@@ -16,12 +16,13 @@ namespace API.Controllers
     {
         private readonly ILogger _logger;
         private IProdutoService _produtoService;
+        private IImagemService _imagemService;
 
-
-        public ProdutoController(ILogger<ProdutoController> logger, IProdutoService produtoService)
+        public ProdutoController(ILogger<ProdutoController> logger, IProdutoService produtoService, IImagemService imagemService)
         {
             _logger = logger;
             _produtoService = produtoService;
+            _imagemService = imagemService;
         }
 
         [Authorize(Roles = "Administrador")]
@@ -36,17 +37,27 @@ namespace API.Controllers
             }
             try
             {
-                ServiceResult<int> resultado = await _produtoService.RegistarProduto(model);
-                if (resultado.Sucesso)
+                ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
+                if (!resultadoValidacaoImagem.Sucesso)
                 {
-                    _logger.LogInformation($"O Produto com nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria} foi registado com sucesso, com idProduto {resultado.Resultado}!");
-                    return Ok();
+                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    return BadRequest(resultadoValidacaoImagem.Erros);
                 }
                 else
                 {
-                    _logger.LogDebug("Ocorreu um erro ao registar o produto com idProduto {resultado.Resultado}!");
-                    return BadRequest(resultado.Erros);
-                } 
+                    ServiceResult<Tuple<string,string>> resultado = _produtoService.RegistarProduto(model, resultadoValidacaoImagem.Resultado);
+                    if (resultado.Sucesso)
+                    {
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        _logger.LogInformation($"O Produto com nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria} foi registado com sucesso, com idProduto {resultado.Resultado}!");
+                        return Ok();
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Ocorreu um erro ao registar o produto com idProduto {resultado.Resultado}!");
+                        return BadRequest(resultado.Erros);
+                    }
+                }
             }
             catch (ArgumentNullException e)
             {
@@ -72,16 +83,26 @@ namespace API.Controllers
             }
             try
             {
-                ServiceResult resultado = await _produtoService.EditarProduto(model);
-                if (resultado.Sucesso)
+                ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
+                if (!resultadoValidacaoImagem.Sucesso)
                 {
-                    _logger.LogInformation($"O Produto com idProduto {model.IdProduto} foi editado, com o nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria}!");
-                    return Ok();
+                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    return BadRequest(resultadoValidacaoImagem.Erros);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao editar o produto com idProduto {model.IdProduto}!");
-                    return BadRequest(resultado.Erros);
+                    ServiceResult<Tuple<string, string>> resultado = _produtoService.EditarProduto(model, resultadoValidacaoImagem.Resultado);
+                    if (resultado.Sucesso)
+                    {
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        _logger.LogInformation($"O Produto com idProduto {model.IdProduto} foi editado, com o nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria}!");
+                        return Ok();
+                    }
+                    else
+                    {
+                        _logger.LogDebug($"Ocorreu um erro ao editar o produto com idProduto {model.IdProduto}!");
+                        return BadRequest(resultado.Erros);
+                    }
                 }
             }
             catch (ArgumentNullException e)

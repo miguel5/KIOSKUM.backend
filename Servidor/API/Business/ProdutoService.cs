@@ -2,26 +2,22 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using API.Helpers;
-using API.ViewModels.ProdutoDTOs;
 using API.ViewModels;
+using API.ViewModels.ProdutoDTOs;
 using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace API.Business
 {
     public interface IProdutoService
     {
-        Task<ServiceResult<int>> RegistarProduto(RegistarProdutoDTO model);
-        Task<ServiceResult> EditarProduto(EditarProdutoDTO model);
+        ServiceResult<Tuple<string, string>> RegistarProduto(RegistarProdutoDTO model, string extensao);
+        ServiceResult<Tuple<string, string>> EditarProduto(EditarProdutoDTO model, string extensao);
         IList<ProdutoViewDTO> GetProdutosDesativados();
         ServiceResult<ProdutoViewDTO> GetProduto(int idProduto);
         ServiceResult DesativarProduto(int idProduto);
@@ -33,17 +29,15 @@ namespace API.Business
     {
         private readonly ILogger _logger;
         private readonly AppSettings _appSettings;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMapper _mapper;
         private readonly IProdutoDAO _produtoDAO;
         private readonly ICategoriaDAO _categoriaDAO;
 
 
-        public ProdutoService(ILogger<ProdutoService> logger, IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IMapper mapper, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
+        public ProdutoService(ILogger<ProdutoService> logger, IOptions<AppSettings> appSettings, IMapper mapper, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
         {
             _logger = logger;
             _appSettings = appSettings.Value;
-            _webHostEnvironment = webHostEnviroment;
             _mapper = mapper;
             _produtoDAO = produtoDAO;
             _categoriaDAO = categoriaDAO;
@@ -85,64 +79,7 @@ namespace API.Business
         }
 
 
-        private ServiceResult<string> ValidaImagem(IFormFile ficheiro)
-        {
-            _logger.LogDebug("A executar [ProdutoService -> ValidaImagem]");
-
-            IList<int> erros = new List<int>();
-            string extensao = null;
-
-            string fileExtension = Path.GetExtension(ContentDispositionHeaderValue.Parse(ficheiro.ContentDisposition).FileName);
-            if (fileExtension.Contains('.'))
-            {
-                fileExtension = fileExtension.Trim('"').Trim('.');
-                if (Enum.IsDefined(typeof(ExtensoesValidasEnumeration), fileExtension))
-                {
-                    if (ficheiro.Length > 0)
-                    {
-                        extensao = fileExtension;
-                    }
-                    else
-                    {
-                        _logger.LogDebug("O ficheiro não possuí conteudo!");
-                        erros.Add((int)ErrosEnumeration.ImagemVazia);
-                    }
-                }
-                else
-                {
-                    _logger.LogDebug($"O formato {fileExtension}, foi rejeitado pelo sistema!");
-                    erros.Add((int)ErrosEnumeration.FormatoImagemInvalido);
-                }
-            }
-            else
-            {
-                _logger.LogDebug("O ficheiro não possuí extensão!");
-                erros.Add((int)ErrosEnumeration.FormatoImagemInvalido);
-            }
-            return new ServiceResult<string> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = extensao };
-        }
-
-
-
-        private async Task GuardarImagem(int idProduto, IFormFile ficheiro, string extensaoAnterior, string extensaoNova)
-        {
-            _logger.LogDebug("A executar [ProdutoService -> GuardarImagem]");
-            
-            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{extensaoNova}");
-            using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-            await ficheiro.CopyToAsync(fileStream);
-
-            if (!extensaoNova.Equals(extensaoAnterior))
-            {
-                filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Produto", $"{idProduto}.{extensaoAnterior}");
-                await Task.Factory.StartNew(() => File.Delete(filePath));
-            }
-            _logger.LogDebug($"Sucesso no upload da imagem do produto com idProduto {idProduto}!");
-            
-        }
-
-
-        public async Task<ServiceResult<int>> RegistarProduto(RegistarProdutoDTO model)
+        public ServiceResult<Tuple<string, string>> RegistarProduto(RegistarProdutoDTO model, string extensao)
         {
             _logger.LogDebug("A executar [ProdutoService -> RegistarProduto]");
             if (string.IsNullOrWhiteSpace(model.Nome))
@@ -157,9 +94,13 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Alergenios", "Parametro não pode ser nulo");
             }
+            if(extensao == null)
+            {
+                throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
+            }
 
             IList<int> erros = new List<int>();
-            int idProduto = -1;
+            Tuple<string, string> paths = null;
 
             if (_produtoDAO.ExisteNomeProduto(model.Nome))
             {
@@ -178,7 +119,6 @@ namespace API.Business
             }
             else
             {
-
                 if (!ValidaNome(model.Nome))
                 {
                     _logger.LogDebug($"O nome {model.Nome} é inválido!");
@@ -205,24 +145,20 @@ namespace API.Business
                     erros.Add((int)ErrosEnumeration.AlergeniosProdutoInvalidos);
                 }
 
-                ServiceResult<string> resultado = ValidaImagem(model.File);
-                if (!resultado.Sucesso)
-                {
-                    erros.Concat(resultado.Erros.Erros);
-                }
-
                 if (!erros.Any())
                 {
                     Produto produto = _mapper.Map<Produto>(model);
-                    produto.ExtensaoImagem = resultado.Resultado;
-                    idProduto = _produtoDAO.RegistarProduto(produto);
-                    await GuardarImagem(idProduto, model.File, "", resultado.Resultado);
+                    produto.ExtensaoImagem = extensao;
+                    int idProduto =_produtoDAO.RegistarProduto(produto);
+                    string pathAnterior = null;
+                    string pathNova = Path.Combine("Images", "Produto", $"{idProduto}.{extensao}");
+                    paths = new Tuple<string, string>(pathAnterior, pathNova);
                 }
             }
-            return new ServiceResult<int> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = idProduto};
+            return new ServiceResult<Tuple<string, string>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = paths};
         }
 
-        public async Task<ServiceResult> EditarProduto(EditarProdutoDTO model)
+        public ServiceResult<Tuple<string, string>> EditarProduto(EditarProdutoDTO model, string extensao)
         {
             _logger.LogDebug("A executar [ProdutoService -> EditarProduto]");
             if (string.IsNullOrWhiteSpace(model.Nome))
@@ -237,9 +173,14 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Alergenios", "Parametro não pode ser nulo");
             }
+            if (extensao == null)
+            {
+                throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
+            }
 
             IList<int> erros = new List<int>();
             Produto produto = _produtoDAO.GetProduto(model.IdProduto);
+            Tuple<string, string> paths = null;
 
             if (produto == null)
             {
@@ -284,19 +225,15 @@ namespace API.Business
                             erros.Add((int)ErrosEnumeration.AlergeniosProdutoInvalidos);
                         }
 
-                        ServiceResult<string> result = ValidaImagem(model.File);
-                        if (!result.Sucesso)
-                        {
-                            erros.Concat(result.Erros.Erros);
-                        }
-
 
                         if (!erros.Any())
                         {
                             Produto novoProduto = _mapper.Map<Produto>(model);
-                            novoProduto.ExtensaoImagem = result.Resultado;
+                            novoProduto.ExtensaoImagem = extensao;
                             _produtoDAO.EditarProduto(novoProduto);
-                            await GuardarImagem(model.IdProduto, model.File, produto.ExtensaoImagem, novoProduto.ExtensaoImagem);
+                            string pathAnterior = Path.Combine("Images", "Produto", $"{model.IdProduto}.{produto.ExtensaoImagem}"); ;
+                            string pathNova = Path.Combine("Images", "Produto", $"{model.IdProduto}.{novoProduto.ExtensaoImagem}");
+                            paths = new Tuple<string, string>(pathAnterior, pathNova);
                         }
                     }
                 }
@@ -306,7 +243,7 @@ namespace API.Business
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
-            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+            return new ServiceResult<Tuple<string, string>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(),Resultado = paths };
         }
 
 
