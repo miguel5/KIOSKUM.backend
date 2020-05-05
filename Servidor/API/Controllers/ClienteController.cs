@@ -36,7 +36,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/cliente/criar -> Post");
             if (model is null)
             {
-                _logger.LogWarning("O objeto ClienteDTO é null!");
+                _logger.LogWarning("O objeto ClienteViewDTO é null!");
                 return BadRequest(nameof(model));
             }
 

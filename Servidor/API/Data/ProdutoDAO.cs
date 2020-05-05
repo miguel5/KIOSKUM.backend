@@ -10,7 +10,7 @@ namespace API.Data
     public interface IProdutoDAO
     {
         bool ExisteNomeProduto(string nome);
-        void RegistarProduto(Produto produto);
+        int RegistarProduto(Produto produto);//retorna o idProduto
         Produto GetProduto(int idProduto);//devolve o produto (ativado/desativado)
         Produto GetProdutoNome(string nome);//devolve o produto (ativado/desativado)
         void EditarProduto(Produto produto);
@@ -75,7 +75,7 @@ namespace API.Data
             throw new NotImplementedException();
         }
 
-        public void RegistarProduto(Produto produto)
+        public int RegistarProduto(Produto produto)
         {
             throw new NotImplementedException();
         }
