@@ -63,3 +63,4 @@
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Serilog.Sinks.Async.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Serilog.Sinks.File.dll
 /Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/Serilog.Sinks.RollingFile.dll
+/Users/lazaropinheiro/KIOSKUM.backend/Servidor/API/bin/Debug/netcoreapp3.1/mono_crash.42f6ec1fa.0.json

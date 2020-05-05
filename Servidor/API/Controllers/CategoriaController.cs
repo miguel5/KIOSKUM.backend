@@ -23,7 +23,7 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        /*[Authorize(Roles = "Administrador")]
         [HttpPost("add")]
         public IActionResult AddCategoria([FromBody] CategoriaDTO model)
         {
@@ -125,6 +125,6 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
-        }
+        }*/
     }
 }

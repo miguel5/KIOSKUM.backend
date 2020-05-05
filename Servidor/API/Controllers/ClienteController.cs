@@ -31,7 +31,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("criar")]
-        public async Task<IActionResult> CriarConta([FromBody] ClienteDTO model)
+        public async Task<IActionResult> CriarConta([FromBody] ClienteViewDTO model)
         {
             _logger.LogDebug("A executar api/cliente/criar -> Post");
             if (model is null)
@@ -212,7 +212,7 @@ namespace API.Controllers
             int idCliente = int.Parse(nameIdentifier);
             try
             {
-                ServiceResult<ClienteDTO> resultado = _clienteService.GetCliente(idCliente);
+                ServiceResult<ClienteViewDTO> resultado = _clienteService.GetCliente(idCliente);
                 if (resultado.Sucesso)
                 {
                     _logger.LogDebug($"O {resultado.Resultado.Nome} efetuou get com sucesso!");

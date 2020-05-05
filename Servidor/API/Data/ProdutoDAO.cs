@@ -30,5 +30,54 @@ namespace API.Data
             _connectionDB = connectionDB;
         }
 
+        public void AtivarProduto(int idProduto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DesativarProduto(int idProduto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EditarProduto(Produto produto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ExisteNomeProduto(string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Produto GetProduto(int idProduto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Produto GetProdutoNome(string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Produto> GetProdutosCategoria(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Produto> GetProdutosDesativados()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool isAtivo(int idProduto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RegistarProduto(Produto produto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

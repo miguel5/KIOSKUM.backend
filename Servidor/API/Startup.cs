@@ -76,18 +76,24 @@ namespace API
             {
                 cfg.CreateMap<Administrador, AdministradorDTO>();
                 cfg.CreateMap<AdministradorDTO, Administrador>();
-                cfg.CreateMap<Categoria, CategoriaDTO>();
-                cfg.CreateMap<CategoriaDTO, Categoria>();
-                cfg.CreateMap<Cliente, ClienteDTO>();
-                cfg.CreateMap<ClienteDTO, Cliente>();
-                cfg.CreateMap<Cliente, EditarClienteDTO>();
-                cfg.CreateMap<EditarClienteDTO, Cliente>();
                 cfg.CreateMap<Administrador, EditarAdministradorDTO>();
                 cfg.CreateMap<EditarAdministradorDTO, Administrador>();
+
+                cfg.CreateMap<Categoria, CategoriaDTO>();
+                cfg.CreateMap<CategoriaDTO, Categoria>();
+
+                cfg.CreateMap<Cliente, ClienteViewDTO>();
+                cfg.CreateMap<ClienteViewDTO, Cliente>();
+                cfg.CreateMap<Cliente, EditarClienteDTO>();
+                cfg.CreateMap<EditarClienteDTO, Cliente>();
+
+
                 cfg.CreateMap<Funcionario, FuncionarioDTO>();
                 cfg.CreateMap<FuncionarioDTO, Funcionario>();
-                cfg.CreateMap<Produto, ProdutoDTO>();
-                cfg.CreateMap<ProdutoDTO, Produto>();
+
+                cfg.CreateMap<RegistarProdutoDTO,Produto>();
+                cfg.CreateMap<EditarProdutoDTO, Produto>();
+                cfg.CreateMap<Produto, ProdutoViewDTO>();
             });
             IMapper mapper = config.CreateMapper();
             services.AddSingleton(mapper);
