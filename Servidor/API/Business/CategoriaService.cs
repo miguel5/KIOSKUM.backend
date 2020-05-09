@@ -21,6 +21,7 @@ namespace API.Business
         IList<CategoriaViewDTO> GetCategoriasDesativadas();
         IList<CategoriaViewDTO> GetCategorias();
         ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria);
+        ServiceResult<CategoriaViewDTO> GetCategoria(int idCategoria);
     }
 
     public class CategoriaService : ICategoriaService
@@ -63,16 +64,16 @@ namespace API.Business
 
             if (_categoriaDAO.ExisteNomeCategoria(model.Nome))
             {
-                _logger.LogDebug($"A categoria com o nome {model.Nome} já existe no Sistema!");
+                _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema!");
                 Categoria categoria = _categoriaDAO.GetCategoriaNome(model.Nome);
                 if (_categoriaDAO.isAtiva(categoria.IdCategoria))
                 {
-                    _logger.LogDebug($"A categoria com o nome {model.Nome} já existe no Sistema, com IdCategoria {categoria.IdCategoria} e encontra-se ativada!");
+                    _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema, com IdCategoria {categoria.IdCategoria} e encontra-se ativada!");
                     erros.Add((int)ErrosEnumeration.NomeCategoriaJaExiste);
                 }
                 else
                 {
-                    _logger.LogDebug($"A categoria com o nome {model.Nome} já existe no Sistema, com IdCategoria {categoria.IdCategoria} e encontra-se desativada!");
+                    _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema, com IdCategoria {categoria.IdCategoria} e encontra-se desativada!");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
@@ -119,7 +120,7 @@ namespace API.Business
 
             if (categoria == null)
             {
-                _logger.LogDebug($"Não existe nenhuma categoria com IdCategoria {model.IdCategoria}!");
+                _logger.LogDebug($"Não existe nenhuma Categoria com IdCategoria {model.IdCategoria}!");
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
             else
@@ -129,14 +130,14 @@ namespace API.Business
                     if (!categoria.Nome.Equals(model.Nome) && _categoriaDAO.ExisteNomeCategoria(model.Nome))
                     {
 
-                        _logger.LogDebug($"O nome {model.Nome} já existe no sistema!");
+                        _logger.LogDebug($"O Nome {model.Nome} já existe no sistema!");
                         erros.Add((int)ErrosEnumeration.NomeCategoriaJaExiste);
                     }
                     else
                     {
                         if (!ValidaNome(model.Nome))
                         {
-                            _logger.LogDebug($"O nome {model.Nome} é inválido!");
+                            _logger.LogDebug($"O Nome {model.Nome} é inválido!");
                             erros.Add((int)ErrosEnumeration.NomeCategoriaInvalido);
                         }
 
@@ -153,7 +154,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogDebug($"A categoria com idCategoria {model.IdCategoria} encontra-se desativada!");
+                    _logger.LogDebug($"A Categoria com IdCategoria {model.IdCategoria} encontra-se desativada!");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
@@ -220,7 +221,7 @@ namespace API.Business
 
             if (!_categoriaDAO.ExisteCategoria(idCategoria))
             {
-                _logger.LogDebug($"A categoria com idCategoria {idCategoria} não existe no sistema!");
+                _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} não existe no sistema!");
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
             else
@@ -238,7 +239,6 @@ namespace API.Business
                             produtosViewDTO.Add(produtoViewDTO);
                         }
                     }
-
                 }
                 else
                 {
@@ -260,7 +260,7 @@ namespace API.Business
 
             if (categoria == null)
             {
-                _logger.LogDebug($"Não existe nenhuma categoria com IdCategoria {idCategoria}!");
+                _logger.LogDebug($"Não existe nenhuma Categoria com IdCategoria {idCategoria}!");
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
             else
@@ -272,7 +272,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogDebug($"A categoria com idCategoria {idCategoria} encontra-se desativada!");
+                    _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }

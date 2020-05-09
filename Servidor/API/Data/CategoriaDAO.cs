@@ -28,7 +28,52 @@ namespace API.Data
             _connectionDB = connectionDB;
         }
 
+        public void EditarCategoria(Categoria novaCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool ExisteCategoria(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ExisteNomeCategoria(string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Categoria GetCategoria(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Categoria GetCategoriaNome(string nome)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Categoria> GetCategorias()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Categoria> GetCategoriasDesativadas()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<Produto> GetProdutosCategoria(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool isAtiva(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int RegistarCategoria(Categoria categoria)
         {
             throw new NotImplementedException();
         }
