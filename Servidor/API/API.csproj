@@ -16,6 +16,7 @@
     <Folder Include="Logs\" />
     <Folder Include="ViewModels\ClienteDTOs\" />
     <Folder Include="ViewModels\ProdutoDTOs\" />
+    <Folder Include="ViewModels\CategoriaDTOs\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

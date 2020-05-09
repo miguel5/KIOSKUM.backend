@@ -33,6 +33,9 @@
 
         CategoriaNaoExiste = 40,
         NomeCategoriaJaExiste = 41,
+        NomeCategoriaInvalido = 42,
+        CategoriaDesativada = 43,
+        CategoriaAtivada = 44,
 
         FormatoImagemInvalido = 50,
         ImagemVazia = 51,

@@ -72,9 +72,9 @@ namespace API.Business
             _logger.LogDebug("A executar [ProdutoService -> ValidaAlergenios]");
             bool sucesso = true;
             foreach (string alergenio in alergenios) if (sucesso)
-                {
-                    sucesso = alergenio.Length <= 45;
-                }
+            {
+                sucesso = alergenio.Length <= 45;
+            }
             return sucesso;
         }
 
@@ -191,7 +191,7 @@ namespace API.Business
             {
                 if (_produtoDAO.isAtivo(model.IdProduto))
                 {
-                    if (!produto.Nome.Equals(model.Nome) && produto.Nome.Equals(model.Nome))
+                    if (!produto.Nome.Equals(model.Nome) && _produtoDAO.ExisteNomeProduto(model.Nome))
                     {
 
                         _logger.LogDebug($"O nome {model.Nome} já existe no sistema!");

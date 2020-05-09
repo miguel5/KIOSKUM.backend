@@ -15,6 +15,7 @@ using API.ViewModels.ClienteDTOs;
 using API.Entities;
 using Microsoft.Extensions.Logging;
 using API.ViewModels.ProdutoDTOs;
+using API.ViewModels.CategoriaDTOs;
 
 namespace API
 {
@@ -75,13 +76,15 @@ namespace API
 
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Administrador, AdministradorDTO>();
+                /*cfg.CreateMap<Administrador, AdministradorDTO>();
                 cfg.CreateMap<AdministradorDTO, Administrador>();
                 cfg.CreateMap<Administrador, EditarAdministradorDTO>();
-                cfg.CreateMap<EditarAdministradorDTO, Administrador>();
+                cfg.CreateMap<EditarAdministradorDTO, Administrador>();*/
 
-                cfg.CreateMap<Categoria, CategoriaDTO>();
-                cfg.CreateMap<CategoriaDTO, Categoria>();
+                cfg.CreateMap<RegistarCategoriaDTO, Categoria>();
+                cfg.CreateMap<EditarCategoriaDTO, Categoria>();
+                cfg.CreateMap<Categoria, CategoriaViewDTO>();
+
 
                 cfg.CreateMap<Cliente, ClienteViewDTO>();
                 cfg.CreateMap<ClienteViewDTO, Cliente>();
@@ -89,8 +92,8 @@ namespace API
                 cfg.CreateMap<EditarClienteDTO, Cliente>();
 
 
-                cfg.CreateMap<Funcionario, FuncionarioDTO>();
-                cfg.CreateMap<FuncionarioDTO, Funcionario>();
+                /*cfg.CreateMap<Funcionario, FuncionarioDTO>();
+                cfg.CreateMap<FuncionarioDTO, Funcionario>();*/
 
                 cfg.CreateMap<RegistarProdutoDTO,Produto>();
                 cfg.CreateMap<EditarProdutoDTO, Produto>();
