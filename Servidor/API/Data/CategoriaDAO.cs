@@ -7,12 +7,16 @@ namespace API.Data
 {
     public interface ICategoriaDAO
     {
-        Categoria GetCategoriaNome(string nome);
-        void EditarCategoria(Categoria c);
-        void AddCategoria(Categoria categoria);
-        bool ExisteNomeCategoria(string nome);
-        int GetIdCategoria(string nomeCategoria);
-        IList<Categoria> GetTodasCategorias();
+        bool ExisteCategoria(int idCategoria);//determina se o idCategoria ja se encontra no sistema
+        bool ExisteNomeCategoria(string nome);//determina se o nome da categoria ja existe no sistema
+        Categoria GetCategoriaNome(string nome);//devolve a categoria dando o nome
+        bool isAtiva(int idCategoria);//determina se uma categoria esta ou não ativa
+        int RegistarCategoria(Categoria categoria);//devolve o id da categoria
+        Categoria GetCategoria(int idCategoria);//Retorna uma categoria (ativada/desativada)
+        void EditarCategoria(Categoria novaCategoria);//apenas edita se estiver ativada
+        IList<Categoria> GetCategoriasDesativadas();//devolve todas as categorias desativada
+        IList<Categoria> GetCategorias();//devolve todas as categorias ativadas
+        IList<Produto> GetProdutosCategoria(int idCategoria);//devolve todos os produtos ativados de uma categoria
     }
 
     public class CategoriaDAO : ICategoriaDAO
@@ -24,32 +28,221 @@ namespace API.Data
             _connectionDB = connectionDB;
         }
 
-        public void AddCategoria(Categoria categoria)
+        public void EditarCategoria(Categoria novaCategoria)
         {
-            throw new NotImplementedException();
+            _connectionDB.OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "editar_categoria";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", produto.IdProduto);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            cmd.Parameters.AddWithValue("?nome", produto.Nome);
+            cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
+
+            cmd.Parameters.AddWithValue("?extensao_imagem", produto.ExtensaoImagem);
+            cmd.Parameters["?extensao_imagem"].Direction = ParameterDirection.Input;
+
+            cmd.ExecuteNonQuery();
+
+            _connectionDB.CloseConnection();
         }
 
-        public void EditarCategoria(Categoria c)
+        public bool ExisteCategoria(int idCategoria)
         {
-            throw new NotImplementedException();
+            _connectionDB.OpenConnection();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "existe_categoria";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idCategoria);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            object val = cmd.ExecuteScalar();
+
+            _connectionDB.CloseConnection();
+
+            return Convert.ToBoolean(val);
         }
 
         public bool ExisteNomeCategoria(string nome)
         {
-            throw new NotImplementedException();
+            _connectionDB.OpenConnection();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "existe_nome_categoria";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?nome", nome);
+            cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
+
+            object val = cmd.ExecuteScalar();
+
+            _connectionDB.CloseConnection();
+
+            return Convert.ToBoolean(val);
+        }
+
+        public Categoria GetCategoria(int idCategoria)
+        {
+            _connectionDB.OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "get_categoria";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idCategoria);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            MySqlDataReader var = cmd.ExecuteReader();
+
+                Categoria categoria = null;
+                try
+                {
+                    if (var.Read())
+                    {
+                        categoria = new Categoria { IdCategoria = idCategoria, Nome = var.GetString(0), ExtensaoImagem = var.GetString(1) };
+
+                    }
+                    return categoria;
+                }
+                catch (Exception) { }
+                finally
+                {
+                    _connectionDB.CloseConnection();
+                }
+
+            }
+            return null;
         }
 
         public Categoria GetCategoriaNome(string nome)
         {
-            throw new NotImplementedException();
+            _connectionDB.OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "get_nome_categoria";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?nome", nome);
+            cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
+
+            MySqlDataReader var = cmd.ExecuteReader();
+
+                Categoria categoria = null;
+                try
+                {
+                    if (var.Read())
+                    {
+                        categoria = new Categoria { IdCategoria = var.GetInt32(0), Nome = nome, ExtensaoImagem = var.GetString(1) };
+
+                    }
+                    return categoria;
+                }
+                catch (Exception) { }
+                finally
+                {
+                    _connectionDB.CloseConnection();
+                }
+
+            }
+            return null;
         }
 
-        public int GetIdCategoria(string nomeCategoria)
+        public IList<Categoria> GetCategorias()
         {
-            throw new NotImplementedException();
-        }
+            IList<Categoria> categorias = new List<>();
 
-        public IList<Categoria> GetTodasCategorias()
+            _connectionDB.OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "get_categorias";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            MySqlDataReader var = cmd.ExecuteReader();
+
+            try
+            {
+                while (var.Read())
+                {
+                    Categoria categoria = new Categoria { IdCategoria = var.GetInt32(0), Nome = var.GetString(1), ExtensaoImagem = var.GetString(2) };
+                    categorias.Add(categoria);
+                }
+            }
+            catch (Exception) { }
+            finally
+            {
+                _connectionDB.CloseConnection();
+            }
+
+        }
+        return null;
+    }
+
+        public IList<Categoria> GetCategoriasDesativadas()
+        {
+            IList<Categoria> categorias = new List<>();
+
+            _connectionDB.OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "get_categorias_desativadas";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            MySqlDataReader var = cmd.ExecuteReader();
+
+            try
+            {
+                while (var.Read())
+                {
+                    Categoria categoria = new Categoria { IdCategoria = var.GetInt32(0), Nome = var.GetString(1), ExtensaoImagem = var.GetString(2) };
+                    categorias.Add(categoria);
+                }
+            }
+            catch (Exception) { }
+            finally
+            {
+                _connectionDB.CloseConnection();
+            }
+
+        }
+        return null;
+    }
+
+        public bool isAtiva(int idCategoria)
+        {
+            _connectionDB.OpenConnection();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDB.Connection;
+
+            cmd.CommandText = "is_categoria_ativa";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idCategoria);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            object val = cmd.ExecuteScalar();
+                
+            _connectionDB.CloseConnection();
+                
+            return Convert.ToBoolean(val);
+
+        public int RegistarCategoria(Categoria categoria)
         {
             throw new NotImplementedException();
         }
