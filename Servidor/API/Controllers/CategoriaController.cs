@@ -29,9 +29,10 @@ namespace API.Controllers
 
 
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("registar")]
-        public async Task<IActionResult> RegistarCategoria([FromBody] RegistarCategoriaDTO model)
+        public async Task<IActionResult> RegistarCategoria([FromForm] RegistarCategoriaDTO model)
         {
             _logger.LogDebug("A executar api/categoria/registar -> Post");
             if (model is null)
@@ -75,9 +76,10 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("editar")]
-        public async Task<IActionResult> EditarCategoria([FromBody] EditarCategoriaDTO model)
+        public async Task<IActionResult> EditarCategoria([FromForm] EditarCategoriaDTO model)
         {
             _logger.LogDebug("A executar api/categoria/editar -> Post");
             if (model is null)
@@ -121,7 +123,8 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpGet("desativadas")]
         public IActionResult GetCategoriasDesativadas()
         {
@@ -145,7 +148,8 @@ namespace API.Controllers
 
 
 
-        [Authorize(Roles = "Administrador,Cliente")]
+        //[Authorize(Roles = "Administrador,Cliente")]
+        [AllowAnonymous]
         [HttpGet("todas")]
         public IActionResult GetCategorias()
         {
@@ -168,7 +172,8 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador,Cliente")]
+        //[Authorize(Roles = "Administrador,Cliente")]
+        [AllowAnonymous]
         [HttpGet("produtos")]
         public IActionResult GetProdutosCategoria(int idCategoria)
         {
@@ -200,7 +205,8 @@ namespace API.Controllers
 
 
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpGet("especifica")]
         public IActionResult GetCategoria(int idCategoria)
         {
@@ -229,7 +235,5 @@ namespace API.Controllers
                 return StatusCode(500);
             }
         }
-
-
     }
 }

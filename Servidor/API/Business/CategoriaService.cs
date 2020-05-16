@@ -192,7 +192,7 @@ namespace API.Business
         public IList<CategoriaViewDTO> GetCategorias()
         {
             _logger.LogDebug("A executar [CategoriaService -> GetCategoriasAtivadas]");
-            IList<CategoriaViewDTO> categoriasViewDTO = null;
+            IList<CategoriaViewDTO> categoriasViewDTO = new List<CategoriaViewDTO>();
 
             IList<Categoria> categorias = _categoriaDAO.GetCategorias();
             if (categorias != null)
@@ -204,10 +204,6 @@ namespace API.Business
                     categoriaViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{categoria.IdCategoria}.{categoria.ExtensaoImagem}"));
                     categoriasViewDTO.Add(categoriaViewDTO);
                 }
-            }
-            else
-            {
-                categoriasViewDTO = new List<CategoriaViewDTO>();
             }
 
             return categoriasViewDTO;

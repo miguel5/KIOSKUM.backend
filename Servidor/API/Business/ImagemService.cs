@@ -75,12 +75,13 @@ namespace API.Business
         {
             _logger.LogDebug("A executar [ImagemService -> GuardarImagem]");
 
+            Console.WriteLine(_webHostEnvironment.WebRootPath);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, pathNova);
             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
             var copyTask = ficheiro.CopyToAsync(fileStream);
             Task taskDelete = Task.CompletedTask;
 
-            if (!pathNova.Equals(pathAnterior))
+            if (!pathNova.Equals(pathAnterior) && !(pathAnterior is null))
             {
                 filePath = Path.Combine(_webHostEnvironment.WebRootPath, pathAnterior);
                 taskDelete = Task.Factory.StartNew(() => File.Delete(filePath));

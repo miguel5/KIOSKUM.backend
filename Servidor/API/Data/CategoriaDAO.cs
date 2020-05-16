@@ -47,14 +47,15 @@ namespace API.Data
             cmd.Parameters.AddWithValue("?id", novaCategoria.IdCategoria);
             cmd.Parameters["?id"].Direction = ParameterDirection.Input;
 
-            cmd.Parameters.AddWithValue("?nome", novaCategoria.Nome);
-            cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
+            cmd.Parameters.AddWithValue("?nomes", novaCategoria.Nome);
+            cmd.Parameters["?nomes"].Direction = ParameterDirection.Input;
 
-            cmd.Parameters.AddWithValue("?extensao_imagem", novaCategoria.ExtensaoImagem);
-            cmd.Parameters["?extensao_imagem"].Direction = ParameterDirection.Input;
+            cmd.Parameters.AddWithValue("?extensao_imagems", novaCategoria.ExtensaoImagem);
+            cmd.Parameters["?extensao_imagems"].Direction = ParameterDirection.Input;
 
             cmd.ExecuteNonQuery();
-
+            Console.WriteLine(novaCategoria.Nome);
+            Console.WriteLine(novaCategoria.ExtensaoImagem);
             _connectionDB.CloseConnection();
         }
 
