@@ -77,13 +77,15 @@ namespace API.Business
 
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, pathNova);
             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-            await ficheiro.CopyToAsync(fileStream);
+            var copyTask = ficheiro.CopyToAsync(fileStream);
+            Task taskDelete = Task.CompletedTask;
 
             if (!pathNova.Equals(pathAnterior))
             {
                 filePath = Path.Combine(_webHostEnvironment.WebRootPath, pathAnterior);
-                await Task.Factory.StartNew(() => File.Delete(filePath));
+                taskDelete = Task.Factory.StartNew(() => File.Delete(filePath));
             }
+            await Task.WhenAll(new[] { copyTask, taskDelete });
 
             _logger.LogDebug($"Sucesso no upload da imagem para a path {pathNova}!");
         }

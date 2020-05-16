@@ -14,7 +14,6 @@ namespace API.Data
         Produto GetProduto(int idProduto);//devolve o produto (ativado/desativado)
         Produto GetProdutoNome(string nome);//devolve o produto (ativado/desativado)
         void EditarProduto(Produto produto);
-        IList<Produto> GetProdutosCategoria(int idCategoria);//apenas devolve os ativados
         IList<Produto> GetProdutosDesativados();//apenas devolve os desativados
         void DesativarProduto(int idProduto);
         void AtivarProduto(int idProduto);
@@ -56,11 +55,6 @@ namespace API.Data
         }
 
         public Produto GetProdutoNome(string nome)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<Produto> GetProdutosCategoria(int idCategoria)
         {
             throw new NotImplementedException();
         }
