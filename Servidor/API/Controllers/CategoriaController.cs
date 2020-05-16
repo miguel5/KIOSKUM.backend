@@ -66,6 +66,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -113,6 +114,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -137,6 +139,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -162,6 +165,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -194,6 +198,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -227,6 +232,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)

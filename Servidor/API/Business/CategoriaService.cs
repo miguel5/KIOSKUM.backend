@@ -54,7 +54,7 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
             }
-            if (extensao == null)
+            if (extensao is null)
             {
                 throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
             }
@@ -109,7 +109,7 @@ namespace API.Business
             {
                 throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
             }
-            if (extensao == null)
+            if (extensao is null)
             {
                 throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
             }
@@ -120,7 +120,7 @@ namespace API.Business
 
             if (categoria == null)
             {
-                _logger.LogDebug($"Não existe nenhuma Categoria com IdCategoria {model.IdCategoria}!");
+                _logger.LogWarning($"Não existe nenhuma Categoria com IdCategoria {model.IdCategoria}!");
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
             else
@@ -256,7 +256,7 @@ namespace API.Business
 
             if (categoria == null)
             {
-                _logger.LogDebug($"Não existe nenhuma Categoria com IdCategoria {idCategoria}!");
+                _logger.LogWarning($"Não existe nenhuma Categoria com IdCategoria {idCategoria}!");
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
             else
