@@ -25,9 +25,10 @@ namespace API.Controllers
             _imagemService = imagemService;
         }
 
-        [Authorize(Roles = "Administrador")]
+        //Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("registar")]
-        public async Task<IActionResult> RegistarProduto([FromBody] RegistarProdutoDTO model)
+        public async Task<IActionResult> RegistarProduto([FromForm] RegistarProdutoDTO model)
         {
             _logger.LogDebug("A executar api/produto/registar -> Post");
             if (model is null)
@@ -71,9 +72,10 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("editar")]
-        public async Task<IActionResult> EditarProduto([FromBody] EditarProdutoDTO model)
+        public async Task<IActionResult> EditarProduto([FromForm] EditarProdutoDTO model)
         {
             _logger.LogDebug("A executar api/produto/editar -> Post");
             if (model is null)

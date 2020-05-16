@@ -191,6 +191,9 @@ namespace API.Data
             _connectionDB.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
+            MySqlCommand cmdI = new MySqlCommand();
+            MySqlCommand cmdA = new MySqlCommand();
+
             cmd.Connection = _connectionDB.Connection;
 
             cmd.CommandText = "get_produto_nome";
@@ -200,7 +203,6 @@ namespace API.Data
             cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
 
             MySqlDataReader var = cmd.ExecuteReader();
-
             Produto produto = null;
             try
             {
@@ -208,31 +210,37 @@ namespace API.Data
                 {
                     produto = new Produto { IdProduto = var.GetInt32(0), Nome = nome, IdCategoria = var.GetInt32(3), Preco = var.GetDouble(1), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(2) };
 
-                    cmd.CommandText = "get_ingredientes_produto";
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    var.Close();
+                    cmdI.Connection = _connectionDB.Connection;
+                    cmdI.CommandText = "get_ingredientes_produto";
+                    cmdI.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                    cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+                    cmdI.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                    cmdI.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
-                    var = cmd.ExecuteReader();
+                    var = cmdI.ExecuteReader();
 
                     while (var.Read())
                     {
                         produto.Ingredientes.Add(var.GetString(0));
                     }
+                    var.Close();
+                    cmdA.Connection = _connectionDB.Connection;
 
-                    cmd.CommandText = "get_alergenicos_produto";
-                    cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                    cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+                    cmdA.CommandText = "get_alergenicos_produto";
+                    cmdA.CommandType = CommandType.StoredProcedure;
 
-                    var = cmd.ExecuteReader();
+                    cmdA.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                    cmdA.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+                    var = cmdA.ExecuteReader();
 
                     while (var.Read())
                     {
                         produto.Alergenios.Add(var.GetString(0));
                     }
+                    var.Close();
                 }
                 return produto;
             }
@@ -345,49 +353,56 @@ namespace API.Data
 
             int productId = Convert.ToInt32(cmd.ExecuteScalar());
 
+            
             foreach (string ingrediente in produto.Ingredientes)
             {
-                cmd.CommandText = "adicionar_ingrediente";
-                cmd.CommandType = CommandType.StoredProcedure;
+                MySqlCommand cmdI = new MySqlCommand();
+                cmdI.Connection = _connectionDB.Connection;
 
-                cmd.Parameters.AddWithValue("?nome", ingrediente);
-                cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
+                cmdI.CommandText = "adicionar_ingrediente";
+                cmdI.CommandType = CommandType.StoredProcedure;
 
-                int ingredientId = Convert.ToInt32(cmd.ExecuteScalar());
+                cmdI.Parameters.AddWithValue("?nome", ingrediente);
+                cmdI.Parameters["?nome"].Direction = ParameterDirection.Input;
 
-                cmd.CommandText = "adicionar_produto_ingrediente";
-                cmd.CommandType = CommandType.StoredProcedure;
+                int ingredientId = Convert.ToInt32(cmdI.ExecuteScalar());
 
-                cmd.Parameters.AddWithValue("?produto", productId);
-                cmd.Parameters["?produto"].Direction = ParameterDirection.Input;
+                cmdI.CommandText = "adicionar_produto_ingrediente";
+                cmdI.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("?ingrediente", ingredientId);
-                cmd.Parameters["?ingrediente"].Direction = ParameterDirection.Input;
+                cmdI.Parameters.AddWithValue("?produto", productId);
+                cmdI.Parameters["?produto"].Direction = ParameterDirection.Input;
 
-                cmd.ExecuteNonQuery();
+                cmdI.Parameters.AddWithValue("?ingrediente", ingredientId);
+                cmdI.Parameters["?ingrediente"].Direction = ParameterDirection.Input;
+
+                cmdI.ExecuteNonQuery();
 
             }
 
             foreach (string alergenico in produto.Alergenios)
             {
-                cmd.CommandText = "adicionar_alergenico";
-                cmd.CommandType = CommandType.StoredProcedure;
+                MySqlCommand cmdA = new MySqlCommand();
+                cmdA.Connection = _connectionDB.Connection;
 
-                cmd.Parameters.AddWithValue("?nome", alergenico);
-                cmd.Parameters["?nome"].Direction = ParameterDirection.Input;
+                cmdA.CommandText = "adicionar_alergenico";
+                cmdA.CommandType = CommandType.StoredProcedure;
+
+                cmdA.Parameters.AddWithValue("?nome", alergenico);
+                cmdA.Parameters["?nome"].Direction = ParameterDirection.Input;
 
                 int alergenicId = Convert.ToInt32(cmd.ExecuteScalar());
 
-                cmd.CommandText = "adicionar_produto_alergenico";
-                cmd.CommandType = CommandType.StoredProcedure;
+                cmdA.CommandText = "adicionar_produto_alergenico";
+                cmdA.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("?produto", productId);
-                cmd.Parameters["?produto"].Direction = ParameterDirection.Input;
+                cmdA.Parameters.AddWithValue("?produto", productId);
+                cmdA.Parameters["?produto"].Direction = ParameterDirection.Input;
 
-                cmd.Parameters.AddWithValue("?alergenico", alergenicId);
-                cmd.Parameters["?alergenico"].Direction = ParameterDirection.Input;
+                cmdA.Parameters.AddWithValue("?alergenico", alergenicId);
+                cmdA.Parameters["?alergenico"].Direction = ParameterDirection.Input;
 
-                cmd.ExecuteNonQuery();
+                cmdA.ExecuteNonQuery();
 
             }
             _connectionDB.CloseConnection();
