@@ -66,7 +66,7 @@ namespace API.Business
             {
                 _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema!");
                 Categoria categoria = _categoriaDAO.GetCategoriaNome(model.Nome);
-                if (_categoriaDAO.isAtiva(categoria.IdCategoria))
+                if (_categoriaDAO.IsAtiva(categoria.IdCategoria))
                 {
                     _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema, com IdCategoria {categoria.IdCategoria} e encontra-se ativada!");
                     erros.Add((int)ErrosEnumeration.NomeCategoriaJaExiste);
@@ -125,7 +125,7 @@ namespace API.Business
             }
             else
             {
-                if (_categoriaDAO.isAtiva(model.IdCategoria))
+                if (_categoriaDAO.IsAtiva(model.IdCategoria))
                 {
                     if (!categoria.Nome.Equals(model.Nome) && _categoriaDAO.ExisteNomeCategoria(model.Nome))
                     {
@@ -226,7 +226,7 @@ namespace API.Business
             }
             else
             {
-                if (_categoriaDAO.isAtiva(idCategoria))
+                if (_categoriaDAO.IsAtiva(idCategoria))
                 {
                     IList<Produto> produtos = _categoriaDAO.GetProdutosCategoria(idCategoria);
                     if (produtos != null)
@@ -265,7 +265,7 @@ namespace API.Business
             }
             else
             {
-                if (_categoriaDAO.isAtiva(idCategoria))
+                if (_categoriaDAO.IsAtiva(idCategoria))
                 {
                     categoriaViewDTO = _mapper.Map<CategoriaViewDTO>(categoria);
                     categoriaViewDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl, "Images", "Categoria", $"{categoria.IdCategoria}.{categoria.ExtensaoImagem}"));
