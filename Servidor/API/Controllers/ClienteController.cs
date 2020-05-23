@@ -46,23 +46,23 @@ namespace API.Controllers
                 ServiceResult resultado = _clienteBusiness.CriarConta(model);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} registou-se com sucesso!");
+                    _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} registou-se com sucesso.");
                     ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailCodigoValidacao(model.Email);
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
-                        _logger.LogDebug("Email do Código de Confirmação enviado com sucesso!");
+                        _logger.LogInformation("Email do Código de Confirmação enviado com sucesso.");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug("Ocorreu um erro na leitura do Email do Código de Confirmação!");
+                        _logger.LogInformation("Ocorreu um erro na leitura do Email do Código de Confirmação.");
                         return BadRequest(resultadoEmails.Erros);
                     }
                 }
                 else
                 {
-                    _logger.LogDebug("Ocorreu um erro ao criar conta!");
+                    _logger.LogInformation("Ocorreu um erro ao criar conta.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -95,23 +95,23 @@ namespace API.Controllers
                 ServiceResult resultado = _clienteBusiness.ConfirmarConta(model);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O Cliente com Email {model.Email} confirmou a sua conta com sucesso!");
+                    _logger.LogInformation($"O Cliente com Email {model.Email} confirmou a sua conta com sucesso.");
                     ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailBoasVindas(model.Email);
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
-                        _logger.LogDebug("Email de Boas Vindas enviado com sucesso!");
+                        _logger.LogInformation("Email de Boas Vindas enviado com sucesso.");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug("Ocorreu um erro na leitura do Email de Boas Vindas!");
+                        _logger.LogInformation("Ocorreu um erro na leitura do Email de Boas Vindas.");
                         return BadRequest(resultadoEmails.Erros);
                     }
                 }
                 else
                 {
-                    _logger.LogDebug("Ocorreu um erro ao confirmar conta!");
+                    _logger.LogInformation("Ocorreu um erro ao confirmar conta.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -144,12 +144,12 @@ namespace API.Controllers
                 ServiceResult<TokenDTO> resultado = _clienteBusiness.Login(model);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O Cliente com Email {model.Email} efetou login com sucesso!");
+                    _logger.LogInformation($"O Cliente com Email {model.Email} efetou login com sucesso.");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar login conta com Email {model.Email}!");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o login com o Email {model.Email}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -183,12 +183,12 @@ namespace API.Controllers
                 ServiceResult resultado = _clienteBusiness.EditarConta(idCliente, model);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} editou a sua conta com sucesso!");
+                    _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} editou a sua conta com sucesso.");
                     return Ok();
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar a edição do Cliente com IdCliente {idCliente}!");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar a edição do Cliente com IdCliente {idCliente}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -216,12 +216,12 @@ namespace API.Controllers
                 ServiceResult<ClienteViewDTO> resultado = _clienteBusiness.GetCliente(idCliente);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogDebug($"Get do Cliente com IdCliente {idCliente} efetuado com sucesso!");
+                    _logger.LogInformation($"Get do Cliente com IdCliente {idCliente} efetuado com sucesso.");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar o Get do Cliente com IdCliente {idCliente}!");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o Get do Cliente com IdCliente {idCliente}.");
                     return BadRequest(resultado.Erros);
                 }
             }

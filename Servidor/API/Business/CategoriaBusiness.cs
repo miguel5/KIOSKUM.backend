@@ -33,21 +33,21 @@ namespace API.Business
 
         private bool ValidaNome(string nome)
         {
-            _logger.LogDebug("A executar [CategoriaService -> ValidaNome]");
+            _logger.LogDebug("A executar [CategoriaBusiness -> ValidaNome]");
             return nome.Length <= 45;
         }
 
 
         public ServiceResult<Tuple<string, string>> RegistarCategoria(RegistarCategoriaDTO model, string extensao)
         {
-            _logger.LogDebug("A executar [CategoriaService -> RegistarCategoria]");
+            _logger.LogDebug("A executar [CategoriaBusiness -> RegistarCategoria]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
             }
             if (extensao is null)
             {
-                throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Extensao", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -55,16 +55,16 @@ namespace API.Business
 
             if (_categoriaDAO.ExisteNomeCategoria(model.Nome))
             {
-                _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema!");
+                _logger.LogDebug($"A Categoria com o Nome {model.Nome} já existe.");
                 Categoria categoria = _categoriaDAO.GetCategoriaNome(model.Nome);
                 if (_categoriaDAO.IsAtiva(categoria.IdCategoria))
                 {
-                    _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema, com IdCategoria {categoria.IdCategoria} e encontra-se ativada!");
+                    _logger.LogDebug($"A Categoria com o Nome {model.Nome} já existe, com IdCategoria {categoria.IdCategoria} e encontra-se ativada.");
                     erros.Add((int)ErrosEnumeration.NomeCategoriaJaExiste);
                 }
                 else
                 {
-                    _logger.LogDebug($"A Categoria com o nome {model.Nome} já existe no Sistema, com IdCategoria {categoria.IdCategoria} e encontra-se desativada!");
+                    _logger.LogDebug($"A Categoria com o Nome {model.Nome} já existe, com IdCategoria {categoria.IdCategoria} e encontra-se desativada.");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
@@ -72,7 +72,7 @@ namespace API.Business
             {
                 if (!ValidaNome(model.Nome))
                 {
-                    _logger.LogDebug($"O nome {model.Nome} é inválido!");
+                    _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                     erros.Add((int)ErrosEnumeration.NomeCategoriaInvalido);
                 }
                 
@@ -95,14 +95,14 @@ namespace API.Business
 
         public ServiceResult<Tuple<string, string>> EditarCategoria(EditarCategoriaDTO model, string extensao)
         {
-            _logger.LogDebug("A executar [CategoriaService -> EditarCategoria]");
+            _logger.LogDebug("A executar [CategoriaBusiness -> EditarCategoria]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
             }
             if (extensao is null)
             {
-                throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Extensao", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -121,14 +121,14 @@ namespace API.Business
                     if (!categoria.Nome.Equals(model.Nome) && _categoriaDAO.ExisteNomeCategoria(model.Nome))
                     {
 
-                        _logger.LogDebug($"O Nome {model.Nome} já existe no sistema!");
+                        _logger.LogDebug($"O Nome {model.Nome} já existe.");
                         erros.Add((int)ErrosEnumeration.NomeCategoriaJaExiste);
                     }
                     else
                     {
                         if (!ValidaNome(model.Nome))
                         {
-                            _logger.LogDebug($"O Nome {model.Nome} é inválido!");
+                            _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                             erros.Add((int)ErrosEnumeration.NomeCategoriaInvalido);
                         }
 
@@ -145,7 +145,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogDebug($"A Categoria com IdCategoria {model.IdCategoria} encontra-se desativada!");
+                    _logger.LogWarning($"A Categoria com IdCategoria {model.IdCategoria} encontra-se desativada.");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
@@ -156,7 +156,7 @@ namespace API.Business
 
         public IList<CategoriaViewDTO> GetCategoriasDesativadas()
         {
-            _logger.LogDebug("A executar [CategoriaService -> GetCategoriasDesativadas]");
+            _logger.LogDebug("A executar [CategoriaBusiness -> GetCategoriasDesativadas]");
             IList<CategoriaViewDTO> categoriasViewDTO = null;
 
             IList<Categoria> categorias = _categoriaDAO.GetCategoriasDesativadas();
@@ -182,7 +182,7 @@ namespace API.Business
 
         public IList<CategoriaViewDTO> GetCategorias()
         {
-            _logger.LogDebug("A executar [CategoriaService -> GetCategoriasAtivadas]");
+            _logger.LogDebug("A executar [CategoriaBusiness -> GetCategoriasAtivadas]");
             IList<CategoriaViewDTO> categoriasViewDTO = new List<CategoriaViewDTO>();
 
             IList<Categoria> categorias = _categoriaDAO.GetCategorias();
@@ -203,12 +203,13 @@ namespace API.Business
 
         public ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria)
         {
+            _logger.LogDebug("A executar [CategoriaBusiness -> GetProdutosCategoria]");
             IList<int> erros = new List<int>();
             IList<ProdutoViewDTO> produtosViewDTO = null;
 
             if (!_categoriaDAO.ExisteCategoria(idCategoria))
             {
-                _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} não existe no sistema!");
+                _logger.LogWarning($"A Categoria com IdCategoria {idCategoria} não existe!");
                 erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
             }
             else
@@ -229,9 +230,11 @@ namespace API.Business
                 }
                 else
                 {
+                    _logger.LogWarning($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
+
             return new ServiceResult<IList<ProdutoViewDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosViewDTO };
         }
 
@@ -239,7 +242,7 @@ namespace API.Business
 
         public ServiceResult<CategoriaViewDTO> GetCategoria(int idCategoria)
         {
-            _logger.LogDebug("A executar [CategoriaService -> GetCategoria]");
+            _logger.LogDebug("A executar [CategoriaBusiness -> GetCategoria]");
             IList<int> erros = new List<int>();
             CategoriaViewDTO categoriaViewDTO = null;
 
@@ -259,7 +262,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
+                    _logger.LogWarning($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }

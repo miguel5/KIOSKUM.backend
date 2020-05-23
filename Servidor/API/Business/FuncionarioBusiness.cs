@@ -47,25 +47,25 @@ namespace API.Business
             _logger.LogDebug("A executar [FuncionarioBusiness -> CriarConta]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
 
             if (_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario))
             {
-                _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} já existe!");
+                _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} já existe.");
                 erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
 
             }
             if (!ValidaNome(model.Nome))
             {
-                _logger.LogDebug($"O Nome {model.Nome} é inválido!");
+                _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                 erros.Add((int)ErrosEnumeration.NomeInvalido);
             }
             if (!ValidaNumFuncionario(model.NumFuncionario))
             {
-                _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} é inválido!");
+                _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} é inválido.");
                 erros.Add((int)ErrosEnumeration.NumFuncionarioInvalido);
             }
            
@@ -84,7 +84,7 @@ namespace API.Business
             _logger.LogDebug("A executar [FuncionarioBusiness -> CriarConta]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -92,20 +92,20 @@ namespace API.Business
 
             if(funcionario == null)
             {
-                _logger.LogWarning($"Não existe nenhum Funcionário com Número de Funcionário {model.NumFuncionario}");
+                _logger.LogWarning($"Não existe nenhum Funcionário com Número de Funcionário {model.NumFuncionario}!");
                 erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
             }
             else
             {
                 if (_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario) && funcionario.NumFuncionario != model.NumFuncionario)
                 {
-                    _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} já existe!");
+                    _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} já existe.");
                     erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
 
                 }
                 if (!ValidaNome(model.Nome))
                 {
-                    _logger.LogDebug($"O Nome {model.Nome} é inválido!");
+                    _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                     erros.Add((int)ErrosEnumeration.NomeInvalido);
                 }
 
@@ -126,7 +126,7 @@ namespace API.Business
             Funcionario funcionario = _funcionarioDAO.GetContaNumFuncionario(numFuncionario);
             if (funcionario == null)
             {
-                _logger.LogWarning($"Não existe nenhum Funcionário com Número de Funcionário {numFuncionario}");
+                _logger.LogWarning($"Não existe nenhum Funcionário com Número de Funcionário {numFuncionario}!");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
             else

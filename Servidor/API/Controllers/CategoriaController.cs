@@ -46,7 +46,7 @@ namespace API.Controllers
                 ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
                 if (!resultadoValidacaoImagem.Sucesso)
                 {
-                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    _logger.LogInformation("O ficheiro não é válido para o sistema.");
                     return BadRequest(resultadoValidacaoImagem.Erros);
                 }
                 else
@@ -55,12 +55,12 @@ namespace API.Controllers
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
-                        _logger.LogInformation($"A Categoria com nome {model.Nome} foi registado com sucesso!");
+                        _logger.LogInformation($"A Categoria com nome {model.Nome} foi registado com sucesso.");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug($"Ocorreu um erro ao registar a categoria com nome {model.Nome}!");
+                        _logger.LogInformation($"Ocorreu um erro ao registar a categoria com nome {model.Nome}.");
                         return BadRequest(resultado.Erros);
                     }
                 }
@@ -94,7 +94,7 @@ namespace API.Controllers
                 ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
                 if (!resultadoValidacaoImagem.Sucesso)
                 {
-                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    _logger.LogInformation("O ficheiro não é válido para o sistema.");
                     return BadRequest(resultadoValidacaoImagem.Erros);
                 }
                 else
@@ -103,12 +103,12 @@ namespace API.Controllers
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
-                        _logger.LogInformation($"A Categoria com  IdCategoria {model.IdCategoria} foi editada, com o nome {model.Nome}!");
+                        _logger.LogInformation($"A Categoria com  IdCategoria {model.IdCategoria} foi editada, com o nome {model.Nome}.");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug($"Ocorreu um erro ao editar a Categoria com IdCategoria {model.IdCategoria}!");
+                        _logger.LogInformation($"Ocorreu um erro ao editar a Categoria com IdCategoria {model.IdCategoria}.");
                         return BadRequest(resultado.Erros);
                     }
                 }
@@ -135,6 +135,7 @@ namespace API.Controllers
             try
             {
                 IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoriasDesativadas();
+                _logger.LogInformation("Get das Categorias destaivadas efetuado com sucesso.");
                 return Ok(resultado);
 
             }
@@ -161,6 +162,7 @@ namespace API.Controllers
             try
             {
                 IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategorias();
+                _logger.LogInformation("Get das Categorias ativadas efetuado com sucesso.");
                 return Ok(resultado);
 
             }
@@ -188,12 +190,12 @@ namespace API.Controllers
                 ServiceResult<IList<ProdutoViewDTO>> resultado = _categoriaBusiness.GetProdutosCategoria(idCategoria);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogDebug($"Foi efetuado o get dos Produtos da Categoria com IdCategoria {idCategoria}!");
+                    _logger.LogInformation($"Get dos Produtos da Categoria com IdCategoria {idCategoria} efetuado com sucesso.");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar o get dos Produtos da Categoria com IdCategoria {idCategoria}!");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o Get dos Produtos da Categoria com IdCategoria {idCategoria}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -222,12 +224,12 @@ namespace API.Controllers
                 ServiceResult<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoria(idCategoria);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogDebug($"Foi efetuado o get do Categoria com IdCategoria {idCategoria}!");
+                    _logger.LogInformation($"Get do Categoria com IdCategoria {idCategoria} efetuado com sucesso.");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar o get da Categoria com IdCategoria {idCategoria}!");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o Get da Categoria com IdCategoria {idCategoria}.");
                     return BadRequest(resultado.Erros);
                 }
             }

@@ -39,12 +39,12 @@ namespace API.Models
                 ServiceResult resultado = _funcionarioBusiness.CriarConta(model);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O {model.Nome} e Número de Funcionário {model.NumFuncionario} foi registado com sucesso!");
+                    _logger.LogInformation($"O {model.Nome} e Número de Funcionário {model.NumFuncionario} foi registado com sucesso.");
                     return Ok();
                 }
                 else
                 {
-                    _logger.LogDebug("Ocorreu um erro ao criar conta!");
+                    _logger.LogInformation("Ocorreu um erro ao criar conta.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -76,12 +76,12 @@ namespace API.Models
                 ServiceResult resultado = _funcionarioBusiness.EditarConta(model);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"Foi editado o nome do Funcionário com Número de Funcionário {model.NumFuncionario} para o novo Nome {model.Nome}!");
+                    _logger.LogInformation($"Foi editado o nome do Funcionário com Número de Funcionário {model.NumFuncionario} para o novo Nome {model.Nome}.");
                     return Ok();
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao editar a conta do Funcionário com Número de Funcionário {model.NumFuncionario}!");
+                    _logger.LogInformation($"Ocorreu um erro ao editar a conta do Funcionário com Número de Funcionário {model.NumFuncionario}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -108,12 +108,12 @@ namespace API.Models
                 ServiceResult<FuncionarioViewDTO> resultado = _funcionarioBusiness.GetFuncionario(numFuncionario);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogDebug($"Get do Funcionário com Número de Funcionário {numFuncionario} efetuado com sucesso!");
+                    _logger.LogInformation($"Get do Funcionário com Número de Funcionário {numFuncionario} efetuado com sucesso.");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar a Get do Funcionário com Número de Funcionário {numFuncionario}!");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar a Get do Funcionário com Número de Funcionário {numFuncionario}.");
                     return BadRequest(resultado.Erros);
                 }
             }

@@ -109,32 +109,32 @@ namespace API.Business
 
             if (_clienteDAO.ExisteEmail(model.Email))
             {
-                _logger.LogDebug($"O Email {model.Email} já existe!");
+                _logger.LogDebug($"O Email {model.Email} já existe.");
                 erros.Add((int)ErrosEnumeration.EmailJaExiste);
             }
             if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel))
             {
-                _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} já existe!");
+                _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} já existe.");
                 erros.Add((int)ErrosEnumeration.NumTelemovelJaExiste);
             }
             if (!ValidaNome(model.Nome))
             {
-                _logger.LogDebug($"O Nome {model.Nome} é inválido!");
+                _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                 erros.Add((int)ErrosEnumeration.NomeInvalido);
             }
             if (!ValidaEmail(model.Email))
             {
-                _logger.LogDebug($"O Email {model.Email} é inválido!");
+                _logger.LogDebug($"O Email {model.Email} é inválido.");
                 erros.Add((int)ErrosEnumeration.EmailInvalido);
             }
             if (!ValidaPassword(model.Password))
             {
-                _logger.LogDebug("A Password introduzida é inválida!");
+                _logger.LogDebug("A Password introduzida é inválida.");
                 erros.Add((int)ErrosEnumeration.PasswordInvalida);
             }
             if (!ValidaNumTelemovel(model.NumTelemovel))
             {
-                _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} é inválida!");
+                _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} é inválida.");
                 erros.Add((int)ErrosEnumeration.NumTelemovelInvalido);
             }
 
@@ -154,7 +154,7 @@ namespace API.Business
             _logger.LogDebug("A executar [ClienteBusiness -> GetEmailCodigoValidacao]");
             if (string.IsNullOrWhiteSpace(email))
             {
-                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
+                throw new ArgumentNullException("Email", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -163,17 +163,17 @@ namespace API.Business
 
             if(codigoValidacao != null)
             {
-                _logger.LogDebug("Início da leitura do ficheiro de EmailGerarCodigo.json");
+                _logger.LogDebug("Início da leitura do ficheiro de EmailGerarCodigo.json.");
                 string pathEmailgerarCodigo = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailGerarCodigo.json");
                 StreamReader sr = new StreamReader(pathEmailgerarCodigo);
                 string json = sr.ReadToEnd();
-                _logger.LogDebug("Fim da leitura do ficheiro de EmailGerarCodigo.json");
+                _logger.LogDebug("Fim da leitura do ficheiro de EmailGerarCodigo.json.");
                 emailCodigoValidacao = JsonConvert.DeserializeObject<Email>(json);
                 emailCodigoValidacao.AdicionaCodigo(codigoValidacao);
             }
             else
             {
-                _logger.LogWarning($"Não existe Código de Validação associado ao Email {email}!");
+                _logger.LogWarning($"O Email {email} não existe!");
                 erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
             return new ServiceResult<Email> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emailCodigoValidacao };
@@ -195,29 +195,29 @@ namespace API.Business
 
             if (!_clienteDAO.ExisteEmail(model.Email))
             {
-                _logger.LogDebug($"O Email {model.Email} não existe!");
+                _logger.LogWarning($"O Email {model.Email} não existe!");
                 erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
             else
             {
                 if (_clienteDAO.ContaConfirmada(model.Email))
                 {
-                    _logger.LogDebug($"O Cliente com Email {model.Email} já se encontra confirmado!");
+                    _logger.LogDebug($"O Email {model.Email} já se encontra confirmado.");
                     erros.Add((int)ErrosEnumeration.ContaJaConfirmada);
                 }
                 if (!_clienteDAO.GetCodigoValidacao(model.Email).Equals(model.Codigo))
                 {
-                    _logger.LogDebug($"O Cliente com Email {model.Email} introduziu um Código de Validação errado!");
+                    _logger.LogDebug($"Código de Validação errado para o Email {model.Email}.");
                     int numTentativas = _clienteDAO.GetNumTentativas(model.Email);
                     if (numTentativas > 0)
                     {
-                        _logger.LogDebug($"O Código de Validação está errado, tem mais {numTentativas-1} tentativas!");
+                        _logger.LogDebug($"O Código de Validação está errado. restam-lhe {numTentativas-1} tentativas.");
                         erros.Add((int)ErrosEnumeration.CodigoValidacaoErrado);
                         _clienteDAO.DecrementaTentativas(model.Email);
                     }
                     else
                     {
-                        _logger.LogDebug("O Código de Validação está errado, a conta foi eliminada!");
+                        _logger.LogDebug("O Código de Validação está errado. Cliente eliminado.");
                         erros.Add((int)ErrosEnumeration.NumTentativasExcedido);
                     }
                 }
@@ -234,7 +234,7 @@ namespace API.Business
             _logger.LogDebug("A executar [ClienteBusiness -> GetEmailBoasVindas]");
             if (string.IsNullOrWhiteSpace(email))
             {
-                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
+                throw new ArgumentNullException("Email", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -242,16 +242,16 @@ namespace API.Business
 
             if (_clienteDAO.ExisteEmail(email))
             {
-                _logger.LogDebug("Início da leitura do ficheiro de EmailBoasVindas.json");
+                _logger.LogDebug("Início da leitura do ficheiro de EmailBoasVindas.json.");
                 string pathEmailBoasVindas = Path.Combine(_webHostEnvironment.ContentRootPath, "Files", "EmailBoasVindas.json");
                 StreamReader sr = new StreamReader(pathEmailBoasVindas);
                 string json = sr.ReadToEnd();
-                _logger.LogDebug("Fim da leitura do ficheiro de EmailBoasVindas.json");
+                _logger.LogDebug("Fim da leitura do ficheiro de EmailBoasVindas.json.");
                 emailBoasVindas = JsonConvert.DeserializeObject<Email>(json);
             }
             else
             {
-                _logger.LogWarning($"Não existe Código de Validação associado ao Email {email}!");
+                _logger.LogWarning($"O Email {email} não existe!");
                 erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
             return new ServiceResult<Email> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emailBoasVindas };
@@ -273,14 +273,14 @@ namespace API.Business
             TokenDTO resultToken = null;
             if (!_clienteDAO.ExisteEmail(model.Email))
             {
-                _logger.LogWarning($"Não existe nenhum Cliente com o Email {model.Email}!");
+                _logger.LogWarning($"O Email {model.Email} não existe.");
                 erros.Add((int)ErrosEnumeration.EmailPasswordIncorreta);
             }
             else
             {
                 if (!_clienteDAO.ContaConfirmada(model.Email))
                 {
-                    _logger.LogDebug($"O Cliente com Email {model.Email} não se encontra confirmado!");
+                    _logger.LogDebug($"O Email {model.Email} não se encontra confirmado.");
                     erros.Add((int)ErrosEnumeration.ContaNaoConfirmada);
                 }
 
@@ -307,7 +307,7 @@ namespace API.Business
                     }
                     else
                     {
-                        _logger.LogWarning("A Password está incorreta");
+                        _logger.LogWarning("A Password está incorreta!");
                         erros.Add((int)ErrosEnumeration.EmailPasswordIncorreta);
                     }
                 }
@@ -342,45 +342,45 @@ namespace API.Business
             Cliente cliente = _clienteDAO.GetContaId(idCliente);
             if (cliente == null)
             {
-                _logger.LogWarning($"Não existe nenhum Cliente com o IdCliente {idCliente}");
+                _logger.LogWarning($"Não existe nenhum Cliente com o IdCliente {idCliente}!");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
             else
             {
                 if (_clienteDAO.ExisteEmail(model.Email) && !model.Email.Equals(cliente.Email))
                 {
-                    _logger.LogDebug($"O Email {model.Email} já existe");
+                    _logger.LogDebug($"O Email {model.Email} já existe.");
                     erros.Add((int)ErrosEnumeration.EmailJaExiste);
                 }
 
                 if (_clienteDAO.ExisteNumTelemovel(model.NumTelemovel) && model.NumTelemovel != cliente.NumTelemovel)
                 {
-                    _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} já existe!");
+                    _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} já existe.");
                     erros.Add((int)ErrosEnumeration.NumTelemovelJaExiste);
                 }
                 if (!ValidaNome(model.Nome))
                 {
-                    _logger.LogDebug($"O Nome {model.Nome} é inválido!");
+                    _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                     erros.Add((int)ErrosEnumeration.NomeInvalido);
                 }
                 if (!ValidaEmail(model.Email))
                 {
-                    _logger.LogDebug($"O Email {model.Email} é inválido!");
+                    _logger.LogDebug($"O Email {model.Email} é inválido.");
                     erros.Add((int)ErrosEnumeration.EmailInvalido);
                 }
                 if (!ValidaPassword(model.NovaPassword))
                 {
-                    _logger.LogDebug("A Password introduzida é inválida!");
+                    _logger.LogDebug("A Password introduzida é inválida.");
                     erros.Add((int)ErrosEnumeration.PasswordInvalida);
                 }
                 if (!ValidaNumTelemovel(model.NumTelemovel))
                 {
-                    _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} é inválido!");
+                    _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} é inválido.");
                     erros.Add((int)ErrosEnumeration.NumTelemovelInvalido);
                 }
                 if (!HashPassword(model.Password).Equals(cliente.Password))
                 {
-                    _logger.LogDebug("As Passwords não coincidem!");
+                    _logger.LogDebug("As Passwords não coincidem.");
                     erros.Add((int)ErrosEnumeration.PasswordsNaoCorrespondem);
                 }
 
@@ -405,7 +405,7 @@ namespace API.Business
             Cliente cliente = _clienteDAO.GetContaId(idCliente);
             if(cliente == null)
             {
-                _logger.LogWarning($"Não existe nenhum Cliente com o IdCliente {idCliente}");
+                _logger.LogWarning($"O IdCliente {idCliente} não existe!");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
             else

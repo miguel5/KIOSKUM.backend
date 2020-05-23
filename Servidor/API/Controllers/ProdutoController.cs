@@ -42,7 +42,7 @@ namespace API.Controllers
                 ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
                 if (!resultadoValidacaoImagem.Sucesso)
                 {
-                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    _logger.LogInformation("O ficheiro não é válido para o sistema.");
                     return BadRequest(resultadoValidacaoImagem.Erros);
                 }
                 else
@@ -51,18 +51,19 @@ namespace API.Controllers
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
-                        _logger.LogInformation($"O Produto com nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria} foi registado com sucesso!");
+                        _logger.LogInformation($"O Produto com nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria} foi registado com sucesso.");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug($"Ocorreu um erro ao registar o Produto com nome {model.Nome}!");
+                        _logger.LogInformation($"Ocorreu um erro ao registar o Produto com nome {model.Nome}.");
                         return BadRequest(resultado.Erros);
                     }
                 }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -89,7 +90,7 @@ namespace API.Controllers
                 ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
                 if (!resultadoValidacaoImagem.Sucesso)
                 {
-                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    _logger.LogInformation("O ficheiro não é válido para o sistema.");
                     return BadRequest(resultadoValidacaoImagem.Erros);
                 }
                 else
@@ -98,18 +99,19 @@ namespace API.Controllers
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
-                        _logger.LogInformation($"O Produto com IdProduto {model.IdProduto} foi editado, com o nome {model.Nome}, com o preço {model.Preco} pertencente à Categoria com IdCategoria {model.IdCategoria}!");
+                        _logger.LogInformation($"O Produto com IdProduto {model.IdProduto} foi editado, com o nome {model.Nome}, com o preço {model.Preco} pertencente à Categoria com IdCategoria {model.IdCategoria}.");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug($"Ocorreu um erro ao editar o Produto com IdProduto {model.IdProduto}!");
+                        _logger.LogInformation($"Ocorreu um erro ao editar o Produto com IdProduto {model.IdProduto}.");
                         return BadRequest(resultado.Erros);
                     }
                 }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -133,6 +135,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -154,12 +157,12 @@ namespace API.Controllers
                 ServiceResult<ProdutoViewDTO> resultado = _produtoBusiness.GetProduto(idProduto);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogDebug($"Foi efetuado o get do Produto com IdProduto {idProduto}!");
+                    _logger.LogInformation($"Foi efetuado o get do Produto com IdProduto {idProduto}.");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar o get do Produto com IdProduto {idProduto}!");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o get do Produto com IdProduto {idProduto}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -191,12 +194,13 @@ namespace API.Controllers
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao desativar o Produto com idProduto {idProduto}!");
+                    _logger.LogInformation($"Ocorreu um erro ao desativar o Produto com IdProduto {idProduto}.");
                     return BadRequest(resultado.Erros);
                 }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
@@ -217,17 +221,18 @@ namespace API.Controllers
                 ServiceResult resultado = _produtoBusiness.AtivarProduto(idProduto);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O Produto com idProduto {idProduto} foi ativado!");
+                    _logger.LogInformation($"O Produto com idProduto {idProduto} foi ativado.");
                     return Ok();
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao ativar o Produto com idProduto {idProduto}!");
+                    _logger.LogInformation($"Ocorreu um erro ao ativar o Produto com idProduto {idProduto}.");
                     return BadRequest(resultado.Erros);
                 }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
