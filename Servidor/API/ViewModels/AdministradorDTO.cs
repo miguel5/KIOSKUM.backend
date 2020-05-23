@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using API.ViewModels.FuncionarioDTOs;
 
 namespace API.ViewModels
 {
-    public class AdministradorDTO : FuncionarioDTO
+    public class AdministradorDTO : FuncionarioViewDTO
     {
         [Required]
         public string Email { get; set; }

@@ -20,6 +20,7 @@
     <Folder Include="Services\" />
     <Folder Include="Services\Pagamentos\" />
     <Folder Include="Services\Pagamentos\MBWay\" />
+    <Folder Include="ViewModels\FuncionarioDTOs\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

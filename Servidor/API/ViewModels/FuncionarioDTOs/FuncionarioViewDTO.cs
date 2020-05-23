@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace API.ViewModels
+namespace API.ViewModels.FuncionarioDTOs
 {
-    public class FuncionarioDTO
+    public class FuncionarioViewDTO
     {
         [Required]
         public string Nome { get; set; }
