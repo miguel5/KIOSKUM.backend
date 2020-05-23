@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.Business;
+using API.Business.Interfaces;
 using API.Entities;
+using API.Services;
 using API.ViewModels.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,13 @@ namespace API.Controllers
     public class ProdutoController : ControllerBase
     {
         private readonly ILogger _logger;
-        private IProdutoService _produtoService;
+        private IProdutoBusiness _produtoBusiness;
         private IImagemService _imagemService;
 
-        public ProdutoController(ILogger<ProdutoController> logger, IProdutoService produtoService, IImagemService imagemService)
+        public ProdutoController(ILogger<ProdutoController> logger, IProdutoBusiness produtoBusiness, IImagemService imagemService)
         {
             _logger = logger;
-            _produtoService = produtoService;
+            _produtoBusiness = produtoBusiness;
             _imagemService = imagemService;
         }
 
@@ -46,7 +47,7 @@ namespace API.Controllers
                 }
                 else
                 {
-                    ServiceResult<Tuple<string,string>> resultado = _produtoService.RegistarProduto(model, resultadoValidacaoImagem.Resultado);
+                    ServiceResult<Tuple<string, string>> resultado = _produtoBusiness.RegistarProduto(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
@@ -93,7 +94,7 @@ namespace API.Controllers
                 }
                 else
                 {
-                    ServiceResult<Tuple<string, string>> resultado = _produtoService.EditarProduto(model, resultadoValidacaoImagem.Resultado);
+                    ServiceResult<Tuple<string, string>> resultado = _produtoBusiness.EditarProduto(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
@@ -126,9 +127,9 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/produto/desativados -> Get");
             try
             {
-                IList<ProdutoViewDTO> resultado = _produtoService.GetProdutosDesativados();
+                IList<ProdutoViewDTO> resultado = _produtoBusiness.GetProdutosDesativados();
                 return Ok(resultado);
-               
+
             }
             catch (ArgumentNullException e)
             {
@@ -150,7 +151,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/produto/especifico -> Get");
             try
             {
-                ServiceResult<ProdutoViewDTO> resultado = _produtoService.GetProduto(idProduto);
+                ServiceResult<ProdutoViewDTO> resultado = _produtoBusiness.GetProduto(idProduto);
                 if (resultado.Sucesso)
                 {
                     _logger.LogDebug($"Foi efetuado o get do Produto com IdProduto {idProduto}!");
@@ -182,7 +183,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/produto/desativar -> Post");
             try
             {
-                ServiceResult resultado = _produtoService.DesativarProduto(idProduto);
+                ServiceResult resultado = _produtoBusiness.DesativarProduto(idProduto);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O Produto com idProduto {idProduto} foi desativado!");
@@ -213,7 +214,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/produto/ativar -> Post");
             try
             {
-                ServiceResult resultado = _produtoService.AtivarProduto(idProduto);
+                ServiceResult resultado = _produtoBusiness.AtivarProduto(idProduto);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O Produto com idProduto {idProduto} foi ativado!");

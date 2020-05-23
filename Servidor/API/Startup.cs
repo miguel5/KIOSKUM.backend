@@ -1,6 +1,7 @@
 using System.Text;
+using API.Business.Interfaces;
 using API.Business;
-using API.Data;
+using API.Data.Interfaces;
 using API.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +17,8 @@ using Microsoft.Extensions.Logging;
 using API.ViewModels.ProdutoDTOs;
 using API.ViewModels.CategoriaDTOs;
 using API.ViewModels.FuncionarioDTOs;
+using API.Data;
+using API.Services;
 
 namespace API
 {
@@ -57,7 +60,7 @@ namespace API
                 };
             });
 
-            services.AddSingleton<IConnectionDB, ConnectionDB>();
+            services.AddSingleton<IConnectionDBService, ConnectionDBService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
             services.AddScoped<IImagemService, ImagemService>();
 
@@ -67,12 +70,12 @@ namespace API
             services.AddScoped<IFuncionarioDAO, FuncionarioDAO>();
             services.AddScoped<IProdutoDAO, ProdutoDAO>();
 
-            services.AddScoped<IAdministradorService, AdministradorService>();
-            services.AddScoped<ICategoriaService, CategoriaService>();
-            services.AddSingleton<IClienteService, ClienteService>();
-            services.AddScoped<IFuncionarioService, FuncionarioService>();
-            services.AddScoped<IProdutoService, ProdutoService>();
-            
+            services.AddScoped<IAdministradorBusiness, AdministradorBusiness>();
+            services.AddScoped<ICategoriaBusiness, CategoriaBusiness>();
+            services.AddSingleton<IClienteBusiness, ClienteBusiness>();
+            services.AddScoped<IFuncionarioBusiness, FuncionarioBusiness>();
+            services.AddScoped<IProdutoBusiness, ProdutoBusiness>();
+
 
             var config = new MapperConfiguration(cfg =>
             {
@@ -95,7 +98,7 @@ namespace API
                 cfg.CreateMap<Funcionario, FuncionarioViewDTO>();
                 cfg.CreateMap<FuncionarioViewDTO, Funcionario>();
 
-                cfg.CreateMap<RegistarProdutoDTO,Produto>();
+                cfg.CreateMap<RegistarProdutoDTO, Produto>();
                 cfg.CreateMap<EditarProdutoDTO, Produto>();
                 cfg.CreateMap<Produto, ProdutoViewDTO>();
             });

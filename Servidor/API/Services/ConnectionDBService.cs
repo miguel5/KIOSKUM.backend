@@ -3,24 +3,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
-namespace API.Business
+namespace API.Services
 {
-    public interface IConnectionDB
-    {
-        MySqlConnection Connection { get; }
-        void OpenConnection();
-        void CloseConnection();
-    }
-
-
-    public class ConnectionDB : IConnectionDB
+    public class ConnectionDBService : IConnectionDBService
     {
         public MySqlConnection Connection { get; private set; }
         private ILogger _logger;
         private DBSettings _dbSettings;
 
 
-        public ConnectionDB(ILogger<ConnectionDB> logger, IOptions<AppSettings> appSettings)
+        public ConnectionDBService(ILogger<ConnectionDBService> logger, IOptions<AppSettings> appSettings)
         {
             _logger = logger;
             _dbSettings = appSettings.Value.DBSettings;

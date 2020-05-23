@@ -21,6 +21,9 @@
     <Folder Include="Services\Pagamentos\" />
     <Folder Include="Services\Pagamentos\MBWay\" />
     <Folder Include="ViewModels\FuncionarioDTOs\" />
+    <Folder Include="ViewModels\AdministradorDTOs\" />
+    <Folder Include="Business\Interfaces\" />
+    <Folder Include="Data\Interfaces\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

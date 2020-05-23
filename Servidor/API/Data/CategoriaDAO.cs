@@ -1,33 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using API.Business;
+using API.Data.Interfaces;
 using API.Entities;
+using API.Services;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace API.Data
 {
-    public interface ICategoriaDAO
-    {
-        bool ExisteCategoria(int idCategoria);//determina se o idCategoria ja se encontra no sistema
-        bool ExisteNomeCategoria(string nome);//determina se o nome da categoria ja existe no sistema
-        Categoria GetCategoriaNome(string nome);//devolve a categoria dando o nome
-        bool IsAtiva(int idCategoria);//determina se uma categoria esta ou não ativa
-        int RegistarCategoria(Categoria categoria);//devolve o id da categoria
-        Categoria GetCategoria(int idCategoria);//Retorna uma categoria (ativada/desativada)
-        void EditarCategoria(Categoria novaCategoria);//apenas edita se estiver ativada
-        IList<Categoria> GetCategoriasDesativadas();//devolve todas as categorias desativada
-        IList<Categoria> GetCategorias();//devolve todas as categorias ativadas
-        IList<Produto> GetProdutosCategoria(int idCategoria);//devolve todos os produtos ativados de uma categoria
-    }
-
     public class CategoriaDAO : ICategoriaDAO
     {
         private readonly ILogger _logger;
-        private readonly IConnectionDB _connectionDB;
+        private readonly IConnectionDBService _connectionDB;
 
-        public CategoriaDAO(ILogger<CategoriaDAO> logger ,IConnectionDB connectionDB)
+        public CategoriaDAO(ILogger<CategoriaDAO> logger, IConnectionDBService connectionDB)
         {
             _logger = logger;
             _connectionDB = connectionDB;

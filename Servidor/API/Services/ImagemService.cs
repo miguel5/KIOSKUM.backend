@@ -10,15 +10,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace API.Business
+namespace API.Services
 {
-    public interface IImagemService
-    {
-        ServiceResult<string> ValidaImagem(IFormFile ficheiro);
-        Task GuardarImagem(IFormFile ficheiro, string pathAnterior, string pathNova);
-
-    }
-
     public class ImagemService : IImagemService
     {
         private readonly ILogger _logger;

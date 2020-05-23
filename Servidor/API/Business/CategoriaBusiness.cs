@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using API.Data;
+using API.Business.Interfaces;
+using API.Data.Interfaces;
 using API.Entities;
 using API.Helpers;
 using API.ViewModels;
@@ -14,24 +15,14 @@ using Microsoft.Extensions.Options;
 
 namespace API.Business
 {
-    public interface ICategoriaService
-    {
-        ServiceResult<Tuple<string, string>> RegistarCategoria(RegistarCategoriaDTO model, string extensao);
-        ServiceResult<Tuple<string, string>> EditarCategoria(EditarCategoriaDTO model, string extensao);
-        IList<CategoriaViewDTO> GetCategoriasDesativadas();
-        IList<CategoriaViewDTO> GetCategorias();
-        ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria);
-        ServiceResult<CategoriaViewDTO> GetCategoria(int idCategoria);
-    }
-
-    public class CategoriaService : ICategoriaService
+    public class CategoriaBusiness : ICategoriaBusiness
     {
         private readonly ILogger _logger;
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
         private readonly ICategoriaDAO _categoriaDAO;
 
-        public CategoriaService(ILogger<CategoriaService> logger, IOptions<AppSettings> appSettings, IMapper mapper, ICategoriaDAO categoriaDAO)
+        public CategoriaBusiness(ILogger<CategoriaBusiness> logger, IOptions<AppSettings> appSettings, IMapper mapper, ICategoriaDAO categoriaDAO)
         {
             _logger = logger;
             _appSettings = appSettings.Value;

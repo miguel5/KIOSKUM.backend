@@ -1,23 +1,17 @@
 ﻿using System;
 using API.Business;
+using API.Data.Interfaces;
 using API.Entities;
+using API.Services;
 
 namespace API.Data
 {
-    public interface IFuncionarioDAO
-    {
-        bool ExisteNumFuncionario(int numFuncionario);
-        void EditarNome(string nome);
-        Funcionario GetContaNumFuncionario(int numFuncionario);
-        void InserirConta(Funcionario funcionario);
-    }
-
     public class FuncionarioDAO : IFuncionarioDAO
     {
-        private readonly IConnectionDB _connectionDB;
+        private readonly IConnectionDBService _connectionDB;
 
 
-        public FuncionarioDAO(IConnectionDB connectionDB)
+        public FuncionarioDAO(IConnectionDBService connectionDB)
         {
             _connectionDB = connectionDB;
         }

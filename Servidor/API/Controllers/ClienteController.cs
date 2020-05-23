@@ -2,7 +2,9 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Business;
+using API.Business.Interfaces;
 using API.Entities;
+using API.Services;
 using API.ViewModels;
 using API.ViewModels.ClienteDTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -17,14 +19,14 @@ namespace API.Controllers
     public class ClienteController : ControllerBase
     {
         private readonly ILogger _logger;
-        private IClienteService _clienteService;
+        private IClienteBusiness _clienteBusiness;
         private IEmailSenderService _emailSenderService;
 
 
-        public ClienteController(ILogger<ClienteController> logger, IClienteService clienteService, IEmailSenderService emailSenderService)
+        public ClienteController(ILogger<ClienteController> logger, IClienteBusiness clienteBusiness, IEmailSenderService emailSenderService)
         {
             _logger = logger;
-            _clienteService = clienteService;
+            _clienteBusiness = clienteBusiness;
             _emailSenderService = emailSenderService;
         }
 
@@ -42,11 +44,11 @@ namespace API.Controllers
 
             try
             {
-                ServiceResult resultado = _clienteService.CriarConta(model);
+                ServiceResult resultado = _clienteBusiness.CriarConta(model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} registou-se com sucesso!");
-                    ServiceResult<Email> resultadoEmails = _clienteService.GetEmailCodigoValidacao(model.Email);
+                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailCodigoValidacao(model.Email);
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
@@ -91,11 +93,11 @@ namespace API.Controllers
 
             try
             {
-                ServiceResult resultado = _clienteService.ConfirmarConta(model);
+                ServiceResult resultado = _clienteBusiness.ConfirmarConta(model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O Cliente com Email {model.Email} confirmou a sua conta com sucesso!");
-                    ServiceResult<Email> resultadoEmails = _clienteService.GetEmailBoasVindas(model.Email);
+                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailBoasVindas(model.Email);
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
@@ -140,7 +142,7 @@ namespace API.Controllers
 
             try
             {
-                ServiceResult<TokenDTO> resultado = _clienteService.Login(model);
+                ServiceResult<TokenDTO> resultado = _clienteBusiness.Login(model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O Cliente com Email {model.Email} efetou login com sucesso!");
@@ -179,7 +181,7 @@ namespace API.Controllers
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 int idCliente = int.Parse(nameIdentifier);
-                ServiceResult resultado = _clienteService.EditarConta(idCliente, model);
+                ServiceResult resultado = _clienteBusiness.EditarConta(idCliente, model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} editou a sua conta com sucesso!");
@@ -212,7 +214,7 @@ namespace API.Controllers
             int idCliente = int.Parse(nameIdentifier);
             try
             {
-                ServiceResult<ClienteViewDTO> resultado = _clienteService.GetCliente(idCliente);
+                ServiceResult<ClienteViewDTO> resultado = _clienteBusiness.GetCliente(idCliente);
                 if (resultado.Sucesso)
                 {
                     _logger.LogDebug($"Get do Cliente com IdCliente {idCliente} efetuado com sucesso!");

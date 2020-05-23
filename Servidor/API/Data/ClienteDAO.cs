@@ -1,34 +1,20 @@
 ﻿using System;
 using System.Data;
 using API.Business;
+using API.Data.Interfaces;
 using API.Entities;
+using API.Services;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace API.Data
 {
-    public interface IClienteDAO
-    {
-        public bool ExisteEmail(string email);
-        bool ExisteNumTelemovel(int numTelemovel);
-        void InserirConta(Cliente cliente, string codigoValidacao, int numMaxTentativas);
-        string GetCodigoValidacao(string email);
-        void DecrementaTentativas(string email);
-        bool ContaConfirmada(string email);
-        Cliente GetContaEmail(string email);
-        Cliente GetContaId(int idCliente);
-        void ValidarConta(string email);
-        void EditarConta(Cliente cliente);
-        int GetNumTentativas(string email);
-    }
-
-
     public class ClienteDAO : IClienteDAO
     {
         private readonly ILogger _logger;
-        private readonly IConnectionDB _connectionDB;
+        private readonly IConnectionDBService _connectionDB;
 
-        public ClienteDAO(ILogger<ClienteDAO> logger, IConnectionDB connectionDB)
+        public ClienteDAO(ILogger<ClienteDAO> logger, IConnectionDBService connectionDB)
         {
             _logger = logger;
             _connectionDB = connectionDB;

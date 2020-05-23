@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.Business;
+using API.Business.Interfaces;
 using API.Entities;
+using API.Services;
 using API.ViewModels.CategoriaDTOs;
 using API.ViewModels.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -16,14 +18,14 @@ namespace API.Controllers
     public class CategoriaController : ControllerBase
     {
         private readonly ILogger _logger;
-        private ICategoriaService _categoriaService;
+        private ICategoriaBusiness _categoriaBusiness;
         private IImagemService _imagemService;
 
 
-        public CategoriaController(ILogger<CategoriaController> logger, ICategoriaService categoriaService, IImagemService imagemService)
+        public CategoriaController(ILogger<CategoriaController> logger, ICategoriaBusiness categoriaBusiness, IImagemService imagemService)
         {
             _logger = logger;
-            _categoriaService = categoriaService;
+            _categoriaBusiness = categoriaBusiness;
             _imagemService = imagemService;
         }
 
@@ -50,7 +52,7 @@ namespace API.Controllers
                 }
                 else
                 {
-                    ServiceResult<Tuple<string, string>> resultado = _categoriaService.RegistarCategoria(model, resultadoValidacaoImagem.Resultado);
+                    ServiceResult<Tuple<string, string>> resultado = _categoriaBusiness.RegistarCategoria(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
@@ -98,7 +100,7 @@ namespace API.Controllers
                 }
                 else
                 {
-                    ServiceResult<Tuple<string, string>> resultado = _categoriaService.EditarCategoria(model, resultadoValidacaoImagem.Resultado);
+                    ServiceResult<Tuple<string, string>> resultado = _categoriaBusiness.EditarCategoria(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
@@ -133,7 +135,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/categoria/desativadas -> Get");
             try
             {
-                IList<CategoriaViewDTO> resultado = _categoriaService.GetCategoriasDesativadas();
+                IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoriasDesativadas();
                 return Ok(resultado);
 
             }
@@ -159,7 +161,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/categoria/todas -> Get");
             try
             {
-                IList<CategoriaViewDTO> resultado = _categoriaService.GetCategorias();
+                IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategorias();
                 return Ok(resultado);
 
             }
@@ -184,7 +186,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/categoria/produtos -> Get");
             try
             {
-                ServiceResult<IList<ProdutoViewDTO>> resultado = _categoriaService.GetProdutosCategoria(idCategoria);
+                ServiceResult<IList<ProdutoViewDTO>> resultado = _categoriaBusiness.GetProdutosCategoria(idCategoria);
                 if (resultado.Sucesso)
                 {
                     _logger.LogDebug($"Foi efetuado o get dos Produtos da Categoria com IdCategoria {idCategoria}!");
@@ -218,7 +220,7 @@ namespace API.Controllers
             _logger.LogDebug("A executar api/categoria/especifica -> Get");
             try
             {
-                ServiceResult<CategoriaViewDTO> resultado = _categoriaService.GetCategoria(idCategoria);
+                ServiceResult<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoria(idCategoria);
                 if (resultado.Sucesso)
                 {
                     _logger.LogDebug($"Foi efetuado o get do Categoria com IdCategoria {idCategoria}!");

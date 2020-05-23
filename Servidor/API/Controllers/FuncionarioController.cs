@@ -1,5 +1,6 @@
 ﻿using System;
 using API.Business;
+using API.Business.Interfaces;
 using API.Entities;
 using API.ViewModels.FuncionarioDTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -14,13 +15,13 @@ namespace API.Models
     public class FuncionarioController : ControllerBase
     {
         private readonly ILogger _logger;
-        private IFuncionarioService _funcionarioService;
+        private IFuncionarioBusiness _funcionarioBusiness;
 
 
-        public FuncionarioController(ILogger<FuncionarioController> logger, IFuncionarioService funcionarioService)
+        public FuncionarioController(ILogger<FuncionarioController> logger, IFuncionarioBusiness funcionarioBusiness)
         {
             _logger = logger;
-            _funcionarioService = funcionarioService;
+            _funcionarioBusiness = funcionarioBusiness;
         }
 
 
@@ -36,7 +37,7 @@ namespace API.Models
 
             try
             {
-                ServiceResult resultado = _funcionarioService.CriarConta(model);
+                ServiceResult resultado = _funcionarioBusiness.CriarConta(model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome} e Número de Funcionário {model.NumFuncionario} foi registado com sucesso!");
@@ -73,7 +74,7 @@ namespace API.Models
 
             try
             {
-                ServiceResult resultado = _funcionarioService.EditarConta(model);
+                ServiceResult resultado = _funcionarioBusiness.EditarConta(model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"Foi editado o nome do Funcionário com Número de Funcionário {model.NumFuncionario} para o novo Nome {model.Nome}!");
@@ -105,7 +106,7 @@ namespace API.Models
             _logger.LogDebug("A executar api/funcionario/get -> Get");
             try
             {
-                ServiceResult<FuncionarioViewDTO> resultado = _funcionarioService.GetFuncionario(numFuncionario);
+                ServiceResult<FuncionarioViewDTO> resultado = _funcionarioBusiness.GetFuncionario(numFuncionario);
                 if (resultado.Sucesso)
                 {
                     _logger.LogDebug($"Get do Funcionário com Número de Funcionário {numFuncionario} efetuado com sucesso!");
