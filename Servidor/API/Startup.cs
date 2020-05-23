@@ -10,12 +10,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using API.ViewModels;
 using API.ViewModels.ClienteDTOs;
 using API.Entities;
 using Microsoft.Extensions.Logging;
 using API.ViewModels.ProdutoDTOs;
 using API.ViewModels.CategoriaDTOs;
+using API.ViewModels.FuncionarioDTOs;
 
 namespace API
 {
@@ -92,8 +92,8 @@ namespace API
                 cfg.CreateMap<EditarClienteDTO, Cliente>();
 
 
-                /*cfg.CreateMap<Funcionario, FuncionarioDTO>();
-                cfg.CreateMap<FuncionarioDTO, Funcionario>();*/
+                cfg.CreateMap<Funcionario, FuncionarioViewDTO>();
+                cfg.CreateMap<FuncionarioViewDTO, Funcionario>();
 
                 cfg.CreateMap<RegistarProdutoDTO,Produto>();
                 cfg.CreateMap<EditarProdutoDTO, Produto>();
