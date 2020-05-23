@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 using API.Business.Interfaces;
-using API.Data;
 using API.Data.Interfaces;
 using API.Entities;
 using API.Helpers;
@@ -18,7 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Business
 {
-   public class AdministradorBusiness : IAdministradorBusiness
+    public class AdministradorBusiness : IAdministradorBusiness
     {
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;

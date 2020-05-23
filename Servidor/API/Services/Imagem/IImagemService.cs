@@ -2,7 +2,7 @@
 using API.Entities;
 using Microsoft.AspNetCore.Http;
 
-namespace API.Services
+namespace API.Services.Imagem
 {
     public interface IImagemService
     {

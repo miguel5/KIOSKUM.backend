@@ -1,19 +1,18 @@
 ﻿using System;
-using API.Business;
 using API.Data.Interfaces;
 using API.Entities;
-using API.Services;
+using API.Services.DBConnection;
 
 namespace API.Data
 {
     public class FuncionarioDAO : IFuncionarioDAO
     {
-        private readonly IConnectionDBService _connectionDB;
+        private readonly  IConnectionDBService _connectionDBService;
 
 
-        public FuncionarioDAO(IConnectionDBService connectionDB)
+        public FuncionarioDAO(IConnectionDBService connectionDBService)
         {
-            _connectionDB = connectionDB;
+            _connectionDBService = connectionDBService;
         }
 
         public void EditarNome(string nome)

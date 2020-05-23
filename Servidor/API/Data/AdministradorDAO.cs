@@ -1,16 +1,16 @@
 ﻿using API.Data.Interfaces;
 using API.Entities;
-using API.Services;
+using API.Services.DBConnection;
 
 namespace API.Data
 {
     public class AdministradorDAO : IAdministradorDAO
     {
-        private readonly IConnectionDBService _connectionDB;
+        private readonly IConnectionDBService _connectionDBService;
 
-        public AdministradorDAO(IConnectionDBService connectionDB)
+        public AdministradorDAO(IConnectionDBService connectionDBService)
         {
-            _connectionDB = connectionDB;
+            _connectionDBService = connectionDBService;
         }
 
         public void EditarConta(Administrador administrador)

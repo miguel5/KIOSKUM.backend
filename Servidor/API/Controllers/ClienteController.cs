@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using API.Business;
 using API.Business.Interfaces;
 using API.Entities;
-using API.Services;
+using API.Services.EmailSender;
 using API.ViewModels;
 using API.ViewModels.ClienteDTOs;
 using Microsoft.AspNetCore.Authorization;

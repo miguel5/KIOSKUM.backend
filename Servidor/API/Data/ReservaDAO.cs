@@ -1,6 +1,4 @@
-﻿using System;
-using API.Data.Interfaces;
-using API.Entities;
+﻿using API.Data.Interfaces;
 
 namespace API.Data
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using API.Entities;
+﻿using API.Entities;
 using API.ViewModels;
 
 namespace API.Business.Interfaces

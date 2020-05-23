@@ -24,6 +24,9 @@
     <Folder Include="ViewModels\AdministradorDTOs\" />
     <Folder Include="Business\Interfaces\" />
     <Folder Include="Data\Interfaces\" />
+    <Folder Include="Services\ConnectionDB\" />
+    <Folder Include="Services\Imagem\" />
+    <Folder Include="Services\EmailSender\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

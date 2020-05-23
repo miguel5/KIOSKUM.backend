@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Data;
-using API.Business;
 using API.Data.Interfaces;
 using API.Entities;
-using API.Services;
+using API.Services.DBConnection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
@@ -12,12 +11,12 @@ namespace API.Data
     public class ClienteDAO : IClienteDAO
     {
         private readonly ILogger _logger;
-        private readonly IConnectionDBService _connectionDB;
+        private readonly IConnectionDBService _connectionDBService;
 
-        public ClienteDAO(ILogger<ClienteDAO> logger, IConnectionDBService connectionDB)
+        public ClienteDAO(ILogger<ClienteDAO> logger, IConnectionDBService connectionDBService)
         {
             _logger = logger;
-            _connectionDB = connectionDB;
+            _connectionDBService = connectionDBService;
         }
 
 
@@ -25,10 +24,10 @@ namespace API.Data
         {
             _logger.LogDebug("A executar [ClienteDAO -> ExisteEmail]");
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "existe_email";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -38,7 +37,7 @@ namespace API.Data
 
             object val = cmd.ExecuteScalar();
                 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
                 
             return Convert.ToBoolean(val);
         }
@@ -46,10 +45,10 @@ namespace API.Data
         public bool ExisteNumTelemovel(int numTelemovel)
         {
             _logger.LogDebug("A executar [ClienteDAO -> ExisteNumTelemovel]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "existe_telemovel";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -59,7 +58,7 @@ namespace API.Data
 
             object val = cmd.ExecuteScalar();
                 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
 
             return (val != null ? Convert.ToBoolean(val) : false);
         }
@@ -67,10 +66,10 @@ namespace API.Data
         public void InserirConta(Cliente cliente, string codigoValidacao, int numMaxTentativas)
         {
             _logger.LogDebug("A executar [ClienteDAO -> InserirConta]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "inserir_cliente";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -95,16 +94,16 @@ namespace API.Data
 
             cmd.ExecuteNonQuery();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
         }
 
         public string GetCodigoValidacao(string email)
         {
             _logger.LogDebug("A executar [ClienteDAO -> GetCodigoValidacao]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "get_codigo_validacao";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -114,7 +113,7 @@ namespace API.Data
 
             string val = (string)cmd.ExecuteScalar();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
 
             return val;
         }
@@ -122,10 +121,10 @@ namespace API.Data
         public bool ContaConfirmada(string email)
         {
             _logger.LogDebug("A executar [ClienteDAO -> ContaConfirmada]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "conta_confirmada";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -135,7 +134,7 @@ namespace API.Data
 
             object val = cmd.ExecuteScalar();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
 
             return (val != null ? Convert.ToBoolean(val) : false);
         }
@@ -143,10 +142,10 @@ namespace API.Data
         public int GetNumTentativas(string email)
         {
             _logger.LogDebug("A executar [ClienteDAO -> GetNumTentativas]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "num_tentativas";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -156,7 +155,7 @@ namespace API.Data
 
             int val = (byte)cmd.ExecuteScalar();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
 
             return val;
         }
@@ -165,10 +164,10 @@ namespace API.Data
         public void DecrementaTentativas(string email)
         {
             _logger.LogDebug("A executar [ClienteDAO -> DecrementaTentativas]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "decrementa_tentativas";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -177,17 +176,17 @@ namespace API.Data
             cmd.Parameters["?mail"].Direction = ParameterDirection.Input;
 
             cmd.ExecuteNonQuery();
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
         }
 
 
         public void ValidarConta(string email)
         {
             _logger.LogDebug("A executar [ClienteDAO -> ValidarConta]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "validar_conta";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -197,16 +196,16 @@ namespace API.Data
 
             cmd.ExecuteNonQuery();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
         }
 
         public Cliente GetContaEmail(string email)
         {
             _logger.LogDebug("A executar [ClienteDAO -> GetContaEmail]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "get_cliente_mail";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -228,17 +227,17 @@ namespace API.Data
             catch { throw;  }
             finally
             {
-                _connectionDB.CloseConnection();
+                _connectionDBService.CloseConnection();
             }
         }
 
         public Cliente GetContaId(int idCliente)
         {
             _logger.LogDebug("A executar [ClienteDAO -> GetContaId]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "get_cliente_id";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -260,17 +259,17 @@ namespace API.Data
             catch (Exception) { throw;}
             finally
             { 
-                _connectionDB.CloseConnection();
+                _connectionDBService.CloseConnection();
             }
         }
 
         public void EditarConta(Cliente cliente)
         {
             _logger.LogDebug("A executar [ClienteDAO -> EditarConta]");
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "editar_dados";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -292,7 +291,7 @@ namespace API.Data
 
             cmd.ExecuteNonQuery();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
         }
     }
 }
