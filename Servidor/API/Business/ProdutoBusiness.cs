@@ -35,20 +35,20 @@ namespace API.Business
 
         private bool ValidaNome(string nome)
         {
-            _logger.LogDebug("A executar [ProdutoService -> ValidaNome]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaNome]");
             return nome.Length <= 45;
         }
 
         private bool ValidaPreco(double preco)
         {
-            _logger.LogDebug("A executar [ProdutoService -> ValidaPreco]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaPreco]");
             Regex rx = new Regex("^\\d{1,6}(.\\d{1,2})?$");
             return rx.IsMatch(preco.ToString());
         }
 
         private bool ValidaIngredientes(IList<string> ingredientes)
         {
-            _logger.LogDebug("A executar [ProdutoService -> ValidaIngredientes]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaIngredientes]");
             bool sucesso = true;
             foreach(string ingrediente in ingredientes) if(sucesso)
             {
@@ -59,7 +59,7 @@ namespace API.Business
 
         private bool ValidaAlergenios(IList<string> alergenios)
         {
-            _logger.LogDebug("A executar [ProdutoService -> ValidaAlergenios]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaAlergenios]");
             bool sucesso = true;
             foreach (string alergenio in alergenios) if (sucesso)
             {
@@ -71,22 +71,22 @@ namespace API.Business
 
         public ServiceResult<Tuple<string, string>> RegistarProduto(RegistarProdutoDTO model, string extensao)
         {
-            _logger.LogDebug("A executar [ProdutoService -> RegistarProduto]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> RegistarProduto]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
             }
             if (model.Ingredientes == null)
             {
-                throw new ArgumentNullException("Ingredientes", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Ingredientes", "Campo não poder ser nulo!");
             }
             if (model.Alergenios == null)
             {
-                throw new ArgumentNullException("Alergenios", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Alergenios", "Campo não poder ser nulo!");
             }
             if(extensao == null)
             {
-                throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Extensao", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -94,16 +94,16 @@ namespace API.Business
 
             if (_produtoDAO.ExisteNomeProduto(model.Nome))
             {
-                _logger.LogDebug($"O produto com o nome {model.Nome} já existe no Sistema!");
+                _logger.LogDebug($"O Produto com o Nome {model.Nome} já existe.");
                 Produto produto = _produtoDAO.GetProdutoNome(model.Nome);
                 if (_produtoDAO.isAtivo(produto.IdProduto))
                 {
-                    _logger.LogDebug($"O produto com o nome {model.Nome} já existe no Sistema, com IdProdudo {produto.IdProduto} e encontra-se ativado!");
+                    _logger.LogDebug($"O Produto com o Nome {model.Nome} já existe, com IdProdudo {produto.IdProduto} e encontra-se ativado.");
                     erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
                 }
                 else
                 {
-                    _logger.LogDebug($"O produto com o nome {model.Nome} já existe no Sistema, com IdProdudo {produto.IdProduto} e encontra-se desativado!");
+                    _logger.LogDebug($"O Produto com o Nome {model.Nome} já existe, com IdProdudo {produto.IdProduto} e encontra-se desativado.");
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
@@ -111,27 +111,27 @@ namespace API.Business
             {
                 if (!ValidaNome(model.Nome))
                 {
-                    _logger.LogDebug($"O nome {model.Nome} é inválido!");
+                    _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                     erros.Add((int)ErrosEnumeration.NomeProdutoInvalido);
                 }
                 if (!ValidaPreco(model.Preco))
                 {
-                    _logger.LogDebug($"O preço {model.Preco} é inválido!");
+                    _logger.LogDebug($"O Preço {model.Preco} é inválido.");
                     erros.Add((int)ErrosEnumeration.PrecoProdutoInvalido);
                 }
                 if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
                 {
-                    _logger.LogDebug($"Não existe nenhuma categoria no sistema com IdCategooria {model.IdCategoria}!");
+                    _logger.LogWarning($"Não existe nenhuma Categoria com IdCategooria {model.IdCategoria}!");
                     erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
                 }
                 if (!ValidaIngredientes(model.Ingredientes))
                 {
-                    _logger.LogDebug($"O nome de um ingrediente é inválido!");
+                    _logger.LogDebug($"O nome de um ingrediente é inválido.");
                     erros.Add((int)ErrosEnumeration.IngredientesProdutoInvalidos);
                 }
                 if (!ValidaAlergenios(model.Alergenios))
                 {
-                    _logger.LogDebug($"O nome de um alergenio é inválido!");
+                    _logger.LogDebug($"O nome de um alergenio é inválido.");
                     erros.Add((int)ErrosEnumeration.AlergeniosProdutoInvalidos);
                 }
 
@@ -150,22 +150,22 @@ namespace API.Business
 
         public ServiceResult<Tuple<string, string>> EditarProduto(EditarProdutoDTO model, string extensao)
         {
-            _logger.LogDebug("A executar [ProdutoService -> EditarProduto]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> EditarProduto]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Nome", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
             }
             if (model.Ingredientes == null)
             {
-                throw new ArgumentNullException("Ingredientes", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Ingredientes", "Campo não poder ser nulo!");
             }
             if (model.Alergenios == null)
             {
-                throw new ArgumentNullException("Alergenios", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Alergenios", "Campo não poder ser nulo!");
             }
             if (extensao == null)
             {
-                throw new ArgumentNullException("Extensao", "Parametro não pode ser nulo");
+                throw new ArgumentNullException("Extensao", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -174,7 +174,7 @@ namespace API.Business
 
             if (produto == null)
             {
-                _logger.LogDebug($"Não existe nenhum produto com IdProduto {model.IdProduto}!");
+                _logger.LogWarning($"Não existe nenhum Produto com IdProduto {model.IdProduto}!");
                 erros.Add((int)ErrosEnumeration.ProdutoNaoExiste);
             }
             else
@@ -183,35 +183,34 @@ namespace API.Business
                 {
                     if (!produto.Nome.Equals(model.Nome) && _produtoDAO.ExisteNomeProduto(model.Nome))
                     {
-
-                        _logger.LogDebug($"O nome {model.Nome} já existe no sistema!");
+                        _logger.LogDebug($"O Nome {model.Nome} já existe.");
                         erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
                     }
                     else
                     {
                         if (!ValidaNome(model.Nome))
                         {
-                            _logger.LogDebug($"O nome {model.Nome} é inválido!");
+                            _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                             erros.Add((int)ErrosEnumeration.NomeProdutoInvalido);
                         }
                         if (!ValidaPreco(model.Preco))
                         {
-                            _logger.LogDebug($"O preço {model.Preco} é inválido!");
+                            _logger.LogDebug($"O preço {model.Preco} é inválido.");
                             erros.Add((int)ErrosEnumeration.PrecoProdutoInvalido);
                         }
                         if (!_categoriaDAO.ExisteCategoria(model.IdCategoria))
                         {
-                            _logger.LogDebug($"Não existe nenhuma categoria no sistema com IdCategooria {model.IdCategoria}!");
+                            _logger.LogWarning($"Não existe nenhuma Categoria, com IdCategooria {model.IdCategoria}!");
                             erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
                         }
                         if (!ValidaIngredientes(model.Ingredientes))
                         {
-                            _logger.LogDebug($"O nome de um ingrediente é inválido!");
+                            _logger.LogDebug($"O Nome de um ingrediente é inválido.");
                             erros.Add((int)ErrosEnumeration.IngredientesProdutoInvalidos);
                         }
                         if (!ValidaAlergenios(model.Alergenios))
                         {
-                            _logger.LogDebug($"O nome de um alergenio é inválido!");
+                            _logger.LogDebug($"O Nome de um alergenio é inválido.");
                             erros.Add((int)ErrosEnumeration.AlergeniosProdutoInvalidos);
                         }
 
@@ -229,7 +228,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogDebug($"O produto com idProduto {model.IdProduto} encontra-se desativado!");
+                    _logger.LogWarning($"O Produto com idProduto {model.IdProduto} encontra-se desativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
@@ -239,7 +238,7 @@ namespace API.Business
 
         public IList<ProdutoViewDTO> GetProdutosDesativados()
         {
-            _logger.LogDebug("A executar [ProdutoService -> GetProdutosDesativados]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> GetProdutosDesativados]");
             IList<ProdutoViewDTO> produtosViewDTO = null;
 
             IList<Produto> produtos = _produtoDAO.GetProdutosDesativados();
@@ -265,7 +264,7 @@ namespace API.Business
 
         public ServiceResult<ProdutoViewDTO> GetProduto(int idProduto)
         {
-            _logger.LogDebug("A executar [ProdutoService -> GetProduto]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> GetProduto]");
             IList<int> erros = new List<int>();
             ProdutoViewDTO produtoViewDTO = null;
 
@@ -273,7 +272,7 @@ namespace API.Business
 
             if (produto == null)
             {
-                _logger.LogDebug($"Não existe nenhum produto com IdProduto {idProduto}!");
+                _logger.LogWarning($"Não existe nenhum Produto com IdProduto {idProduto}!");
                 erros.Add((int)ErrosEnumeration.ProdutoNaoExiste);
             }
             else
@@ -285,7 +284,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogDebug($"O produto com idProduto {idProduto} encontra-se desativado!");
+                    _logger.LogWarning($"O Produto com IdProduto {idProduto} encontra-se desativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
@@ -296,14 +295,14 @@ namespace API.Business
 
         public ServiceResult DesativarProduto(int idProduto)
         {
-            _logger.LogDebug("A executar [ProdutoService -> DesativarProduto]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> DesativarProduto]");
 
             IList<int> erros = new List<int>();
             Produto produto = _produtoDAO.GetProduto(idProduto);
 
             if (produto == null)
             {
-                _logger.LogDebug($"Não existe nenhum produto com IdProduto {idProduto}!");
+                _logger.LogWarning($"Não existe nenhum Produto com IdProduto {idProduto}!");
                 erros.Add((int)ErrosEnumeration.ProdutoNaoExiste);
             }
             else
@@ -314,7 +313,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogDebug($"O produto com idProduto {idProduto} já se encontra desativado!");
+                    _logger.LogWarning($"O Produto com IdProduto {idProduto} já se encontra desativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
@@ -324,20 +323,20 @@ namespace API.Business
 
         public ServiceResult AtivarProduto(int idProduto)
         {
-            _logger.LogDebug("A executar [ProdutoService -> AtivarProduto]");
+            _logger.LogDebug("A executar [ProdutoBusiness -> AtivarProduto]");
             IList<int> erros = new List<int>();
             Produto produto = _produtoDAO.GetProduto(idProduto);
 
             if (produto == null)
             {
-                _logger.LogDebug($"Não existe nenhum produto com IdProduto {idProduto}!");
+                _logger.LogWarning($"Não existe nenhum Produto com IdProduto {idProduto}!");
                 erros.Add((int)ErrosEnumeration.ProdutoNaoExiste);
             }
             else
             {
                 if (_produtoDAO.isAtivo(idProduto))
                 {
-                    _logger.LogDebug($"O produto com idProduto {idProduto} já se encontra ativado!");
+                    _logger.LogWarning($"O Produto com IdProduto {idProduto} já se encontra ativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoAtivado);
                 }
                 else
