@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
-using API.Business;
+using API.Business.Interfaces;
 using API.Entities;
 using API.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -14,12 +14,12 @@ namespace API.Controllers
     [Route("api/administrador")]
     public class AdministradorController : ControllerBase
     {
-        private IAdministradorService _administradorService;
+        private IAdministradorBusiness _administradorBusiness;
 
 
-        public AdministradorController(IAdministradorService administradorService)
+        public AdministradorController(IAdministradorBusiness administradorBusiness)
         {
-            _administradorService = administradorService;
+            _administradorBusiness = administradorBusiness;
         }
 
 
@@ -31,7 +31,7 @@ namespace API.Controllers
 
             try
             {
-                ServiceResult resultado = _administradorService.CriarConta(model);
+                ServiceResult resultado = _administradorBusiness.CriarConta(model);
                 return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
@@ -50,7 +50,7 @@ namespace API.Controllers
 
             try
             {
-                ServiceResult<TokenDTO> resultado = _administradorService.Login(model);
+                ServiceResult<TokenDTO> resultado = _administradorBusiness.Login(model);
                 return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
@@ -70,7 +70,7 @@ namespace API.Controllers
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 int idAdministrador = int.Parse(nameIdentifier);
-                ServiceResult resultado = _administradorService.EditarDados(idAdministrador, model);
+                ServiceResult resultado = _administradorBusiness.EditarDados(idAdministrador, model);
                 return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
             }
             catch (ArgumentNullException e)
@@ -85,7 +85,7 @@ namespace API.Controllers
         {
             string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idAdministrador = int.Parse(nameIdentifier);
-            ServiceResult<AdministradorDTO> resultado = _administradorService.GetAdministrador(idAdministrador);
+            ServiceResult<AdministradorDTO> resultado = _administradorBusiness.GetAdministrador(idAdministrador);
             return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
         }
     }

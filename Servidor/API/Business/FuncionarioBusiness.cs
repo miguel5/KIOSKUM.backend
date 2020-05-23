@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using API.Data;
+using API.Business.Interfaces;
+using API.Data.Interfaces;
 using API.Entities;
 using API.ViewModels;
 using API.ViewModels.FuncionarioDTOs;
@@ -11,22 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace API.Business
 {
-    public interface IFuncionarioService
-    {
-        ServiceResult CriarConta(FuncionarioViewDTO model);
-        ServiceResult EditarConta(FuncionarioViewDTO model);
-        ServiceResult<FuncionarioViewDTO> GetFuncionario(int numFuncionario);
-    }
-
-
-    public class FuncionarioService : IFuncionarioService
+    public class FuncionarioBusiness : IFuncionarioBusiness
     {
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
         private readonly IFuncionarioDAO _funcionarioDAO;
 
 
-        public FuncionarioService(ILogger<FuncionarioService> logger, IMapper mapper, IFuncionarioDAO funcionarioDAO)
+        public FuncionarioBusiness(ILogger<FuncionarioBusiness> logger, IMapper mapper, IFuncionarioDAO funcionarioDAO)
         {
             _logger = logger;
             _mapper = mapper;

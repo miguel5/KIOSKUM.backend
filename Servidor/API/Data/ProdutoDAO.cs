@@ -2,31 +2,20 @@
 using System.Collections.Generic;
 using System.Data;
 using API.Business;
+using API.Data.Interfaces;
 using API.Entities;
+using API.Services;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace API.Data
 {
-    public interface IProdutoDAO
-    {
-        bool ExisteNomeProduto(string nome);
-        int RegistarProduto(Produto produto);//retorna o idProduto
-        Produto GetProduto(int idProduto);//devolve o produto (ativado/desativado)
-        Produto GetProdutoNome(string nome);//devolve o produto (ativado/desativado)
-        void EditarProduto(Produto produto);
-        IList<Produto> GetProdutosDesativados();//apenas devolve os desativados
-        void DesativarProduto(int idProduto);
-        void AtivarProduto(int idProduto);
-        bool isAtivo(int idProduto);
-    }
-
     public class ProdutoDAO : IProdutoDAO
     {
         private readonly ILogger _logger;
-        private readonly IConnectionDB _connectionDB;
+        private readonly IConnectionDBService _connectionDB;
 
-        public ProdutoDAO(ILogger<ProdutoDAO> logger, IConnectionDB connectionDB)
+        public ProdutoDAO(ILogger<ProdutoDAO> logger, IConnectionDBService connectionDB)
         {
             _logger = logger;
             _connectionDB = connectionDB;
@@ -353,7 +342,7 @@ namespace API.Data
 
             int productId = Convert.ToInt32(cmd.ExecuteScalar());
 
-            
+
             foreach (string ingrediente in produto.Ingredientes)
             {
                 MySqlCommand cmdI = new MySqlCommand();

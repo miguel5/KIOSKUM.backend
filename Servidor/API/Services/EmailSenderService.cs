@@ -6,13 +6,8 @@ using API.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace API.Business
+namespace API.Services
 {
-    public interface IEmailSenderService : IDisposable
-    {
-        Task SendEmail(string email, Email mensagem);
-    }
-
     public class EmailSenderService : IEmailSenderService
     {
 

@@ -6,7 +6,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using API.Business.Interfaces;
 using API.Data;
+using API.Data.Interfaces;
 using API.Entities;
 using API.Helpers;
 using API.ViewModels;
@@ -21,19 +23,7 @@ using Newtonsoft.Json;
 
 namespace API.Business
 {
-    public interface IClienteService
-    {
-        ServiceResult CriarConta(ClienteViewDTO model);
-        ServiceResult<Email> GetEmailCodigoValidacao(string email);
-        ServiceResult ConfirmarConta(ConfirmarClienteDTO model);
-        ServiceResult<Email> GetEmailBoasVindas(string email);
-        ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
-        ServiceResult EditarConta(int idCliente, EditarClienteDTO model);
-        ServiceResult<ClienteViewDTO> GetCliente(int idCliente);
-    }
-
-
-    public class ClienteService : IClienteService
+    public class ClienteBusiness : IClienteBusiness
     {
         private readonly ILogger _logger;
         private readonly AppSettings _appSettings;
@@ -41,7 +31,7 @@ namespace API.Business
         private readonly IMapper _mapper;
         private readonly IClienteDAO _clienteDAO;
 
-        public ClienteService(ILogger<ClienteService> logger, IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IMapper mapper, IClienteDAO clienteDAO)
+        public ClienteBusiness(ILogger<ClienteBusiness> logger, IOptions<AppSettings> appSettings, IWebHostEnvironment webHostEnviroment, IMapper mapper, IClienteDAO clienteDAO)
         {
             _logger = logger;
             _appSettings = appSettings.Value;

@@ -5,7 +5,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using API.Business.Interfaces;
 using API.Data;
+using API.Data.Interfaces;
 using API.Entities;
 using API.Helpers;
 using API.ViewModels;
@@ -16,21 +18,13 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Business
 {
-    public interface IAdministradorService
-    {
-        ServiceResult CriarConta(AdministradorDTO model);
-        ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
-        ServiceResult EditarDados(int idFuncionario, EditarAdministradorDTO model);
-        ServiceResult<AdministradorDTO> GetAdministrador(int idAdministrador);
-    }
-
-    public class AdministradorService : IAdministradorService
+   public class AdministradorBusiness : IAdministradorBusiness
     {
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
         private readonly IAdministradorDAO _administradorDAO;
 
-        public AdministradorService(IOptions<AppSettings> appSettings, IMapper mapper, IAdministradorDAO administradorDAO)
+        public AdministradorBusiness(IOptions<AppSettings> appSettings, IMapper mapper, IAdministradorDAO administradorDAO)
         {
             _appSettings = appSettings.Value;
             _mapper = mapper;

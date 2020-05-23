@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using API.Business.Interfaces;
 using API.Data;
+using API.Data.Interfaces;
 using API.Entities;
 using API.Helpers;
 using API.ViewModels;
@@ -14,18 +16,7 @@ using Microsoft.Extensions.Options;
 
 namespace API.Business
 {
-    public interface IProdutoService
-    {
-        ServiceResult<Tuple<string, string>> RegistarProduto(RegistarProdutoDTO model, string extensao);
-        ServiceResult<Tuple<string, string>> EditarProduto(EditarProdutoDTO model, string extensao);
-        IList<ProdutoViewDTO> GetProdutosDesativados();
-        ServiceResult<ProdutoViewDTO> GetProduto(int idProduto);
-        ServiceResult DesativarProduto(int idProduto);
-        ServiceResult AtivarProduto(int idProduto);
-    }
-
-
-    public class ProdutoService : IProdutoService
+    public class ProdutoBusiness : IProdutoBusiness
     {
         private readonly ILogger _logger;
         private readonly AppSettings _appSettings;
@@ -34,7 +25,7 @@ namespace API.Business
         private readonly ICategoriaDAO _categoriaDAO;
 
 
-        public ProdutoService(ILogger<ProdutoService> logger, IOptions<AppSettings> appSettings, IMapper mapper, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
+        public ProdutoBusiness(ILogger<ProdutoBusiness> logger, IOptions<AppSettings> appSettings, IMapper mapper, IProdutoDAO produtoDAO, ICategoriaDAO categoriaDAO)
         {
             _logger = logger;
             _appSettings = appSettings.Value;
