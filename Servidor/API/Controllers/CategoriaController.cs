@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.Business;
 using API.Entities;
-using API.ViewModels;
+using API.ViewModels.CategoriaDTOs;
+using API.ViewModels.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
@@ -14,117 +15,231 @@ namespace API.Controllers
     [Route("api/categoria")]
     public class CategoriaController : ControllerBase
     {
+        private readonly ILogger _logger;
         private ICategoriaService _categoriaService;
+        private IImagemService _imagemService;
 
 
-        public CategoriaController(ICategoriaService categoriaService)
+        public CategoriaController(ILogger<CategoriaController> logger, ICategoriaService categoriaService, IImagemService imagemService)
         {
+            _logger = logger;
             _categoriaService = categoriaService;
+            _imagemService = imagemService;
         }
 
 
-        /*[Authorize(Roles = "Administrador")]
-        [HttpPost("add")]
-        public IActionResult AddCategoria([FromBody] CategoriaDTO model)
+
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        [HttpPost("registar")]
+        public async Task<IActionResult> RegistarCategoria([FromForm] RegistarCategoriaDTO model)
         {
+            _logger.LogDebug("A executar api/categoria/registar -> Post");
             if (model is null)
             {
+                _logger.LogWarning("O objeto RegistarCategoriaDTO é null!");
                 return BadRequest(nameof(model));
             }
             try
             {
-                ServiceResult resultado = _categoriaService.AddCategoria(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+                ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
+                if (!resultadoValidacaoImagem.Sucesso)
+                {
+                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    return BadRequest(resultadoValidacaoImagem.Erros);
+                }
+                else
+                {
+                    ServiceResult<Tuple<string, string>> resultado = _categoriaService.RegistarCategoria(model, resultadoValidacaoImagem.Resultado);
+                    if (resultado.Sucesso)
+                    {
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        _logger.LogInformation($"A Categoria com nome {model.Nome} foi registado com sucesso!");
+                        return Ok();
+                    }
+                    else
+                    {
+                        _logger.LogDebug($"Ocorreu um erro ao registar a categoria com nome {model.Nome}!");
+                        return BadRequest(resultado.Erros);
+                    }
+                }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
-
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
         }
 
 
-        [Authorize(Roles = "Administrador")]
-        [HttpPost("upload/imagem")]
-        public async Task<IActionResult> UploadImagem([FromForm] ImagemDTO model)
-        {
-            if (model is null)
-            {
-                return BadRequest(nameof(model));
-            }
-            try
-            {
-                ServiceResult resultado = await _categoriaService.UploadImagem(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
-
-            }catch(ArgumentException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
-
-        }
-
-
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("editar")]
-        public IActionResult EditarCategoria([FromBody] CategoriaDTO model)
+        public async Task<IActionResult> EditarCategoria([FromForm] EditarCategoriaDTO model)
         {
+            _logger.LogDebug("A executar api/categoria/editar -> Post");
             if (model is null)
             {
+                _logger.LogWarning("O objeto EditarCategoriaDTO é null!");
                 return BadRequest(nameof(model));
             }
             try
             {
-                ServiceResult resultado = _categoriaService.EditarCategoria(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+                ServiceResult<string> resultadoValidacaoImagem = _imagemService.ValidaImagem(model.File);
+                if (!resultadoValidacaoImagem.Sucesso)
+                {
+                    _logger.LogDebug("O ficheiro não é válido para o sistema!");
+                    return BadRequest(resultadoValidacaoImagem.Erros);
+                }
+                else
+                {
+                    ServiceResult<Tuple<string, string>> resultado = _categoriaService.EditarCategoria(model, resultadoValidacaoImagem.Resultado);
+                    if (resultado.Sucesso)
+                    {
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        _logger.LogInformation($"A Categoria com  IdCategoria {model.IdCategoria} foi editada, com o nome {model.Nome}!");
+                        return Ok();
+                    }
+                    else
+                    {
+                        _logger.LogDebug($"Ocorreu um erro ao editar a Categoria com IdCategoria {model.IdCategoria}!");
+                        return BadRequest(resultado.Erros);
+                    }
+                }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
-
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
         }
 
 
-        [Authorize(Roles = "Administrador,Cliente")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        [HttpGet("desativadas")]
+        public IActionResult GetCategoriasDesativadas()
+        {
+            _logger.LogDebug("A executar api/categoria/desativadas -> Get");
+            try
+            {
+                IList<CategoriaViewDTO> resultado = _categoriaService.GetCategoriasDesativadas();
+                return Ok(resultado);
+
+            }
+            catch (ArgumentNullException e)
+            {
+                _logger.LogError(e, e.Message);
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+
+        //[Authorize(Roles = "Administrador,Cliente")]
+        [AllowAnonymous]
         [HttpGet("todas")]
         public IActionResult GetCategorias()
         {
-            ServiceResult<IList<CategoriaDTO>> resultado = _categoriaService.GetTodasCategorias();
-            return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
-        }
-
-
-        [Authorize(Roles = "Administrador")]
-        [HttpGet("especifica")]
-        public IActionResult GetProduto(string nome)
-        {
+            _logger.LogDebug("A executar api/categoria/todas -> Get");
             try
             {
-                ServiceResult<CategoriaDTO> resultado = _categoriaService.GetCategoriaNome(nome);
-                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+                IList<CategoriaViewDTO> resultado = _categoriaService.GetCategorias();
+                return Ok(resultado);
+
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
             }
         }
 
+
+        //[Authorize(Roles = "Administrador,Cliente")]
         [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
-        [HttpPost("remover")]
-        public async Task<IActionResult> RemoverCategoria(string nome)
-        { 
+        [HttpGet("produtos")]
+        public IActionResult GetProdutosCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar api/categoria/produtos -> Get");
             try
             {
-                ServiceResult resultado = await _categoriaService.RemoverCategoria(nome);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
-
+                ServiceResult<IList<ProdutoViewDTO>> resultado = _categoriaService.GetProdutosCategoria(idCategoria);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogDebug($"Foi efetuado o get dos Produtos da Categoria com IdCategoria {idCategoria}!");
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    _logger.LogDebug($"Ocorreu um erro ao efetuar o get dos Produtos da Categoria com IdCategoria {idCategoria}!");
+                    return BadRequest(resultado.Erros);
+                }
             }
-            catch (ArgumentException e)
+            catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
             }
-        }*/
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        [HttpGet("especifica")]
+        public IActionResult GetCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar api/categoria/especifica -> Get");
+            try
+            {
+                ServiceResult<CategoriaViewDTO> resultado = _categoriaService.GetCategoria(idCategoria);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogDebug($"Foi efetuado o get do Categoria com IdCategoria {idCategoria}!");
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    _logger.LogDebug($"Ocorreu um erro ao efetuar o get da Categoria com IdCategoria {idCategoria}!");
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                _logger.LogError(e, e.Message);
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
     }
 }

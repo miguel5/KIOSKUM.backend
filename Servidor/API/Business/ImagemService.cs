@@ -75,15 +75,18 @@ namespace API.Business
         {
             _logger.LogDebug("A executar [ImagemService -> GuardarImagem]");
 
+            Console.WriteLine(_webHostEnvironment.WebRootPath);
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, pathNova);
             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
-            await ficheiro.CopyToAsync(fileStream);
+            var copyTask = ficheiro.CopyToAsync(fileStream);
+            Task taskDelete = Task.CompletedTask;
 
-            if (!pathNova.Equals(pathAnterior))
+            if (!pathNova.Equals(pathAnterior) && !(pathAnterior is null))
             {
                 filePath = Path.Combine(_webHostEnvironment.WebRootPath, pathAnterior);
-                await Task.Factory.StartNew(() => File.Delete(filePath));
+                taskDelete = Task.Factory.StartNew(() => File.Delete(filePath));
             }
+            await Task.WhenAll(new[] { copyTask, taskDelete });
 
             _logger.LogDebug($"Sucesso no upload da imagem para a path {pathNova}!");
         }

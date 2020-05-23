@@ -16,6 +16,10 @@
     <Folder Include="Logs\" />
     <Folder Include="ViewModels\ClienteDTOs\" />
     <Folder Include="ViewModels\ProdutoDTOs\" />
+    <Folder Include="ViewModels\CategoriaDTOs\" />
+    <Folder Include="Services\" />
+    <Folder Include="Services\Pagamentos\" />
+    <Folder Include="Services\Pagamentos\MBWay\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

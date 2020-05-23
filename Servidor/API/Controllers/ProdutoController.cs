@@ -25,9 +25,10 @@ namespace API.Controllers
             _imagemService = imagemService;
         }
 
-        [Authorize(Roles = "Administrador")]
+        //Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("registar")]
-        public async Task<IActionResult> RegistarProduto([FromBody] RegistarProdutoDTO model)
+        public async Task<IActionResult> RegistarProduto([FromForm] RegistarProdutoDTO model)
         {
             _logger.LogDebug("A executar api/produto/registar -> Post");
             if (model is null)
@@ -49,12 +50,12 @@ namespace API.Controllers
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
-                        _logger.LogInformation($"O Produto com nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria} foi registado com sucesso, com idProduto {resultado.Resultado}!");
+                        _logger.LogInformation($"O Produto com nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria} foi registado com sucesso!");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug("Ocorreu um erro ao registar o produto com idProduto {resultado.Resultado}!");
+                        _logger.LogDebug($"Ocorreu um erro ao registar o Produto com nome {model.Nome}!");
                         return BadRequest(resultado.Erros);
                     }
                 }
@@ -71,9 +72,10 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("editar")]
-        public async Task<IActionResult> EditarProduto([FromBody] EditarProdutoDTO model)
+        public async Task<IActionResult> EditarProduto([FromForm] EditarProdutoDTO model)
         {
             _logger.LogDebug("A executar api/produto/editar -> Post");
             if (model is null)
@@ -95,12 +97,12 @@ namespace API.Controllers
                     if (resultado.Sucesso)
                     {
                         await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
-                        _logger.LogInformation($"O Produto com idProduto {model.IdProduto} foi editado, com o nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria}!");
+                        _logger.LogInformation($"O Produto com IdProduto {model.IdProduto} foi editado, com o nome {model.Nome}, com o preço {model.Preco} pertencente à Categoria com IdCategoria {model.IdCategoria}!");
                         return Ok();
                     }
                     else
                     {
-                        _logger.LogDebug($"Ocorreu um erro ao editar o produto com idProduto {model.IdProduto}!");
+                        _logger.LogDebug($"Ocorreu um erro ao editar o Produto com IdProduto {model.IdProduto}!");
                         return BadRequest(resultado.Erros);
                     }
                 }
@@ -145,18 +147,18 @@ namespace API.Controllers
         [HttpGet("especifico")]
         public IActionResult GetProduto(int idProduto)
         {
-            _logger.LogDebug("A executar api/produto/especificados -> Get");
+            _logger.LogDebug("A executar api/produto/especifico -> Get");
             try
             {
                 ServiceResult<ProdutoViewDTO> resultado = _produtoService.GetProduto(idProduto);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogDebug($"Foi efetuado um get do Produto com idProduto {idProduto}!");
+                    _logger.LogDebug($"Foi efetuado o get do Produto com IdProduto {idProduto}!");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogDebug($"Ocorreu um erro ao efetuar o get do Produto com idProduto {idProduto}!");
+                    _logger.LogDebug($"Ocorreu um erro ao efetuar o get do Produto com IdProduto {idProduto}!");
                     return BadRequest(resultado.Erros);
                 }
             }
