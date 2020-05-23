@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.Business;
 using API.Business.Interfaces;
 using API.Entities;
-using API.Services;
+using API.Services.Imagem;
 using API.ViewModels.CategoriaDTOs;
 using API.ViewModels.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;

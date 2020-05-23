@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using API.Business;
 using API.Data.Interfaces;
 using API.Entities;
-using API.Services;
+using API.Services.DBConnection;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
@@ -13,21 +12,21 @@ namespace API.Data
     public class ProdutoDAO : IProdutoDAO
     {
         private readonly ILogger _logger;
-        private readonly IConnectionDBService _connectionDB;
+        private readonly IConnectionDBService _connectionDBService;
 
-        public ProdutoDAO(ILogger<ProdutoDAO> logger, IConnectionDBService connectionDB)
+        public ProdutoDAO(ILogger<ProdutoDAO> logger, IConnectionDBService connectionDBService)
         {
             _logger = logger;
-            _connectionDB = connectionDB;
+            _connectionDBService = connectionDBService;
         }
 
         public void AtivarProduto(int idProduto)
         {
             _logger.LogDebug("A executar [ProdutoDAO -> AtivarProduto]");
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "ativar_produto";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -37,16 +36,16 @@ namespace API.Data
 
             cmd.ExecuteNonQuery();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
         }
 
         public void DesativarProduto(int idProduto)
         {
             _logger.LogDebug("A executar [ProdutoDAO -> DesativarProduto]");
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "desativar_produto";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -56,17 +55,17 @@ namespace API.Data
 
             cmd.ExecuteNonQuery();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
         }
 
         public void EditarProduto(Produto produto)
         {
             _logger.LogDebug("A executar [ProdutoDAO -> EditarProduto]");
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "editar_produto";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -88,16 +87,16 @@ namespace API.Data
 
             cmd.ExecuteNonQuery();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
         }
 
         public bool ExisteNomeProduto(string nome)
         {
             _logger.LogDebug("A executar [ProdutoDAO -> ExisteNomeProduto]");
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "existe_nome_produto";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -107,7 +106,7 @@ namespace API.Data
 
             object val = cmd.ExecuteScalar();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
 
             return Convert.ToBoolean(val);
         }
@@ -118,10 +117,10 @@ namespace API.Data
             _logger.LogDebug("A executar [ProdutoDAO -> GetProduto]");
 
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "get_produto";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -169,7 +168,7 @@ namespace API.Data
             catch (Exception) { throw; }
             finally
             {
-                _connectionDB.CloseConnection();
+                _connectionDBService.CloseConnection();
             }
         }
 
@@ -177,13 +176,13 @@ namespace API.Data
         {
             _logger.LogDebug("A executar [ProdutoDAO -> GetProdutoNome]");
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
             MySqlCommand cmdI = new MySqlCommand();
             MySqlCommand cmdA = new MySqlCommand();
 
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "get_produto_nome";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -200,7 +199,7 @@ namespace API.Data
                     produto = new Produto { IdProduto = var.GetInt32(0), Nome = nome, IdCategoria = var.GetInt32(3), Preco = var.GetDouble(1), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(2) };
 
                     var.Close();
-                    cmdI.Connection = _connectionDB.Connection;
+                    cmdI.Connection = _connectionDBService.Connection;
                     cmdI.CommandText = "get_ingredientes_produto";
                     cmdI.CommandType = CommandType.StoredProcedure;
 
@@ -214,7 +213,7 @@ namespace API.Data
                         produto.Ingredientes.Add(var.GetString(0));
                     }
                     var.Close();
-                    cmdA.Connection = _connectionDB.Connection;
+                    cmdA.Connection = _connectionDBService.Connection;
 
 
                     cmdA.CommandText = "get_alergenicos_produto";
@@ -236,7 +235,7 @@ namespace API.Data
             catch (Exception) { throw; }
             finally
             {
-                _connectionDB.CloseConnection();
+                _connectionDBService.CloseConnection();
             }
         }
 
@@ -246,10 +245,10 @@ namespace API.Data
 
             IList<Produto> produtos = new List<Produto>();
 
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "get_produtos_desativados";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -294,16 +293,16 @@ namespace API.Data
             catch (Exception) { throw; }
             finally
             {
-                _connectionDB.CloseConnection();
+                _connectionDBService.CloseConnection();
             }
 
         }
 
         public bool isAtivo(int idProduto)
         {
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "is_produto_ativo";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -313,17 +312,17 @@ namespace API.Data
 
             object val = cmd.ExecuteScalar();
 
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
 
             return Convert.ToBoolean(val);
         }
 
         public int RegistarProduto(Produto produto)
         {
-            _connectionDB.OpenConnection();
+            _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
-            cmd.Connection = _connectionDB.Connection;
+            cmd.Connection = _connectionDBService.Connection;
 
             cmd.CommandText = "adicionar_produto";
             cmd.CommandType = CommandType.StoredProcedure;
@@ -346,7 +345,7 @@ namespace API.Data
             foreach (string ingrediente in produto.Ingredientes)
             {
                 MySqlCommand cmdI = new MySqlCommand();
-                cmdI.Connection = _connectionDB.Connection;
+                cmdI.Connection = _connectionDBService.Connection;
 
                 cmdI.CommandText = "adicionar_ingrediente";
                 cmdI.CommandType = CommandType.StoredProcedure;
@@ -372,7 +371,7 @@ namespace API.Data
             foreach (string alergenico in produto.Alergenios)
             {
                 MySqlCommand cmdA = new MySqlCommand();
-                cmdA.Connection = _connectionDB.Connection;
+                cmdA.Connection = _connectionDBService.Connection;
 
                 cmdA.CommandText = "adicionar_alergenico";
                 cmdA.CommandType = CommandType.StoredProcedure;
@@ -394,7 +393,7 @@ namespace API.Data
                 cmdA.ExecuteNonQuery();
 
             }
-            _connectionDB.CloseConnection();
+            _connectionDBService.CloseConnection();
             return productId;
         }
     }

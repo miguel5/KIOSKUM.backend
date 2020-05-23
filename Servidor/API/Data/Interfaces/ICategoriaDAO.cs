@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using API.Entities;
 
 namespace API.Data.Interfaces

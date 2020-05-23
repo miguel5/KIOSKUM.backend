@@ -1,5 +1,4 @@
-﻿using System;
-using API.Entities;
+﻿using API.Entities;
 using API.ViewModels.FuncionarioDTOs;
 
 namespace API.Business.Interfaces

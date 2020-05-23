@@ -18,7 +18,9 @@ using API.ViewModels.ProdutoDTOs;
 using API.ViewModels.CategoriaDTOs;
 using API.ViewModels.FuncionarioDTOs;
 using API.Data;
-using API.Services;
+using API.Services.DBConnection;
+using API.Services.EmailSender;
+using API.Services.Imagem;
 
 namespace API
 {

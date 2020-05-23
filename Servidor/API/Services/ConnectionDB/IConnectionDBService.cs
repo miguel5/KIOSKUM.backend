@@ -1,6 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 
-namespace API.Services
+namespace API.Services.DBConnection
 {
     public interface IConnectionDBService
     {
