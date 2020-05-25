@@ -30,8 +30,8 @@ namespace API.Controllers
 
 
 
-        //[Authorize(Roles = "Administrador")]
         [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("registar")]
         public async Task<IActionResult> RegistarCategoria([FromForm] RegistarCategoriaDTO model)
         {
@@ -78,8 +78,8 @@ namespace API.Controllers
         }
 
 
-        //[Authorize(Roles = "Administrador")]
         [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("editar")]
         public async Task<IActionResult> EditarCategoria([FromForm] EditarCategoriaDTO model)
         {
@@ -153,8 +153,8 @@ namespace API.Controllers
 
 
 
-        //[Authorize(Roles = "Administrador,Cliente")]
         [AllowAnonymous]
+        //[Authorize(Roles = "Administrador,Cliente")]
         [HttpGet("todas")]
         public IActionResult GetCategorias()
         {
@@ -179,8 +179,8 @@ namespace API.Controllers
         }
 
 
-        //[Authorize(Roles = "Administrador,Cliente")]
         [AllowAnonymous]
+        //[Authorize(Roles = "Administrador,Cliente")]
         [HttpGet("produtos")]
         public IActionResult GetProdutosCategoria(int idCategoria)
         {
@@ -213,8 +213,8 @@ namespace API.Controllers
 
 
 
-        //[Authorize(Roles = "Administrador")]
         [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("especifica")]
         public IActionResult GetCategoria(int idCategoria)
         {
@@ -246,7 +246,8 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("desativar")]
         public IActionResult DesativarCategoria(int idCategoria)
         {
@@ -278,7 +279,8 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("ativar")]
         public IActionResult AtivarCategoria(int idCategoria)
         {
