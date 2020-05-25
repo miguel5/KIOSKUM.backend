@@ -5,7 +5,7 @@ namespace API.Data.Interfaces
     public interface IFuncionarioDAO
     {
         bool ExisteNumFuncionario(int numFuncionario);
-        void EditarNome(string nome);
+        void EditarConta(Funcionario funcionario);
         Funcionario GetContaNumFuncionario(int numFuncionario);
         void InserirConta(Funcionario funcionario);
     }

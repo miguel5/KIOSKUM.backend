@@ -111,7 +111,7 @@ namespace API.Business
 
                 if (!erros.Any())
                 {
-                    _funcionarioDAO.EditarNome(model.Nome);
+                    _funcionarioDAO.EditarConta(funcionario);
                 }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };

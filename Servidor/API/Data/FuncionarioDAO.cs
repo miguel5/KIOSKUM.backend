@@ -15,7 +15,7 @@ namespace API.Data
             _connectionDBService = connectionDBService;
         }
 
-        public void EditarNome(string nome)
+        public void EditarConta(Funcionario funcionario)
         {
             throw new NotImplementedException();
         }
