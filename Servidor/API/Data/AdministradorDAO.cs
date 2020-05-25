@@ -1,25 +1,16 @@
-﻿using API.Business;
+﻿using API.Data.Interfaces;
 using API.Entities;
+using API.Services.DBConnection;
 
 namespace API.Data
 {
-    public interface IAdministradorDAO
-    {
-        bool ExisteEmail(string email);
-        void InserirConta(Administrador administrador);
-        Administrador GetContaEmail(string email);
-        bool ExisteNumFuncionario(int numFuncionario);
-        Administrador GetContaId(int idFuncionario);
-        void EditarConta(Administrador administrador);
-    }
-
     public class AdministradorDAO : IAdministradorDAO
     {
-        private readonly IConnectionDB _connectionDB;
+        private readonly IConnectionDBService _connectionDBService;
 
-        public AdministradorDAO(IConnectionDB connectionDB)
+        public AdministradorDAO(IConnectionDBService connectionDBService)
         {
-            _connectionDB = connectionDB;
+            _connectionDBService = connectionDBService;
         }
 
         public void EditarConta(Administrador administrador)
