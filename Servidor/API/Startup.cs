@@ -21,6 +21,7 @@ using API.Data;
 using API.Services.DBConnection;
 using API.Services.EmailSender;
 using API.Services.Imagem;
+using API.ViewModels.AdministradorDTOs;
 
 namespace API
 {
@@ -81,10 +82,9 @@ namespace API
 
             var config = new MapperConfiguration(cfg =>
             {
-                /*cfg.CreateMap<Administrador, AdministradorDTO>();
-                cfg.CreateMap<AdministradorDTO, Administrador>();
-                cfg.CreateMap<Administrador, EditarAdministradorDTO>();
-                cfg.CreateMap<EditarAdministradorDTO, Administrador>();*/
+                cfg.CreateMap<Administrador, AdministradorViewDTO>();
+                cfg.CreateMap<AdministradorViewDTO, Administrador>();
+                cfg.CreateMap<EditarAdministradorDTO, Administrador>();
 
                 cfg.CreateMap<RegistarCategoriaDTO, Categoria>();
                 cfg.CreateMap<EditarCategoriaDTO, Categoria>();
@@ -93,7 +93,6 @@ namespace API
 
                 cfg.CreateMap<Cliente, ClienteViewDTO>();
                 cfg.CreateMap<ClienteViewDTO, Cliente>();
-                cfg.CreateMap<Cliente, EditarClienteDTO>();
                 cfg.CreateMap<EditarClienteDTO, Cliente>();
 
 
