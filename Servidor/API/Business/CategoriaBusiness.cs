@@ -75,7 +75,7 @@ namespace API.Business
                     _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                     erros.Add((int)ErrosEnumeration.NomeCategoriaInvalido);
                 }
-                
+
 
                 if (!erros.Any())
                 {
@@ -145,7 +145,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogWarning($"A Categoria com IdCategoria {model.IdCategoria} encontra-se desativada.");
+                    _logger.LogDebug($"A Categoria com IdCategoria {model.IdCategoria} encontra-se desativada.");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
@@ -230,7 +230,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogWarning($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
+                    _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
@@ -262,7 +262,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogWarning($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
+                    _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
                     erros.Add((int)ErrosEnumeration.CategoriaDesativada);
                 }
             }
@@ -270,5 +270,67 @@ namespace API.Business
             return new ServiceResult<CategoriaViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = categoriaViewDTO };
         }
 
+
+        public ServiceResult DesativarCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar [CategoriaBusiness -> DesativarCategoria]");
+            IList<int> erros = new List<int>();
+            Categoria categoria = _categoriaDAO.GetCategoria(idCategoria);
+
+            if (categoria == null)
+            {
+                _logger.LogWarning($"Não existe nenhuma Categoria com IdCategoria {idCategoria}!");
+                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+            }
+            else
+            {
+                if (_categoriaDAO.IsAtiva(idCategoria))
+                {
+                    int numProdutosAtivados = _categoriaDAO.GetNumProdutosAtivados(idCategoria);
+                    if (numProdutosAtivados == 0)
+                    {
+                        _categoriaDAO.DesativarCategoria(idCategoria);
+                    }
+                    else
+                    {
+                        _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} possuí {numProdutosAtivados} ativados!");
+                        erros.Add((int)ErrosEnumeration.ExistemProdutosAtivados);
+                    }
+                }
+                else
+                {
+                    _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} já se encontra desativada!");
+                    erros.Add((int)ErrosEnumeration.CategoriaDesativada);
+                }
+            }
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
+
+
+        public ServiceResult AtivarCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar [CategoriaBusiness -> AtivarCategoria]");
+            IList<int> erros = new List<int>();
+            Categoria categoria = _categoriaDAO.GetCategoria(idCategoria);
+
+            if (categoria == null)
+            {
+                _logger.LogWarning($"Não existe nenhuma Categoria com IdCategoria {idCategoria}!");
+                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+            }
+            else
+            {
+                if (_categoriaDAO.IsAtiva(idCategoria))
+                {
+                    _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} já se encontra ativada!");
+                    erros.Add((int)ErrosEnumeration.CategoriaAtivada);
+                }
+                else
+                {
+                    _categoriaDAO.AtivarCategoria(idCategoria);
+                }
+            }
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
     }
 }

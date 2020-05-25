@@ -20,6 +20,16 @@ namespace API.Data
             _connectionDBService = connectionDBService;
         }
 
+        public void AtivarCategoria(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DesativarCategoria(int idCategoria)
+        {
+            throw new NotImplementedException();
+        }
+
         public void EditarCategoria(Categoria novaCategoria)
         {
             _logger.LogDebug("A executar [CategoriaDAO -> EditarCategoria]");
@@ -214,6 +224,11 @@ namespace API.Data
             {
                 _connectionDBService.CloseConnection();
             }
+        }
+
+        public int GetNumProdutosAtivados(int idCategoria)
+        {
+            throw new NotImplementedException();
         }
 
         public IList<Produto> GetProdutosCategoria(int idCategoria)

@@ -244,5 +244,70 @@ namespace API.Controllers
                 return StatusCode(500);
             }
         }
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("desativar")]
+        public IActionResult DesativarCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar api/categoria/desativar -> Post");
+            try
+            {
+                ServiceResult resultado = _categoriaBusiness.DesativarCategoria(idCategoria);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation($"A Categoria com idCategoria {idCategoria} foi desativado!");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogInformation($"Ocorreu um erro ao desativar a Categoria com IdCategoria {idCategoria}.");
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                _logger.LogError(e, e.Message);
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost("ativar")]
+        public IActionResult AtivarCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar api/categoria/ativar -> Post");
+            try
+            {
+                ServiceResult resultado = _categoriaBusiness.AtivarCategoria(idCategoria);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation($"A Categoria com IdCategoria {idCategoria} foi ativada.");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogInformation($"Ocorreu um erro ao ativar a Categoria com IdCategoria {idCategoria}.");
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                _logger.LogError(e, e.Message);
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
     }
 }

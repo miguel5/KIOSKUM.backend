@@ -15,5 +15,8 @@ namespace API.Data.Interfaces
         IList<Categoria> GetCategoriasDesativadas();//devolve todas as categorias desativada
         IList<Categoria> GetCategorias();//devolve todas as categorias ativadas
         IList<Produto> GetProdutosCategoria(int idCategoria);//devolve todos os produtos ativados de uma categoria
+        int GetNumProdutosAtivados(int idCategoria);
+        void DesativarCategoria(int idCategoria);
+        void AtivarCategoria(int idCategoria);
     }
 }
