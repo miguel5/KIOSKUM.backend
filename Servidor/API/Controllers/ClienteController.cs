@@ -208,11 +208,12 @@ namespace API.Controllers
         [HttpGet("get")]
         public IActionResult GetCliente()
         {
-            _logger.LogDebug("A executar api/cliente/get -> Get");
-            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            int idCliente = int.Parse(nameIdentifier);
             try
             {
+                _logger.LogDebug("A executar api/cliente/get -> Get");
+                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                int idCliente = int.Parse(nameIdentifier);
+            
                 ServiceResult<ClienteViewDTO> resultado = _clienteBusiness.GetCliente(idCliente);
                 if (resultado.Sucesso)
                 {

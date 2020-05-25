@@ -1,12 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.Security.Claims;
 using API.Business.Interfaces;
 using API.Entities;
 using API.ViewModels;
+using API.ViewModels.AdministradorDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
@@ -15,29 +15,51 @@ namespace API.Controllers
     [Route("api/administrador")]
     public class AdministradorController : ControllerBase
     {
+        private readonly ILogger _logger;
         private IAdministradorBusiness _administradorBusiness;
 
 
-        public AdministradorController(IAdministradorBusiness administradorBusiness)
+        public AdministradorController(ILogger<AdministradorController> logger, IAdministradorBusiness administradorBusiness)
         {
+            _logger = logger;
             _administradorBusiness = administradorBusiness;
         }
 
 
         [HttpPost("criar")]
-        public IActionResult CriarConta([FromBody] AdministradorDTO model)
+        public IActionResult CriarConta([FromBody] AdministradorViewDTO model)
         {
+            _logger.LogDebug("A executar api/administrador/criar -> Post");
             if (model is null)
+            {
+                _logger.LogWarning("O objeto AdministradorViewDTO é null!");
                 return BadRequest(nameof(model));
+            }
+
 
             try
             {
                 ServiceResult resultado = _administradorBusiness.CriarConta(model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Funcionário {model.NumFuncionario} registou-se com sucesso.");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogInformation("Ocorreu um erro ao criar conta.");
+                    return BadRequest(resultado.Erros);
+                }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
             }
         }
 
@@ -46,48 +68,104 @@ namespace API.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] AutenticacaoDTO model)
         {
+            _logger.LogDebug("A executar api/administrador/login -> Post");
             if (model is null)
+            {
+                _logger.LogWarning("O objeto AutenticacaoDTO é null!");
                 return BadRequest(nameof(model));
+            }
 
             try
             {
                 ServiceResult<TokenDTO> resultado = _administradorBusiness.Login(model);
-                return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation($"O Administrador com Email {model.Email} efetou login com sucesso.");
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o login com o Email {model.Email}.");
+                    return BadRequest(resultado.Erros);
+                }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
             }
         }
 
 
         [HttpPost("editar")]
-        public IActionResult EditarDados([FromBody] EditarAdministradorDTO model)
+        public IActionResult EditarConta([FromBody] EditarAdministradorDTO model)
         {
+            _logger.LogDebug("A executar api/administrador/editar -> Post");
             if (model is null)
+            {
+                _logger.LogWarning("O objeto EditarAdministradorDTO é null!");
                 return BadRequest(nameof(model));
+            }
 
             try
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                int idAdministrador = int.Parse(nameIdentifier);
-                ServiceResult resultado = _administradorBusiness.EditarDados(idAdministrador, model);
-                return resultado.Sucesso ? Ok() : (IActionResult)BadRequest(resultado.Erros);
+                int idFuncionario = int.Parse(nameIdentifier);
+                ServiceResult resultado = _administradorBusiness.EditarConta(idFuncionario, model);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Funcionário {model.NumFuncionario} editou a sua conta com sucesso.");
+                    return Ok();
+                }
+                else
+                {
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar a edição do Administrador com IdFuncionario {idFuncionario}.");
+                    return BadRequest(resultado.Erros);
+                }
             }
             catch (ArgumentNullException e)
             {
+                _logger.LogError(e, e.Message);
                 return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
             }
         }
 
 
         [HttpGet("get")]
-        public IActionResult GetCliente()
+        public IActionResult GetAdministrador()
         {
-            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            int idAdministrador = int.Parse(nameIdentifier);
-            ServiceResult<AdministradorDTO> resultado = _administradorBusiness.GetAdministrador(idAdministrador);
-            return resultado.Sucesso ? Ok(resultado.Resultado) : (IActionResult)BadRequest(resultado.Erros);
+            _logger.LogDebug("A executar api/administrador/get -> Get");
+            try
+            {
+                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                int idFuncionario = int.Parse(nameIdentifier);
+                ServiceResult<AdministradorViewDTO> resultado = _administradorBusiness.GetAdministrador(idFuncionario);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation($"Get do Administrador com IdFuncionario {idFuncionario} efetuado com sucesso.");
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o Get do Administrador com IdFuncionario {idFuncionario}.");
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
         }
     }
 }
