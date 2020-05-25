@@ -14,5 +14,7 @@ namespace API.Business.Interfaces
         IList<CategoriaViewDTO> GetCategorias();
         ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria);
         ServiceResult<CategoriaViewDTO> GetCategoria(int idCategoria);
+        ServiceResult DesativarCategoria(int idCategoria);
+        ServiceResult AtivarCategoria(int idCategoria);
     }
 }

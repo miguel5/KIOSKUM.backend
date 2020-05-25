@@ -13,6 +13,6 @@ namespace API.Data.Interfaces
         IList<Produto> GetProdutosDesativados();//apenas devolve os desativados
         void DesativarProduto(int idProduto);
         void AtivarProduto(int idProduto);
-        bool isAtivo(int idProduto);
+        bool IsAtivo(int idProduto);
     }
 }

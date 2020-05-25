@@ -96,7 +96,7 @@ namespace API.Business
             {
                 _logger.LogDebug($"O Produto com o Nome {model.Nome} já existe.");
                 Produto produto = _produtoDAO.GetProdutoNome(model.Nome);
-                if (_produtoDAO.isAtivo(produto.IdProduto))
+                if (_produtoDAO.IsAtivo(produto.IdProduto))
                 {
                     _logger.LogDebug($"O Produto com o Nome {model.Nome} já existe, com IdProdudo {produto.IdProduto} e encontra-se ativado.");
                     erros.Add((int)ErrosEnumeration.NomeProdutoJaExiste);
@@ -179,7 +179,7 @@ namespace API.Business
             }
             else
             {
-                if (_produtoDAO.isAtivo(model.IdProduto))
+                if (_produtoDAO.IsAtivo(model.IdProduto))
                 {
                     if (!produto.Nome.Equals(model.Nome) && _produtoDAO.ExisteNomeProduto(model.Nome))
                     {
@@ -228,7 +228,7 @@ namespace API.Business
                 }
                 else
                 {
-                    _logger.LogWarning($"O Produto com idProduto {model.IdProduto} encontra-se desativado!");
+                    _logger.LogDebug($"O Produto com idProduto {model.IdProduto} encontra-se desativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
@@ -277,14 +277,14 @@ namespace API.Business
             }
             else
             {
-                if (_produtoDAO.isAtivo(idProduto))
+                if (_produtoDAO.IsAtivo(idProduto))
                 {
                     produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
                     produtoViewDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl, "Images", "Produto", $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
                 }
                 else
                 {
-                    _logger.LogWarning($"O Produto com IdProduto {idProduto} encontra-se desativado!");
+                    _logger.LogDebug($"O Produto com IdProduto {idProduto} encontra-se desativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
@@ -307,13 +307,13 @@ namespace API.Business
             }
             else
             {
-                if (_produtoDAO.isAtivo(idProduto))
+                if (_produtoDAO.IsAtivo(idProduto))
                 {
                     _produtoDAO.DesativarProduto(idProduto);
                 }
                 else
                 {
-                    _logger.LogWarning($"O Produto com IdProduto {idProduto} já se encontra desativado!");
+                    _logger.LogDebug($"O Produto com IdProduto {idProduto} já se encontra desativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoDesativado);
                 }
             }
@@ -334,9 +334,9 @@ namespace API.Business
             }
             else
             {
-                if (_produtoDAO.isAtivo(idProduto))
+                if (_produtoDAO.IsAtivo(idProduto))
                 {
-                    _logger.LogWarning($"O Produto com IdProduto {idProduto} já se encontra ativado!");
+                    _logger.LogDebug($"O Produto com IdProduto {idProduto} já se encontra ativado!");
                     erros.Add((int)ErrosEnumeration.ProdutoAtivado);
                 }
                 else

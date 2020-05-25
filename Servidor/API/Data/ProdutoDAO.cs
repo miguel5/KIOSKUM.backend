@@ -298,7 +298,7 @@ namespace API.Data
 
         }
 
-        public bool isAtivo(int idProduto)
+        public bool IsAtivo(int idProduto)
         {
             _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();

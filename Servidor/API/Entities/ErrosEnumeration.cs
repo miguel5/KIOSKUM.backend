@@ -36,6 +36,7 @@
         NomeCategoriaInvalido = 42,
         CategoriaDesativada = 43,
         CategoriaAtivada = 44,
+        ExistemProdutosAtivados = 45,
 
         FormatoImagemInvalido = 50,
         ImagemVazia = 51,

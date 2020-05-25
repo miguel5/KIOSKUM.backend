@@ -189,7 +189,7 @@ namespace API.Controllers
                 ServiceResult resultado = _produtoBusiness.DesativarProduto(idProduto);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O Produto com idProduto {idProduto} foi desativado!");
+                    _logger.LogInformation($"O Produto com IdProduto {idProduto} foi desativado!");
                     return Ok();
                 }
                 else
@@ -221,12 +221,12 @@ namespace API.Controllers
                 ServiceResult resultado = _produtoBusiness.AtivarProduto(idProduto);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"O Produto com idProduto {idProduto} foi ativado.");
+                    _logger.LogInformation($"O Produto com IdProduto {idProduto} foi ativado.");
                     return Ok();
                 }
                 else
                 {
-                    _logger.LogInformation($"Ocorreu um erro ao ativar o Produto com idProduto {idProduto}.");
+                    _logger.LogInformation($"Ocorreu um erro ao ativar o Produto com IdProduto {idProduto}.");
                     return BadRequest(resultado.Erros);
                 }
             }
