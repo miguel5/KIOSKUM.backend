@@ -94,15 +94,15 @@ namespace API.Business
             _logger.LogDebug("A executar [ClienteBusiness -> CriarConta]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
-                throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
+                throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
             }
             if (string.IsNullOrWhiteSpace(model.Email))
             {
-                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
+                throw new ArgumentNullException("Email", "Campo não poder ser nulo!");
             }
             if (string.IsNullOrWhiteSpace(model.Password))
             {
-                throw new ArgumentNullException("Password","Campo não poder ser nulo.");
+                throw new ArgumentNullException("Password", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
@@ -335,7 +335,7 @@ namespace API.Business
             }
             if (string.IsNullOrWhiteSpace(model.NovaPassword))
             {
-                throw new ArgumentNullException("Nova Password", "Campo não poder ser nulo!");
+                throw new ArgumentNullException("NovaPassword", "Campo não poder ser nulo!");
             }
 
             IList<int> erros = new List<int>();
