@@ -12,5 +12,7 @@
         public DBSettings DBSettings { get; set; }
 
         public int NumTentativasCodigoValidacao { get; set; }
+
+        public BarSettings BarSettings { get; set; }
     }
 }

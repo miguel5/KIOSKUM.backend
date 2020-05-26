@@ -293,5 +293,10 @@ namespace API.Data
 
             _connectionDBService.CloseConnection();
         }
+
+        public bool ExisteCliente(int idCliente)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

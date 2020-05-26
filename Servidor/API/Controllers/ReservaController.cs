@@ -13,7 +13,7 @@ namespace API.Controllers
     [Route("api/reserva")]
     public class ReservaController : ControllerBase
     {
-        private List<Reserva> reservas;
+        /*private List<Reserva> reservas;
         private readonly ILogger<ReservaController> _logger;
 
         public ReservaController(ILogger<ReservaController> logger)
@@ -39,7 +39,7 @@ namespace API.Controllers
         {
             return reservas;
 
-        }
+        }*/
 
     }
 

@@ -41,6 +41,7 @@
         FormatoImagemInvalido = 50,
         ImagemVazia = 51,
 
-        
+        ItensInvalidos = 60,
+        HoraEntregaInvalida = 61,
     }
 }

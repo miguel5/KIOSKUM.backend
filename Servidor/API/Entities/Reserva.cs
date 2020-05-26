@@ -8,7 +8,7 @@ namespace API.Entities
         public int IdReserva { get; set; }
         public int IdCliente { get; set; }
         public Tuple<int, int> IdFuncionarios { get; set; }
-        public IList<Tuple<int, int, string>> Items { get; set; } //(idProduto,Quantidade,Observações)
+        public IList<Item> Items { get; set; } 
         public EstadosReservaEnum Estado { get; set; }
         public double Preco { get; set; }
         public DateTime HoraEntrega { get; set; }

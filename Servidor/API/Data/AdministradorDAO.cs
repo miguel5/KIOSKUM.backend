@@ -3,21 +3,25 @@ using System.Data;
 using API.Data.Interfaces;
 using API.Entities;
 using API.Services.DBConnection;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace API.Data
 {
     public class AdministradorDAO : IAdministradorDAO
     {
+        private readonly ILogger _logger;
         private readonly IConnectionDBService _connectionDBService;
 
-        public AdministradorDAO(IConnectionDBService connectionDBService)
+        public AdministradorDAO(ILogger<AdministradorDAO> logger, IConnectionDBService connectionDBService)
         {
+            _logger = logger;
             _connectionDBService = connectionDBService;
         }
 
         public void EditarConta(Administrador administrador)
         {
+            _logger.LogDebug("A executar [AdministradorDAO -> EditarConta]");
             MySqlCommand cmd = new MySqlCommand();
             cmd.Connection = _connectionDBService.Connection;
 
@@ -46,6 +50,7 @@ namespace API.Data
 
         public bool ExisteEmail(string email)
         {
+            _logger.LogDebug("A executar [AdministradorDAO -> ExisteEmail]");
             _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();
             cmd.Connection = _connectionDBService.Connection;
@@ -84,6 +89,7 @@ namespace API.Data
 
         public Administrador GetContaEmail(string email)
         {
+            _logger.LogDebug("A executar [AdministradorDAO -> GetContaEmail]");
             _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -115,6 +121,7 @@ namespace API.Data
 
         public Administrador GetContaId(int idFuncionario)
         {
+            _logger.LogDebug("A executar [AdministradorDAO -> GetContaId]");
             _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -146,6 +153,7 @@ namespace API.Data
 
         public void InserirConta(Administrador administrador)
         {
+            _logger.LogDebug("A executar [AdministradorDAO -> InserirConta]");
             _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();

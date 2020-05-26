@@ -27,6 +27,7 @@
     <Folder Include="Services\ConnectionDB\" />
     <Folder Include="Services\Imagem\" />
     <Folder Include="Services\EmailSender\" />
+    <Folder Include="ViewModels\ReservaDTOs\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
