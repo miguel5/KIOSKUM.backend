@@ -113,7 +113,21 @@ namespace API.Data
 
         public bool ExisteProduto(int idProduto)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug("A executar [ProdutoDAO -> ExisteProduto]");
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDBService.Connection;
+
+            cmd.CommandText = "existe_produto";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idProduto);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            object val = cmd.ExecuteScalar();
+
+            _connectionDBService.CloseConnection();
+
+            return Convert.ToBoolean(val);
         }
 
         public Produto GetProduto(int idProduto)

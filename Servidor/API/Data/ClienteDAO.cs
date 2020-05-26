@@ -296,7 +296,21 @@ namespace API.Data
 
         public bool ExisteCliente(int idCliente)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug("A executar [ClienteDAO -> ExisteCliente]");
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDBService.Connection;
+
+            cmd.CommandText = "existe_cliente";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idCliente);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            object val = cmd.ExecuteScalar();
+
+            _connectionDBService.CloseConnection();
+
+            return Convert.ToBoolean(val);
         }
     }
 }

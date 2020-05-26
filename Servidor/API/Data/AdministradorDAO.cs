@@ -140,7 +140,8 @@ namespace API.Data
             {
                 if (var.Read())
                 {
-                    administrador = new Administrador { IdFuncionario = idFuncionario, Nome = var.GetString(0), NumFuncionario = var.GetInt32(1), Email = var.GetString(2), Password = var.GetString(3) };
+                    administrador = new Administrador { IdFuncionario = idFuncionario, Nome = var.GetString(0),
+                        NumFuncionario = var.GetInt32(1), Email = var.GetString(2), Password = var.GetString(3) };
                 }
                 return administrador;
             }
