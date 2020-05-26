@@ -111,6 +111,11 @@ namespace API.Data
             return Convert.ToBoolean(val);
         }
 
+        public bool ExisteProduto(int idProduto)
+        {
+            throw new NotImplementedException();
+        }
+
         public Produto GetProduto(int idProduto)
         {
 

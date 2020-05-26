@@ -22,6 +22,7 @@ using API.Services.DBConnection;
 using API.Services.EmailSender;
 using API.Services.Imagem;
 using API.ViewModels.AdministradorDTOs;
+using API.ViewModels.ReservaDTOs;
 
 namespace API
 {
@@ -102,6 +103,9 @@ namespace API
                 cfg.CreateMap<RegistarProdutoDTO, Produto>();
                 cfg.CreateMap<EditarProdutoDTO, Produto>();
                 cfg.CreateMap<Produto, ProdutoViewDTO>();
+
+
+                cfg.CreateMap<RegistarReservaDTO, Reserva>();
             });
             IMapper mapper = config.CreateMapper();
             services.AddSingleton(mapper);

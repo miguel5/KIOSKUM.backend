@@ -1,4 +1,5 @@
 ﻿using API.Data.Interfaces;
+using API.Entities;
 
 namespace API.Data
 {
@@ -6,6 +7,11 @@ namespace API.Data
     {
         public ReservaDAO()
         {
+        }
+
+        public void RegistarReserva(Reserva reserva)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

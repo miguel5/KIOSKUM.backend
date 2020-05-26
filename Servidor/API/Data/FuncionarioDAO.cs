@@ -3,22 +3,26 @@ using System.Data;
 using API.Data.Interfaces;
 using API.Entities;
 using API.Services.DBConnection;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace API.Data
 {
     public class FuncionarioDAO : IFuncionarioDAO
     {
+        private readonly ILogger _logger;
         private readonly IConnectionDBService _connectionDBService;
 
 
-        public FuncionarioDAO(IConnectionDBService connectionDBService)
+        public FuncionarioDAO(ILogger<FuncionarioDAO> logger, IConnectionDBService connectionDBService)
         {
+            _logger = logger;
             _connectionDBService = connectionDBService;
         }
 
         public void EditarConta(Funcionario funcionario)
         {
+            _logger.LogDebug("A executar [FuncionarioDAO -> EditarConta]");
             MySqlCommand cmd = new MySqlCommand();
             cmd.Connection = _connectionDBService.Connection;
 
@@ -41,6 +45,7 @@ namespace API.Data
 
         public bool ExisteNumFuncionario(int numFuncionario)
         {
+            _logger.LogDebug("A executar [FuncionarioDAO -> ExisteNumFuncionario]");
             _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();
             cmd.Connection = _connectionDBService.Connection;
@@ -60,6 +65,7 @@ namespace API.Data
 
         public Funcionario GetContaNumFuncionario(int numFuncionario)
         {
+            _logger.LogDebug("A executar [FuncionarioDAO -> GetContaNumFuncionario]");
             _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();
@@ -91,6 +97,7 @@ namespace API.Data
 
         public void InserirConta(Funcionario funcionario)
         {
+            _logger.LogDebug("A executar [FuncionarioDAO -> InserirConta]");
             _connectionDBService.OpenConnection();
 
             MySqlCommand cmd = new MySqlCommand();

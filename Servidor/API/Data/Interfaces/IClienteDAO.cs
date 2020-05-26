@@ -15,5 +15,6 @@ namespace API.Data.Interfaces
         void ValidarConta(string email);
         void EditarConta(Cliente cliente);
         int GetNumTentativas(string email);
+        bool ExisteCliente(int idCliente);
     }
 }

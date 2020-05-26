@@ -14,5 +14,6 @@ namespace API.Data.Interfaces
         void DesativarProduto(int idProduto);
         void AtivarProduto(int idProduto);
         bool IsAtivo(int idProduto);
+        bool ExisteProduto(int idProduto);
     }
 }
