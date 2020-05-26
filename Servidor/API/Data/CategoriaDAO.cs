@@ -22,12 +22,36 @@ namespace API.Data
 
         public void AtivarCategoria(int idCategoria)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug("A executar [CategoriaDAO -> AtivarCategoria]");
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDBService.Connection;
+
+            cmd.CommandText = "ativar_categoria";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idCategoria);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            cmd.ExecuteNonQuery();
+
+            _connectionDBService.CloseConnection();
         }
 
         public void DesativarCategoria(int idCategoria)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug("A executar [CategoriaDAO -> DesativarCategoria]");
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDBService.Connection;
+
+            cmd.CommandText = "desativar_categoria";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idCategoria);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            cmd.ExecuteNonQuery();
+
+            _connectionDBService.CloseConnection();
         }
 
         public void EditarCategoria(Categoria novaCategoria)
@@ -228,7 +252,21 @@ namespace API.Data
 
         public int GetNumProdutosAtivados(int idCategoria)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug("A executar [CategoriaDAO -> GetNumProdutosAtivados]");
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDBService.Connection;
+
+            cmd.CommandText = "get_num_produtos_ativados";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idCategoria);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            object val = cmd.ExecuteScalar();
+
+            _connectionDBService.CloseConnection();
+
+            return Convert.ToInt32(val);
         }
 
         public IList<Produto> GetProdutosCategoria(int idCategoria)
