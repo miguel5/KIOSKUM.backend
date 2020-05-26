@@ -111,6 +111,24 @@ namespace API.Data
             return Convert.ToBoolean(val);
         }
 
+        public bool ExisteProduto(int idProduto)
+        {
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = _connectionDBService.Connection;
+
+            cmd.CommandText = "existe_produto";
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("?id", idProduto);
+            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+            object val = cmd.ExecuteScalar();
+
+            _connectionDBService.CloseConnection();
+
+            return Convert.ToBoolean(val);
+        }
+
         public Produto GetProduto(int idProduto)
         {
 
@@ -298,7 +316,7 @@ namespace API.Data
 
         }
 
-        public bool isAtivo(int idProduto)
+        public bool IsAtivo(int idProduto)
         {
             _connectionDBService.OpenConnection();
             MySqlCommand cmd = new MySqlCommand();
