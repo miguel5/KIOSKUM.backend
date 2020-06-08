@@ -1,11 +1,12 @@
-﻿using API.Helpers;
+﻿using System;
+using API.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 namespace API.Services.DBConnection
 {
-    public class ConnectionDBService : IConnectionDBService
+    public class ConnectionDBService : IConnectionDBService, IDisposable
     {
         public MySqlConnection Connection { get; private set; }
         private ILogger _logger;
@@ -41,12 +42,27 @@ namespace API.Services.DBConnection
             _logger.LogDebug("Conexão aberta");
         }
 
-
         public void CloseConnection()
         {
             _logger.LogDebug("A executar [ConnectionDB -> OpenConnection]");
             Connection.Close();
             _logger.LogDebug("Conexão fechada");
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~ConnectionDBService() => Dispose(false);
+
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (Connection != null) { Connection.Dispose(); Connection = null; }
+            }
         }
     }
 }
