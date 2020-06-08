@@ -257,7 +257,7 @@ namespace API.Data
 
                         while (var.Read())
                         {
-                            Categoria categoria = new Categoria { IdCategoria = var.GetInt32(0), Nome = var.GetString(1), ExtensaoImagem = var.GetString(2) };
+                            Categoria categoria = new Categoria { IdCategoria = var.GetInt32(0), Nome = var.GetString(1), ExtensaoImagem = var.GetString(3) };
                             categorias.Add(categoria);
                         }
                         return categorias;
@@ -290,7 +290,7 @@ namespace API.Data
                     {
                         while (var.Read())
                         {
-                            Categoria categoria = new Categoria { IdCategoria = var.GetInt32(0), Nome = var.GetString(1), ExtensaoImagem = var.GetString(2) };
+                            Categoria categoria = new Categoria { IdCategoria = var.GetInt32(0), Nome = var.GetString(1), ExtensaoImagem = var.GetString(3) };
                             categorias.Add(categoria);
                         }
                         return categorias;
@@ -315,7 +315,7 @@ namespace API.Data
                 {
                     cmd.Connection = _connectionDBService.Connection;
 
-                    cmd.CommandText = "get_num_produtos_ativados";
+                    cmd.CommandText = "get_num_produtos_ativos";
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     cmd.Parameters.AddWithValue("?id", idCategoria);
