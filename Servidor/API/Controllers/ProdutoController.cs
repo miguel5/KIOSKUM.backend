@@ -122,7 +122,8 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("desativados")]
         public IActionResult GetProdutosDesativados()
         {
@@ -146,8 +147,8 @@ namespace API.Controllers
         }
 
 
-
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpGet("especifico")]
         public IActionResult GetProduto(int idProduto)
         {
@@ -178,8 +179,8 @@ namespace API.Controllers
         }
 
 
-
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("desativar")]
         public IActionResult DesativarProduto(int idProduto)
         {
@@ -211,7 +212,8 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("ativar")]
         public IActionResult AtivarProduto(int idProduto)
         {

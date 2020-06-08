@@ -165,6 +165,7 @@ namespace API.Business
                 string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Categoria");
                 foreach (Categoria categoria in categorias)
                 {
+                    Console.WriteLine(categoria.ExtensaoImagem);
                     CategoriaViewDTO categoriaViewDTO = _mapper.Map<CategoriaViewDTO>(categoria);
                     categoriaViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{categoria.IdCategoria}.{categoria.ExtensaoImagem}"));
                     categoriasViewDTO.Add(categoriaViewDTO);

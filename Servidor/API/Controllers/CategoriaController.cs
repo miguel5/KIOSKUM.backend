@@ -135,7 +135,7 @@ namespace API.Controllers
             try
             {
                 IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoriasDesativadas();
-                _logger.LogInformation("Get das Categorias destaivadas efetuado com sucesso.");
+                _logger.LogInformation("Get das Categorias desativadas efetuado com sucesso.");
                 return Ok(resultado);
 
             }

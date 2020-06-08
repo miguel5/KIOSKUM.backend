@@ -196,13 +196,14 @@ namespace API.Data
                             cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
                             cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
+                            var.Close();
                             using (MySqlDataReader varI = cmd.ExecuteReader())
                             {
                                 while (varI.Read())
                                 {
-                                    produto.Ingredientes.Add(var.GetString(0));
+                                    produto.Ingredientes.Add(varI.GetString(0));
                                 }
-
+                                varI.Close();
                             }
                             cmd.CommandText = "get_alergenicos_produto";
                             cmd.CommandType = CommandType.StoredProcedure;
@@ -216,6 +217,7 @@ namespace API.Data
                                 {
                                     produto.Alergenios.Add(varA.GetString(0));
                                 }
+                                varA.Close();
                             }
                         }
                         return produto;
@@ -255,6 +257,7 @@ namespace API.Data
                             produto = new Produto { IdProduto = var.GetInt32(0), Nome = nome, IdCategoria = var.GetInt32(3), Preco = var.GetDouble(1), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(2) };
                             var.Close();
                         }
+                        var.Close();
                     }
                 }
 

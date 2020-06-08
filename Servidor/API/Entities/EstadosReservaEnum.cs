@@ -2,6 +2,6 @@
 {
     public enum EstadosReservaEnum
     {
-        Pendente, Rejeitada, Aceite, Paga, Entregue
+        Pendente, Rejeitada, Aceite, Paga, Entregue, Cancelado
     }
 }
