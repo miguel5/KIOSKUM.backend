@@ -8,12 +8,12 @@ using Microsoft.Extensions.Options;
 
 namespace API.Services.EmailSender
 {
-    public class EmailSenderService : IEmailSenderService
+    public class EmailSenderService : IEmailSenderService, IDisposable
     {
 
         private readonly ILogger<EmailSenderService> _logger;
         private readonly EmailSettings _emailSettings;
-        private readonly SmtpClient _smtp;
+        private SmtpClient _smtp;
 
 
         public EmailSenderService(ILogger<EmailSenderService> logger, IOptions<AppSettings> appSettings)
@@ -43,7 +43,18 @@ namespace API.Services.EmailSender
 
         public void Dispose()
         {
-            _smtp.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~EmailSenderService() => Dispose(false);
+
+        protected void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_smtp != null) { _smtp.Dispose(); _smtp = null; }
+            }
         }
     }
 }

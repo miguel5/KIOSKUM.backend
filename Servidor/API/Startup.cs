@@ -64,19 +64,19 @@ namespace API
                 };
             });
 
-            services.AddSingleton<IConnectionDBService, ConnectionDBService>();
-            services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddTransient<IConnectionDBService, ConnectionDBService>();
+            services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddScoped<IImagemService, ImagemService>();
 
             services.AddScoped<IAdministradorDAO, AdministradorDAO>();
             services.AddScoped<ICategoriaDAO, CategoriaDAO>();
-            services.AddSingleton<IClienteDAO, ClienteDAO>();
+            services.AddScoped<IClienteDAO, ClienteDAO>();
             services.AddScoped<IFuncionarioDAO, FuncionarioDAO>();
             services.AddScoped<IProdutoDAO, ProdutoDAO>();
 
             services.AddScoped<IAdministradorBusiness, AdministradorBusiness>();
             services.AddScoped<ICategoriaBusiness, CategoriaBusiness>();
-            services.AddSingleton<IClienteBusiness, ClienteBusiness>();
+            services.AddScoped<IClienteBusiness, ClienteBusiness>();
             services.AddScoped<IFuncionarioBusiness, FuncionarioBusiness>();
             services.AddScoped<IProdutoBusiness, ProdutoBusiness>();
 

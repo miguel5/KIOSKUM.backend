@@ -94,5 +94,7 @@ namespace API.Business
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
+
+        public ServiceResult AceitarReserva()
     }
 }
