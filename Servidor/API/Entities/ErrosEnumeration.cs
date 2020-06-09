@@ -43,5 +43,7 @@
 
         ItensInvalidos = 60,
         HoraEntregaInvalida = 61,
+        ReservaNaoExiste = 62,
+        TransicaoEstadosReservaImpossivel = 63,
     }
 }
