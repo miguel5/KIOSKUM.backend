@@ -7,5 +7,10 @@ namespace API.Services.Pagamentos.MBWay
         {
             return true;
         }
+
+        public bool PedirPagamento(PagamentoModel model)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

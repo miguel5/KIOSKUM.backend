@@ -106,6 +106,8 @@ namespace API
 
 
                 cfg.CreateMap<RegistarReservaDTO, Reserva>();
+                cfg.CreateMap<Item, ItemViewDTO>();
+                cfg.CreateMap<Reserva, ReservaViewDTO>();
             });
             IMapper mapper = config.CreateMapper();
             services.AddSingleton(mapper);
