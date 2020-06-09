@@ -1,5 +1,4 @@
-﻿using System;
-namespace API.Services.Pagamentos
+﻿namespace API.Services.Pagamentos
 {
     public abstract class PagamentoModel
     {

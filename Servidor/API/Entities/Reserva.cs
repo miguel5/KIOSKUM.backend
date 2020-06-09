@@ -7,7 +7,8 @@ namespace API.Entities
     {
         public int IdReserva { get; set; }
         public int IdCliente { get; set; }
-        public Tuple<int, int> IdFuncionarios { get; set; }
+        public int IdFuncionarioDecide { get; set; }
+        public int IdFuncionarioEntrega { get; set; }
         public IList<Item> Items { get; set; } 
         public EstadosReservaEnum Estado { get; set; }
         public double Preco { get; set; }
