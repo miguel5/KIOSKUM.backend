@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using API.Entities;
 
 namespace API.Data.Interfaces
@@ -9,5 +10,6 @@ namespace API.Data.Interfaces
         bool ExisteReserva(int idReserva);
         Reserva GetReserva(int idReserva);
         void EditarReserva(Reserva reserva);
+        List<Reserva> GetReservasEstado(int estado);
     }
 }

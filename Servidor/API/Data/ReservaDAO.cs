@@ -9,6 +9,21 @@ namespace API.Data
         {
         }
 
+        public void EditarReserva(Reserva reserva)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool ExisteReserva(int idReserva)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Reserva GetReserva(int idReserva)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void RegistarReserva(Reserva reserva)
         {
             throw new System.NotImplementedException();

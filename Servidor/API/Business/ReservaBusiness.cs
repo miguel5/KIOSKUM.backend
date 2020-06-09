@@ -9,6 +9,7 @@ using API.Helpers;
 using API.Services.Pagamentos;
 using API.Services.Pagamentos.MBWay;
 using API.ViewModels;
+using API.ViewModels.ProdutoDTOs;
 using API.ViewModels.ReservaDTOs;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -39,11 +40,11 @@ namespace API.Business
             _pagamentoService = pagamentoService;
         }
 
-        private bool ValidaItens(IList<Item> items)
+        private bool ValidaItens(IList<Item> itens)
         {
             _logger.LogDebug("A executar [ReservaBusiness -> ValidaItens]");
             bool result = true;
-            foreach(Item item in items) if (result)
+            foreach(Item item in itens) if (result)
             { 
                 result = item.Quantidade >= 1 && item.Observacoes.Length >= 0 && item.Observacoes.Length <= 300 && _produtoDAO.ExisteProduto(item.IdProduto);
             }
@@ -63,10 +64,10 @@ namespace API.Business
             return sucessoAbertura && sucessoEncerramento && horaEntrega.Date == now.Date && horaEntrega.TimeOfDay >= abertura.TimeOfDay && horaEntrega.TimeOfDay <= encerramento.TimeOfDay && (horaEntrega-now).TotalMinutes >= barSettings.TempoAprovocaoReserva;
         }
 
-        private double CalculaPrecoTotalReserva(IList<Item> items)
+        private double CalculaValorTotalReserva(IList<Item> itens)
         {
             double precoTotal = 0;
-            foreach(Item item in items)
+            foreach(Item item in itens)
             {
                 Produto produto = _produtoDAO.GetProduto(item.IdProduto);
                 precoTotal += produto.Preco * item.Quantidade;
@@ -80,7 +81,7 @@ namespace API.Business
             _logger.LogDebug("A executar [ReservaBusiness -> RegistarReserva]");
             if (model.Itens == null)
             {
-                throw new ArgumentNullException("Items", "Campo não poder ser nulo!");
+                throw new ArgumentNullException("Itens", "Campo não poder ser nulo!");
             }
             if (model.HoraEntrega == null)
             {
@@ -106,6 +107,7 @@ namespace API.Business
             if (!erros.Any())
             {
                 Reserva reserva = _mapper.Map<Reserva>(model);
+                reserva.Preco = CalculaValorTotalReserva(model.Itens);
                 _reservaDAO.RegistarReserva(reserva);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
@@ -133,12 +135,10 @@ namespace API.Business
                 {
                     reserva.Estado = model.Decisao == true ? EstadosReservaEnum.Aceite : EstadosReservaEnum.Rejeitada;
                     reserva.IdFuncionarioDecide = model.NumFuncionario;
-                    if(model.Decisao == true && reserva.Items != null)
+                    if(model.Decisao == true)
                     {
-                        double valorTotal = CalculaValorTotalReserva(reserva.Items);
                         int numTelemovel = _clienteDAO.GetContaId(reserva.IdCliente).NumTelemovel;
-                        _pagamentoService.PedirPagamento(new MBWayPagamentoModel { NumTelemovel = numTelemovel, Valor = precoTotal});
-
+                        _pagamentoService.PedirPagamento(new MBWayPagamentoModel { NumTelemovel = numTelemovel, Valor = reserva.Preco});
                     }
                     _reservaDAO.EditarReserva(reserva);
                 }
@@ -150,5 +150,65 @@ namespace API.Business
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
+
+        public IList<ReservaViewDTO> GetReservasEstado(EstadosReservaEnum estadosReserva)
+        {
+            IList<ReservaViewDTO> reservasViewDTO = new List<ReservaViewDTO>();
+
+            IList<Reserva> reservas = _reservaDAO.GetReservasEstado((int) estadosReserva);
+
+            foreach(Reserva reserva in reservas)
+            {
+                IList <ItemViewDTO>  itensDTO = new List<ItemViewDTO>();
+
+                foreach(Item item in reserva.Itens)
+                {
+                    ItemViewDTO itemViewDTO = _mapper.Map<ItemViewDTO>(item);
+                    Produto produto = _produtoDAO.GetProduto(item.IdProduto);
+                    itemViewDTO.ProdutoView = _mapper.Map<ProdutoViewDTO>(produto);
+                    itensDTO.Add(itemViewDTO);
+                }
+
+                ReservaViewDTO reservaViewDTO = _mapper.Map<ReservaViewDTO>(reserva);
+                reservaViewDTO.Itens = itensDTO;
+
+                reservasViewDTO.Add(reservaViewDTO);
+            }
+            return reservasViewDTO;
+        }
+
+
+
+        public ServiceResult EntregarReserva(EntregarReservaDTO model)
+        {
+            IList<int> erros = new List<int>();
+
+            if (!_reservaDAO.ExisteReserva(model.IdReserva))
+            {
+                erros.Add((int)ErrosEnumeration.ReservaNaoExiste);
+            }
+
+            if (!_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario))
+            {
+                erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
+            }
+
+            if (!erros.Any())
+            {
+                Reserva reserva = _reservaDAO.GetReserva(model.IdReserva);
+                if(reserva.Estado == EstadosReservaEnum.Paga)
+                {
+                    reserva.Estado = EstadosReservaEnum.Entregue;
+                    _reservaDAO.EditarReserva(reserva);
+                }
+                else
+                {
+                    erros.Add((int)ErrosEnumeration.TransicaoEstadosReservaImpossivel);
+                }
+
+            }
+
+            return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
     }
 }
