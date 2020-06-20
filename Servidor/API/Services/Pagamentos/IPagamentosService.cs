@@ -1,9 +1,11 @@
 ﻿using System;
+using API.Entities;
+
 namespace API.Services.Pagamentos
 {
     public interface IPagamentosService
     {
-        bool PedirPagamento(PagamentoModel model);
+        ServiceResult<string> PedirPagamento(PagamentoModel model);
         bool Pagar(PagamentoModel model);
     }
 }

@@ -114,7 +114,7 @@ namespace API.Business
         }
 
 
-        public ServiceResult FuncionarioDecideReserva(FuncionarioDecideReservaDTO model)
+        public ServiceResult FuncionarioDecideReserva(FuncionarioDecideReservaDTO model, bool decisao)
         {
             IList<int> erros = new List<int>();
 
@@ -133,14 +133,23 @@ namespace API.Business
                 Reserva reserva = _reservaDAO.GetReserva(model.IdReserva);
                 if(reserva.Estado == EstadosReservaEnum.Pendente)
                 {
-                    reserva.Estado = model.Decisao == true ? EstadosReservaEnum.Aceite : EstadosReservaEnum.Rejeitada;
+                    reserva.Estado = decisao == true ? EstadosReservaEnum.Aceite : EstadosReservaEnum.Rejeitada;
                     reserva.IdFuncionarioDecide = model.NumFuncionario;
-                    if(model.Decisao == true)
+                    if (decisao == true)
                     {
                         int numTelemovel = _clienteDAO.GetContaId(reserva.IdCliente).NumTelemovel;
-                        _pagamentoService.PedirPagamento(new MBWayPagamentoModel { NumTelemovel = numTelemovel, Valor = reserva.Preco});
+                        ServiceResult<string> resultado = _pagamentoService.PedirPagamento(new MBWayPagamentoModel { NumTelemovel = numTelemovel, Valor = reserva.Preco });
+                        if (!resultado.Sucesso)
+                        {
+                            reserva.TransactionUniqueId = resultado.Resultado;
+                            erros.Add((int)ErrosEnumeration.ErroNoPedidoDePagamento);
+                            _reservaDAO.EditarReserva(reserva);
+                        }
                     }
-                    _reservaDAO.EditarReserva(reserva);
+                    else
+                    {
+                        _reservaDAO.EditarReserva(reserva);
+                    }
                 }
                 else
                 {

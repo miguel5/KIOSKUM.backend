@@ -1,46 +1,241 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
+using API.Business.Interfaces;
 using API.Entities;
+using API.ViewModels.ReservaDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace API.Controllers
 {
-    
+
     [ApiController]
     [Route("api/reserva")]
     public class ReservaController : ControllerBase
     {
-        /*private List<Reserva> reservas;
-        private readonly ILogger<ReservaController> _logger;
+        private readonly ILogger _logger;
+        private IReservaBusiness _reservaBusiness;
 
-        public ReservaController(ILogger<ReservaController> logger)
+
+        public ReservaController(ILogger<ReservaController> logger, IReservaBusiness reservaBusiness)
         {
             _logger = logger;
-            reservas = new List<Reserva>();
-            Reserva r;
-            for (int i = 0; i < 5; i++)
+            _reservaBusiness = reservaBusiness;
+        }
+
+
+        [Authorize(Roles = "Cliente")]
+        [HttpPost("registar")]
+        public IActionResult RegistarReserva (RegistarReservaDTO model)
+        {
+            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            int idCliente = int.Parse(nameIdentifier);
+            try
             {
-                r = new Reserva();
-                r.IdReserva = i;
-                r.IdCliente = 1;
-                r.Items = new List<Tuple<int, int, string>> { new Tuple<int, int, string>(1, 2, "") ,  new Tuple<int, int, string>(3, 1, "Sem sal.") };
-                r.Preco = 5.70;
-                r.HoraEntrega = DateTime.Now;
+                if (model is null)
+                {
+                    return BadRequest(nameof(model));
+                }
+
+                ServiceResult resultado = _reservaBusiness.RegistarReserva(idCliente, model);
+                if (resultado.Sucesso)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
             }
         }
-       
 
-        [HttpGet]
-        [Route("todos")]
-        public IList<Reserva> Get()
+
+        [Authorize(Roles="Funcionario")]
+        [HttpPost("aceitar")]
+        public IActionResult AceitarReserva(FuncionarioDecideReservaDTO model)
         {
-            return reservas;
+            if(model is null)
+            {
+                return BadRequest(nameof(model));
+            }
 
+            try
+            {
+                ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(model, true);
+                if (resultado.Sucesso)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [Authorize(Roles = "Funcionario")]
+        [HttpPost("rejeitar")]
+        public IActionResult RejeitarReserva(FuncionarioDecideReservaDTO model)
+        {
+            if (model is null)
+            {
+                return BadRequest(nameof(model));
+            }
+
+            try
+            {
+                ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(model, false);
+                if (resultado.Sucesso)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpGet("pendentes")]
+        public IActionResult GetReservasPendentes()
+        { 
+            try
+            {
+                IList<ReservaViewDTO> reservasPendentes = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Pendente);
+                return Ok(reservasPendentes);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpGet("rejeitadas")]
+        public IActionResult GetReservasRejeitadas()
+        {
+            try
+            {
+                IList<ReservaViewDTO> reservasRejeitadas = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Rejeitada);
+                return Ok(reservasRejeitadas);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpGet("aceites")]
+        public IActionResult GetReservasAceites()
+        {
+            try
+            {
+                IList<ReservaViewDTO> reservasAceites = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Aceite);
+                return Ok(reservasAceites);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpGet("pagas")]
+        public IActionResult GetReservasPagas()
+        {
+            try
+            {
+                IList<ReservaViewDTO> reservasPagas = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Paga);
+                return Ok(reservasPagas);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpGet("entregues")]
+        public IActionResult GetReservasEntregues()
+        {
+            try
+            {
+                IList<ReservaViewDTO> reservasEntregues = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Entregue);
+                return Ok(reservasEntregues);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [HttpGet("canceladas")]
+        public IActionResult GetReservasCanceladas()
+        {
+            try
+            {
+                IList<ReservaViewDTO> reservasCanceladas = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Cancelada);
+                return Ok(reservasCanceladas);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        /*[HttpPost("entregar")]
+        public IActionResult EntregarReserva(EntregarReservaDTO model)
+        {
+            if(model is null)
+            {
+                return BadRequest(nameof(model));
+            }
+
+            try
+            {
+
+            }
         }*/
 
     }
-
 }
