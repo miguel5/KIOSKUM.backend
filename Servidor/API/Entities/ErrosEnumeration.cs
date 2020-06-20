@@ -45,5 +45,6 @@
         HoraEntregaInvalida = 61,
         ReservaNaoExiste = 62,
         TransicaoEstadosReservaImpossivel = 63,
+        ErroNoPedidoDePagamento = 64,
     }
 }

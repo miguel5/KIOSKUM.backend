@@ -10,8 +10,5 @@ namespace API.ViewModels.ReservaDTOs
 
         [Required]
         public int NumFuncionario { get; set; }
-
-        [Required]
-        public bool Decisao { get; set; }
     }
 }
