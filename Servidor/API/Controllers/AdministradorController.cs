@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Security.Claims;
-using API.Business.Interfaces;
-using API.Entities;
-using API.ViewModels;
-using API.ViewModels.AdministradorDTOs;
+using Business.Interfaces;
+using DTO;
+using DTO.AdministradorDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Services;
 
 namespace API.Controllers
 {

@@ -6,37 +6,9 @@
 
 
   <ItemGroup>
-    <Folder Include="ViewModels\" />
     <Folder Include="Controllers\" />
     <Folder Include="Files\" />
-    <Folder Include="Data\" />
-    <Folder Include="Business\" />
-    <Folder Include="Entities\" />
-    <Folder Include="Helpers\" />
     <Folder Include="Logs\" />
-    <Folder Include="ViewModels\ClienteDTOs\" />
-    <Folder Include="ViewModels\ProdutoDTOs\" />
-    <Folder Include="ViewModels\CategoriaDTOs\" />
-    <Folder Include="Services\" />
-    <Folder Include="Services\Pagamentos\" />
-    <Folder Include="Services\Pagamentos\MBWay\" />
-    <Folder Include="ViewModels\FuncionarioDTOs\" />
-    <Folder Include="ViewModels\AdministradorDTOs\" />
-    <Folder Include="Business\Interfaces\" />
-    <Folder Include="Data\Interfaces\" />
-    <Folder Include="Services\ConnectionDB\" />
-    <Folder Include="Services\Imagem\" />
-    <Folder Include="Services\EmailSender\" />
-    <Folder Include="ViewModels\ReservaDTOs\" />
-    <Folder Include="Exceptions\" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
-    <PackageReference Include="MySql.Data" Version="8.0.19" />
-    <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8" />
-    <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="mono_crash.mem.9613.70000a033000.blob" />
@@ -57,5 +29,20 @@
   </ItemGroup>
   <ItemGroup>
     <Content Remove="wwwroot\Images\Categorias\app.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Business\Business.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\Entities\Entities.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\Services\Services.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.5" />
   </ItemGroup>
 </Project>

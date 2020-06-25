@@ -1,8 +1,8 @@
 using System.Text;
-using API.Business.Interfaces;
-using API.Business;
-using API.Data.Interfaces;
-using API.Helpers;
+using Business.Interfaces;
+using Business;
+using DAO.Interfaces;
+using Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -11,18 +11,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using API.ViewModels.ClienteDTOs;
-using API.Entities;
+using DTO.ClienteDTOs;
+using Entities;
 using Microsoft.Extensions.Logging;
-using API.ViewModels.ProdutoDTOs;
-using API.ViewModels.CategoriaDTOs;
-using API.ViewModels.FuncionarioDTOs;
-using API.Data;
-using API.Services.DBConnection;
-using API.Services.EmailSender;
-using API.Services.Imagem;
-using API.ViewModels.AdministradorDTOs;
-using API.ViewModels.ReservaDTOs;
+using DTO.ProdutoDTOs;
+using DTO.CategoriaDTOs;
+using DTO.FuncionarioDTOs;
+using DAO;
+using Services.DBConnection;
+using Services.EmailSender;
+using Services.Imagem;
+using DTO.AdministradorDTOs;
+using DTO.ReservaDTOs;
 
 namespace API
 {
@@ -118,7 +118,7 @@ namespace API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddFile(Configuration.GetSection("Logging"));
+            //loggerFactory.AddFile(Configuration.GetSection("Logging"));
 
             if (env.IsDevelopment())
             {

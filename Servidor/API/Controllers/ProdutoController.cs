@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.Business.Interfaces;
-using API.Entities;
-using API.Services.Imagem;
-using API.ViewModels.ProdutoDTOs;
+using Business.Interfaces;
+using Entities;
+using Services.Imagem;
+using DTO.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Services;
+using Microsoft.AspNetCore.Hosting;
 
 namespace API.Controllers
 {
@@ -16,12 +18,14 @@ namespace API.Controllers
     public class ProdutoController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private IProdutoBusiness _produtoBusiness;
         private IImagemService _imagemService;
 
-        public ProdutoController(ILogger<ProdutoController> logger, IProdutoBusiness produtoBusiness, IImagemService imagemService)
+        public ProdutoController(ILogger<ProdutoController> logger, IWebHostEnvironment webHostEnvironment, IProdutoBusiness produtoBusiness, IImagemService imagemService)
         {
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
             _produtoBusiness = produtoBusiness;
             _imagemService = imagemService;
         }
@@ -50,7 +54,7 @@ namespace API.Controllers
                     ServiceResult<Tuple<string, string>> resultado = _produtoBusiness.RegistarProduto(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
-                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath.ToString());
                         _logger.LogInformation($"O Produto com nome {model.Nome}, com o preço {model.Preco} pertencente à categoria com idCategoria {model.IdCategoria} foi registado com sucesso.");
                         return Ok();
                     }
@@ -98,7 +102,7 @@ namespace API.Controllers
                     ServiceResult<Tuple<string, string>> resultado = _produtoBusiness.EditarProduto(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
-                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath.ToString());
                         _logger.LogInformation($"O Produto com IdProduto {model.IdProduto} foi editado, com o nome {model.Nome}, com o preço {model.Preco} pertencente à Categoria com IdCategoria {model.IdCategoria}.");
                         return Ok();
                     }
