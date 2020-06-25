@@ -5,6 +5,7 @@ using System.Linq;
 using API.Business.Interfaces;
 using API.Data.Interfaces;
 using API.Entities;
+using API.Exceptions;
 using API.Helpers;
 using API.Services.Pagamentos;
 using API.Services.Pagamentos.MBWay;
@@ -121,6 +122,7 @@ namespace API.Business
             if (!_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario))
             {
                 erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
+                throw new NumFuncionarioInexistenteException();
             }
 
             if (!_reservaDAO.ExisteReserva(model.IdReserva))
@@ -200,6 +202,7 @@ namespace API.Business
             if (!_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario))
             {
                 erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
+                throw new NumFuncionarioInexistenteException();
             }
 
             if (!erros.Any())

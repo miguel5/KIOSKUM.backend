@@ -6,6 +6,5 @@ namespace API.Services.Pagamentos
     public interface IPagamentosService
     {
         ServiceResult<string> PedirPagamento(PagamentoModel model);
-        bool Pagar(PagamentoModel model);
     }
 }

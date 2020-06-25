@@ -8,11 +8,6 @@ namespace API.Services.Pagamentos.MBWay
 {
     public class MBWayService : IPagamentosService
     {
-        public bool Pagar(PagamentoModel model)
-        {
-            return true;
-        }
-
         public ServiceResult<string> PedirPagamento(PagamentoModel model)
         {
             IList<int> erros = new List<int>();
