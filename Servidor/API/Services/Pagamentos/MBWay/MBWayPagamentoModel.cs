@@ -3,6 +3,5 @@
     public class MBWayPagamentoModel : PagamentoModel
     {
         public int NumTelemovel { get; set; }
-        
     }
 }

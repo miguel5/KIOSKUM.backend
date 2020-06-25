@@ -1,4 +1,5 @@
-﻿using API.Data.Interfaces;
+﻿using System.Collections.Generic;
+using API.Data.Interfaces;
 using API.Entities;
 
 namespace API.Data
@@ -20,6 +21,11 @@ namespace API.Data
         }
 
         public Reserva GetReserva(int idReserva)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<Reserva> GetReservasEstado(int estado)
         {
             throw new System.NotImplementedException();
         }

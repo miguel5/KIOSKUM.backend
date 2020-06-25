@@ -28,6 +28,7 @@
     <Folder Include="Services\Imagem\" />
     <Folder Include="Services\EmailSender\" />
     <Folder Include="ViewModels\ReservaDTOs\" />
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

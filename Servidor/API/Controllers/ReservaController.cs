@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using API.Business.Interfaces;
 using API.Entities;
+using API.Exceptions;
 using API.ViewModels.ReservaDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +54,10 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
+            catch (NumFuncionarioInexistenteException)
+            {
+                return Unauthorized();
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -60,8 +65,6 @@ namespace API.Controllers
             }
         }
 
-
-        [Authorize(Roles="Funcionario")]
         [HttpPost("aceitar")]
         public IActionResult AceitarReserva(FuncionarioDecideReservaDTO model)
         {
@@ -93,8 +96,6 @@ namespace API.Controllers
             }
         }
 
-
-        [Authorize(Roles = "Funcionario")]
         [HttpPost("rejeitar")]
         public IActionResult RejeitarReserva(FuncionarioDecideReservaDTO model)
         {
@@ -223,19 +224,35 @@ namespace API.Controllers
         }
 
 
-        /*[HttpPost("entregar")]
+        [HttpPost("entregar")]
         public IActionResult EntregarReserva(EntregarReservaDTO model)
         {
-            if(model is null)
+            if (model is null)
             {
                 return BadRequest(nameof(model));
             }
 
             try
             {
-
+                ServiceResult resultado = _reservaBusiness.EntregarReserva(model);
+                if (resultado.Sucesso)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(resultado.Erros);
+                }
             }
-        }*/
-
+            catch (NumFuncionarioInexistenteException)
+            {
+                return Unauthorized();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
     }
 }
