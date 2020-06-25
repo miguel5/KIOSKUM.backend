@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using API.Business.Interfaces;
-using API.Entities;
-using API.Exceptions;
-using API.ViewModels.ReservaDTOs;
+using Business.Interfaces;
+using Entities;
+using DTO.ReservaDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Services;
 
 namespace API.Controllers
 {
@@ -54,10 +54,10 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
-            catch (NumFuncionarioInexistenteException)
+            /*catch (NumFuncionarioInexistenteException)
             {
                 return Unauthorized();
-            }
+            }*/
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -244,10 +244,10 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (NumFuncionarioInexistenteException)
+            /*catch (NumFuncionarioInexistenteException)
             {
                 return Unauthorized();
-            }
+            }*/
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);

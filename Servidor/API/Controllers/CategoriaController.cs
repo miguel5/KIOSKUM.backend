@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.Business.Interfaces;
-using API.Entities;
-using API.Services.Imagem;
-using API.ViewModels.CategoriaDTOs;
-using API.ViewModels.ProdutoDTOs;
+using Business.Interfaces;
+using Services.Imagem;
+using DTO.CategoriaDTOs;
+using DTO.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Services;
+using Microsoft.AspNetCore.Hosting;
 
 namespace API.Controllers
 {
@@ -17,13 +18,14 @@ namespace API.Controllers
     public class CategoriaController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private ICategoriaBusiness _categoriaBusiness;
         private IImagemService _imagemService;
 
-
-        public CategoriaController(ILogger<CategoriaController> logger, ICategoriaBusiness categoriaBusiness, IImagemService imagemService)
+        public CategoriaController(ILogger<CategoriaController> logger, IWebHostEnvironment webHostEnviroment, ICategoriaBusiness categoriaBusiness, IImagemService imagemService)
         {
             _logger = logger;
+            _webHostEnvironment = webHostEnviroment;
             _categoriaBusiness = categoriaBusiness;
             _imagemService = imagemService;
         }
@@ -54,7 +56,7 @@ namespace API.Controllers
                     ServiceResult<Tuple<string, string>> resultado = _categoriaBusiness.RegistarCategoria(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
-                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath.ToString());
                         _logger.LogInformation($"A Categoria com nome {model.Nome} foi registado com sucesso.");
                         return Ok();
                     }
@@ -102,7 +104,7 @@ namespace API.Controllers
                     ServiceResult<Tuple<string, string>> resultado = _categoriaBusiness.EditarCategoria(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
-                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2);
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath.ToString());
                         _logger.LogInformation($"A Categoria com  IdCategoria {model.IdCategoria} foi editada, com o nome {model.Nome}.");
                         return Ok();
                     }

@@ -1,10 +1,10 @@
 ﻿using System;
-using API.Business.Interfaces;
-using API.Entities;
-using API.ViewModels.FuncionarioDTOs;
+using Business.Interfaces;
+using DTO.FuncionarioDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Services;
 
 namespace API.Models
 {

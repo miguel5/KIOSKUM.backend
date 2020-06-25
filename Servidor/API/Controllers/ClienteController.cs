@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using API.Business.Interfaces;
-using API.Entities;
-using API.Services.EmailSender;
-using API.ViewModels;
-using API.ViewModels.ClienteDTOs;
+using Business.Interfaces;
+using Entities;
+using Services.EmailSender;
+using DTO;
+using DTO.ClienteDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Services;
+using Microsoft.AspNetCore.Hosting;
 
 namespace API.Controllers
 {
@@ -18,13 +20,15 @@ namespace API.Controllers
     public class ClienteController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private IClienteBusiness _clienteBusiness;
         private IEmailSenderService _emailSenderService;
 
 
-        public ClienteController(ILogger<ClienteController> logger, IClienteBusiness clienteBusiness, IEmailSenderService emailSenderService)
+        public ClienteController(ILogger<ClienteController> logger, IWebHostEnvironment webHostEnviroment, IClienteBusiness clienteBusiness, IEmailSenderService emailSenderService)
         {
             _logger = logger;
+            _webHostEnvironment = webHostEnviroment;
             _clienteBusiness = clienteBusiness;
             _emailSenderService = emailSenderService;
         }
@@ -47,7 +51,7 @@ namespace API.Controllers
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} registou-se com sucesso.");
-                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailCodigoValidacao(model.Email);
+                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailCodigoValidacao(model.Email, _webHostEnvironment.WebRootPath.ToString());
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
@@ -96,7 +100,7 @@ namespace API.Controllers
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O Cliente com Email {model.Email} confirmou a sua conta com sucesso.");
-                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailBoasVindas(model.Email);
+                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailBoasVindas(model.Email, _webHostEnvironment.ContentRootPath.ToString());
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
