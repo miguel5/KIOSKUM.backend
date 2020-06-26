@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DTO.ReservaDTOs
+namespace DTO.TrabalhadorDTOs
 {
-    public class EntregarReservaDTO
+    public class AutenticacaoTrabalhadorDTO
     {
         [Required]
         public int NumFuncionario { get; set; }
 
         [Required]
-        public int IdReserva { get; set; }
+        public string Password { get; set; }
     }
 }

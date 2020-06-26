@@ -134,7 +134,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public IActionResult Login([FromBody] AutenticacaoDTO model)
+        public IActionResult Login([FromBody] AutenticacaoClienteDTO model)
         {
             _logger.LogDebug("A executar api/cliente/login -> Post");
             if (model is null)

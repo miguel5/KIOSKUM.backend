@@ -20,21 +20,6 @@ namespace Services.DBConnection
             Initialize();
         }
 
-
-        private void Initialize()
-        {
-            var builder = new MySqlConnectionStringBuilder
-            {
-                Server = _dbSettings.Server,
-                Database = _dbSettings.Database,
-                UserID = _dbSettings.UserID,
-                Password = _dbSettings.Password,
-                SslMode = MySqlSslMode.Required,
-            };
-            Connection = new MySqlConnection(builder.ConnectionString);
-        }
-
-
         public void OpenConnection()
         {
             _logger.LogDebug("A executar [ConnectionDB -> OpenConnection]");
@@ -55,7 +40,9 @@ namespace Services.DBConnection
             GC.SuppressFinalize(this);
         }
 
+
         ~ConnectionDBService() => Dispose(false);
+
 
         protected void Dispose(bool disposing)
         {
@@ -63,6 +50,20 @@ namespace Services.DBConnection
             {
                 if (Connection != null) { Connection.Dispose(); Connection = null; }
             }
+        }
+
+
+        private void Initialize()
+        {
+            var builder = new MySqlConnectionStringBuilder
+            {
+                Server = _dbSettings.Server,
+                Database = _dbSettings.Database,
+                UserID = _dbSettings.UserID,
+                Password = _dbSettings.Password,
+                SslMode = MySqlSslMode.Required,
+            };
+            Connection = new MySqlConnection(builder.ConnectionString);
         }
     }
 }

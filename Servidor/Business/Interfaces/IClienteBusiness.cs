@@ -11,7 +11,7 @@ namespace Business.Interfaces
         ServiceResult<Email> GetEmailCodigoValidacao(string email, string webRootPath);
         ServiceResult ConfirmarConta(ConfirmarClienteDTO model);
         ServiceResult<Email> GetEmailBoasVindas(string email, string webRootPath);
-        ServiceResult<TokenDTO> Login(AutenticacaoDTO model);
+        ServiceResult<TokenDTO> Login(AutenticacaoClienteDTO model);
         ServiceResult EditarConta(int idCliente, EditarClienteDTO model);
         ServiceResult<ClienteViewDTO> GetCliente(int idCliente);
     }

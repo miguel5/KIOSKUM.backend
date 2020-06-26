@@ -1,12 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DTO.FuncionarioDTOs;
 
-namespace DTO.AdministradorDTOs
+namespace DTO.TrabalhadorDTOs
 {
-    public class EditarAdministradorDTO : FuncionarioViewDTO
+    public class EditarTrabalhadorDTO
     {
         [Required]
-        public string Email { get; set; }
+        public string Nome { get; set; }
+
+        [Required]
+        public int NumFuncionario { get; set; }
 
         [Required]
         public string Password { get; set; }

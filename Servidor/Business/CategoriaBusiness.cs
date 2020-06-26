@@ -32,13 +32,6 @@ namespace Business
         }
 
 
-        private bool ValidaNome(string nome)
-        {
-            _logger.LogDebug("A executar [CategoriaBusiness -> ValidaNome]");
-            return nome.Length <= 45;
-        }
-
-
         public ServiceResult<Tuple<string, string>> RegistarCategoria(RegistarCategoriaDTO model, string extensao)
         {
             _logger.LogDebug("A executar [CategoriaBusiness -> RegistarCategoria]");
@@ -90,8 +83,6 @@ namespace Business
             }
             return new ServiceResult<Tuple<string, string>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = paths };
         }
-
-
 
 
         public ServiceResult<Tuple<string, string>> EditarCategoria(EditarCategoriaDTO model, string extensao)
@@ -333,6 +324,14 @@ namespace Business
                 }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
+
+
+
+        private bool ValidaNome(string nome)
+        {
+            _logger.LogDebug("A executar [CategoriaBusiness -> ValidaNome]");
+            return nome.Length <= 45;
         }
     }
 }

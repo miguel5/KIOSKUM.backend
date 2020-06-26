@@ -22,6 +22,36 @@ namespace DAO
 
         public void EditarConta(Funcionario funcionario)
         {
+            throw new NotImplementedException();
+        }
+
+        public bool ExisteIdFuncionario(int idFuncionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ExisteNumFuncionario(int numFuncionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Funcionario GetContaIdFuncionario(int numFuncionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Funcionario GetContaNumFuncionario(int numFuncionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InserirConta(Funcionario funcionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*public void EditarConta(Funcionario funcionario)
+        {
             _logger.LogDebug("A executar [FuncionarioDAO -> EditarConta]");
             try
             {
@@ -143,6 +173,6 @@ namespace DAO
             {
                 _connectionDBService.CloseConnection();
             }
-        }
+        }*/
     }
 }

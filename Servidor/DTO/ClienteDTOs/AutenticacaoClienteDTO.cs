@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DTO
+namespace DTO.ClienteDTOs
 {
-    public class AutenticacaoDTO
+    public class AutenticacaoClienteDTO
     {
         [Required]
         public string Email { get; set; }

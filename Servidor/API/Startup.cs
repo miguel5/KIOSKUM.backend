@@ -16,13 +16,12 @@ using Entities;
 using Microsoft.Extensions.Logging;
 using DTO.ProdutoDTOs;
 using DTO.CategoriaDTOs;
-using DTO.FuncionarioDTOs;
 using DAO;
 using Services.DBConnection;
 using Services.EmailSender;
 using Services.Imagem;
-using DTO.AdministradorDTOs;
 using DTO.ReservaDTOs;
+using DTO.TrabalhadorDTOs;
 
 namespace API
 {
@@ -83,9 +82,13 @@ namespace API
 
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Administrador, AdministradorViewDTO>();
-                cfg.CreateMap<AdministradorViewDTO, Administrador>();
-                cfg.CreateMap<EditarAdministradorDTO, Administrador>();
+                cfg.CreateMap<Administrador, TrabalhadorViewDTO>();
+                cfg.CreateMap<TrabalhadorViewDTO, Administrador>();
+                cfg.CreateMap<EditarTrabalhadorDTO, Administrador>();
+
+                cfg.CreateMap<Funcionario, TrabalhadorViewDTO>();
+                cfg.CreateMap<TrabalhadorViewDTO, Funcionario>();
+                cfg.CreateMap<EditarTrabalhadorDTO, Funcionario>();
 
                 cfg.CreateMap<RegistarCategoriaDTO, Categoria>();
                 cfg.CreateMap<EditarCategoriaDTO, Categoria>();
@@ -96,9 +99,6 @@ namespace API
                 cfg.CreateMap<ClienteViewDTO, Cliente>();
                 cfg.CreateMap<EditarClienteDTO, Cliente>();
 
-
-                cfg.CreateMap<Funcionario, FuncionarioViewDTO>();
-                cfg.CreateMap<FuncionarioViewDTO, Funcionario>();
 
                 cfg.CreateMap<RegistarProdutoDTO, Produto>();
                 cfg.CreateMap<EditarProdutoDTO, Produto>();

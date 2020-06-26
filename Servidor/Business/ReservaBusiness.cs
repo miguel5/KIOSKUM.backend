@@ -41,41 +41,6 @@ namespace Business
             _pagamentoService = pagamentoService;
         }
 
-        private bool ValidaItens(IList<Item> itens)
-        {
-            _logger.LogDebug("A executar [ReservaBusiness -> ValidaItens]");
-            bool result = true;
-            foreach(Item item in itens) if (result)
-            { 
-                result = item.Quantidade >= 1 && item.Observacoes.Length >= 0 && item.Observacoes.Length <= 300 && _produtoDAO.ExisteProduto(item.IdProduto);
-            }
-            return result;
-        }
-
-
-        private bool ValidaHoraEntrega(DateTime horaEntrega)
-        {
-            _logger.LogDebug("A executar [ReservaBusiness -> ValidaHoraEntrega]");
-            BarSettings barSettings = _appSettings.BarSettings;
-            DateTime abertura;
-            DateTime encerramento;
-            bool sucessoAbertura = DateTime.TryParseExact(barSettings.HoraAbertura, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.NoCurrentDateDefault, out abertura);
-            bool sucessoEncerramento = DateTime.TryParseExact(barSettings.HoraEncerramento, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.NoCurrentDateDefault, out encerramento);
-            DateTime now = DateTime.Now;
-            return sucessoAbertura && sucessoEncerramento && horaEntrega.Date == now.Date && horaEntrega.TimeOfDay >= abertura.TimeOfDay && horaEntrega.TimeOfDay <= encerramento.TimeOfDay && (horaEntrega-now).TotalMinutes >= barSettings.TempoAprovocaoReserva;
-        }
-
-        private double CalculaValorTotalReserva(IList<Item> itens)
-        {
-            double precoTotal = 0;
-            foreach(Item item in itens)
-            {
-                Produto produto = _produtoDAO.GetProduto(item.IdProduto);
-                precoTotal += produto.Preco * item.Quantidade;
-            }
-            return Math.Round(precoTotal,2);
-        }
-
 
         public ServiceResult RegistarReserva(int idCliente, RegistarReservaDTO model)
         {
@@ -115,28 +80,27 @@ namespace Business
         }
 
 
-        public ServiceResult FuncionarioDecideReserva(FuncionarioDecideReservaDTO model, bool decisao)
+        public ServiceResult FuncionarioDecideReserva(int idFuncionario, int idReserva, bool decisao)
         {
             IList<int> erros = new List<int>();
 
-            if (!_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario))
+            if (!_funcionarioDAO.ExisteIdFuncionario(idFuncionario))
             {
-                erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
-                //throw new NumFuncionarioInexistenteException();
+                erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
 
-            if (!_reservaDAO.ExisteReserva(model.IdReserva))
+            if (!_reservaDAO.ExisteReserva(idReserva))
             {
                 erros.Add((int)ErrosEnumeration.ReservaNaoExiste);
             }
 
             if (!erros.Any())
             {
-                Reserva reserva = _reservaDAO.GetReserva(model.IdReserva);
+                Reserva reserva = _reservaDAO.GetReserva(idReserva);
                 if(reserva.Estado == EstadosReservaEnum.Pendente)
                 {
                     reserva.Estado = decisao == true ? EstadosReservaEnum.Aceite : EstadosReservaEnum.Rejeitada;
-                    reserva.IdFuncionarioDecide = model.NumFuncionario;
+                    reserva.IdFuncionarioDecide = idFuncionario;
                     if (decisao == true)
                     {
                         int numTelemovel = _clienteDAO.GetContaId(reserva.IdCliente).NumTelemovel;
@@ -190,24 +154,22 @@ namespace Business
 
 
 
-        public ServiceResult EntregarReserva(EntregarReservaDTO model)
+        public ServiceResult EntregarReserva(int idFuncionario, int idReserva)
         {
             IList<int> erros = new List<int>();
 
-            if (!_reservaDAO.ExisteReserva(model.IdReserva))
+            if (!_funcionarioDAO.ExisteIdFuncionario(idFuncionario))
+            {
+                erros.Add((int)ErrosEnumeration.ContaNaoExiste);
+            }
+            if (!_reservaDAO.ExisteReserva(idReserva))
             {
                 erros.Add((int)ErrosEnumeration.ReservaNaoExiste);
             }
 
-            if (!_funcionarioDAO.ExisteNumFuncionario(model.NumFuncionario))
-            {
-                erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
-                //throw new NumFuncionarioInexistenteException();
-            }
-
             if (!erros.Any())
             {
-                Reserva reserva = _reservaDAO.GetReserva(model.IdReserva);
+                Reserva reserva = _reservaDAO.GetReserva(idReserva);
                 if(reserva.Estado == EstadosReservaEnum.Paga)
                 {
                     reserva.Estado = EstadosReservaEnum.Entregue;
@@ -222,5 +184,44 @@ namespace Business
 
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
+
+
+
+
+        private bool ValidaItens(IList<Item> itens)
+        {
+            _logger.LogDebug("A executar [ReservaBusiness -> ValidaItens]");
+            bool result = true;
+            foreach (Item item in itens) if (result)
+                {
+                    result = item.Quantidade >= 1 && item.Observacoes.Length >= 0 && item.Observacoes.Length <= 300 && _produtoDAO.ExisteProduto(item.IdProduto);
+                }
+            return result;
+        }
+
+
+        private bool ValidaHoraEntrega(DateTime horaEntrega)
+        {
+            _logger.LogDebug("A executar [ReservaBusiness -> ValidaHoraEntrega]");
+            BarSettings barSettings = _appSettings.BarSettings;
+            DateTime abertura;
+            DateTime encerramento;
+            bool sucessoAbertura = DateTime.TryParseExact(barSettings.HoraAbertura, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.NoCurrentDateDefault, out abertura);
+            bool sucessoEncerramento = DateTime.TryParseExact(barSettings.HoraEncerramento, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.NoCurrentDateDefault, out encerramento);
+            DateTime now = DateTime.Now;
+            return sucessoAbertura && sucessoEncerramento && horaEntrega.Date == now.Date && horaEntrega.TimeOfDay >= abertura.TimeOfDay && horaEntrega.TimeOfDay <= encerramento.TimeOfDay && (horaEntrega - now).TotalMinutes >= barSettings.TempoAprovocaoReserva;
+        }
+
+        private double CalculaValorTotalReserva(IList<Item> itens)
+        {
+            double precoTotal = 0;
+            foreach (Item item in itens)
+            {
+                Produto produto = _produtoDAO.GetProduto(item.IdProduto);
+                precoTotal += produto.Preco * item.Quantidade;
+            }
+            return Math.Round(precoTotal, 2);
+        }
+
     }
 }

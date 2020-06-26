@@ -1,90 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
 using Business.Interfaces;
 using DAO.Interfaces;
-using Entities;
 using Helpers;
 using DTO;
-using DTO.AdministradorDTOs;
 using AutoMapper;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Services;
+using Services.HashPassword;
+using DTO.TrabalhadorDTOs;
+using System.Collections.Generic;
+using Entities;
+using System.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace Business
 {
     public class AdministradorBusiness : IAdministradorBusiness
     {
         private readonly ILogger _logger;
+        private readonly IHashPasswordService _hashPasswordService;
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
         private readonly IAdministradorDAO _administradorDAO;
 
-        public AdministradorBusiness(ILogger<AdministradorBusiness> logger, IOptions<AppSettings> appSettings, IMapper mapper, IAdministradorDAO administradorDAO)
+
+        public AdministradorBusiness(ILogger<AdministradorBusiness> logger, IHashPasswordService hashPasswordService, IOptions<AppSettings> appSettings, IMapper mapper, IAdministradorDAO administradorDAO)
         {
             _logger = logger;
+            _hashPasswordService = hashPasswordService;
             _appSettings = appSettings.Value;
             _mapper = mapper;
             _administradorDAO = administradorDAO;
         }
 
 
-        private string HashPassword(string password)
-        {
-            _logger.LogDebug("A executar [AdministradorBusiness -> HashPassword]");
-            return Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: new byte[0],
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8));
-        }
-
-
-        private bool ValidaNome(string nome)
-        {
-            _logger.LogDebug("A executar [AdministradorBusiness -> ValidaNome]");
-            return nome.Length <= 100;
-        }
-
-        private bool ValidaEmail(string email)
-        {
-            _logger.LogDebug("A executar [AdministradorBusiness -> ValidaEmail]");
-            Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
-            return rx.IsMatch(email) && email.Length <= 100;
-        }
-
-        private bool ValidaPassword(string password)
-        {
-            _logger.LogDebug("A executar [AdministradorBusiness -> ValidaPassword]");
-            return password.Length >= 8 && password.Length <= 45;
-        }
-
-        private bool ValidaNumFuncionario(int numFuncionario)
-        {
-            _logger.LogDebug("A executar [AdministradorBusiness -> ValidaNumFuncionario]");
-            Regex rx = new Regex("^[0-9]{5}$");
-            return rx.IsMatch(numFuncionario.ToString());
-        }
-
-
-        public ServiceResult CriarConta(AdministradorViewDTO model)
+        public ServiceResult CriarConta(TrabalhadorViewDTO model)
         {
             _logger.LogDebug("A executar [AdministradorBusiness -> CriarConta]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
                 throw new ArgumentNullException("Nome", "Campo não poder ser nulo.");
-            }
-            if (string.IsNullOrWhiteSpace(model.Email))
-            {
-                throw new ArgumentNullException("Email", "Campo não poder ser nulo.");
             }
             if (string.IsNullOrWhiteSpace(model.Password))
             {
@@ -93,25 +53,15 @@ namespace Business
 
             IList<int> erros = new List<int>();
 
-            if (_administradorDAO.ExisteEmail(model.Email))
-            {
-                _logger.LogDebug($"O Email {model.Email} já existe.");
-                erros.Add((int)ErrosEnumeration.EmailJaExiste);
-            }
-            if (_administradorDAO.ExisteNumFuncionario(model.NumFuncionario))
-            {
-                _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} já existe.");
-                erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
-            }
             if (!ValidaNome(model.Nome))
             {
                 _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                 erros.Add((int)ErrosEnumeration.NomeInvalido);
             }
-            if (!ValidaEmail(model.Email))
+            if (_administradorDAO.ExisteNumFuncionario(model.NumFuncionario))
             {
-                _logger.LogDebug($"O Email {model.Email} é inválido.");
-                erros.Add((int)ErrosEnumeration.EmailInvalido);
+                _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} já existe.");
+                erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
             }
             if (!ValidaPassword(model.Password))
             {
@@ -127,7 +77,7 @@ namespace Business
             if (!erros.Any())
             {
                 Administrador administrador = _mapper.Map<Administrador>(model);
-                administrador.Password = HashPassword(model.Password);
+                administrador.Password = _hashPasswordService.HashPassword(model.Password);
                 _administradorDAO.InserirConta(administrador);
             }
 
@@ -135,13 +85,9 @@ namespace Business
         }
 
 
-        public ServiceResult<TokenDTO> Login(AutenticacaoDTO model)
+        public ServiceResult<TokenDTO> Login(AutenticacaoTrabalhadorDTO model)
         {
             _logger.LogDebug("A executar [AdministradorBusiness -> Login]");
-            if (string.IsNullOrWhiteSpace(model.Email))
-            {
-                throw new ArgumentNullException("Email", "Campo não poder ser nulo!");
-            }
             if (string.IsNullOrWhiteSpace(model.Password))
             {
                 throw new ArgumentNullException("Password", "Campo não poder ser nulo!");
@@ -149,15 +95,16 @@ namespace Business
 
             IList<int> erros = new List<int>();
             TokenDTO resultToken = null;
-            if (!_administradorDAO.ExisteEmail(model.Email))
+
+            if (!_administradorDAO.ExisteNumFuncionario(model.NumFuncionario))
             {
-                _logger.LogWarning($"O Email {model.Email} não existe.");
-                erros.Add((int)ErrosEnumeration.EmailNaoExiste);
+                _logger.LogWarning($"O Número de Funcionário {model.NumFuncionario} não existe.");
+                erros.Add((int)ErrosEnumeration.NumFuncionarioNaoExiste);
             }
             else
             { 
-                Administrador administrador = _administradorDAO.GetContaEmail(model.Email);
-                if (administrador.Password.Equals(HashPassword(model.Password)))
+                Administrador administrador = _administradorDAO.GetContaNumFuncionario(model.NumFuncionario);
+                if (administrador.Password.Equals(_hashPasswordService.HashPassword(model.Password)))
                 {
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -168,7 +115,7 @@ namespace Business
                             new Claim(ClaimTypes.NameIdentifier, administrador.IdFuncionario.ToString()),
                             new Claim(ClaimTypes.Role, "Administrador")
                         }),
-                        Expires = DateTime.UtcNow.AddDays(7),
+                        Expires = DateTime.UtcNow.AddHours(12),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
                     var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -185,17 +132,12 @@ namespace Business
         }
 
 
-
-        public ServiceResult EditarConta(int idFuncionario, EditarAdministradorDTO model)
+        public ServiceResult EditarConta(int idFuncionario, EditarTrabalhadorDTO model)
         {
             _logger.LogDebug("A executar [AdministradorBusiness -> EditarConta]");
             if (string.IsNullOrWhiteSpace(model.Nome))
             {
                 throw new ArgumentNullException("Nome", "Campo não poder ser nulo!");
-            }
-            if (string.IsNullOrWhiteSpace(model.Email))
-            {
-                throw new ArgumentNullException("Email", "Campo não poder ser nulo!");
             }
             if (string.IsNullOrWhiteSpace(model.Password))
             {
@@ -208,7 +150,7 @@ namespace Business
             }
 
             IList<int> erros = new List<int>();
-            Administrador administrador = _administradorDAO.GetContaId(idFuncionario);
+            Administrador administrador = _administradorDAO.GetContaIdFuncionario(idFuncionario);
             if (administrador == null)
             {
                 _logger.LogWarning($"Não existe nenhum Administrador com o IdFuncionario {idFuncionario}!");
@@ -216,38 +158,17 @@ namespace Business
             }
             else
             {
-                if (_administradorDAO.ExisteEmail(model.Email) && !model.Email.Equals(administrador.Email))
-                {
-                    _logger.LogDebug($"O Email {model.Email} já existe.");
-                    erros.Add((int)ErrosEnumeration.EmailJaExiste);
-                }
-
-                if (_administradorDAO.ExisteNumFuncionario(model.NumFuncionario) && model.NumFuncionario != administrador.NumFuncionario)
-                {
-                    _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} já existe.");
-                    erros.Add((int)ErrosEnumeration.NumFuncionarioJaExiste);
-                }
                 if (!ValidaNome(model.Nome))
                 {
                     _logger.LogDebug($"O Nome {model.Nome} é inválido.");
                     erros.Add((int)ErrosEnumeration.NomeInvalido);
-                }
-                if (!ValidaEmail(model.Email))
-                {
-                    _logger.LogDebug($"O Email {model.Email} é inválido.");
-                    erros.Add((int)ErrosEnumeration.EmailInvalido);
                 }
                 if (!ValidaPassword(model.NovaPassword))
                 {
                     _logger.LogDebug("A Password introduzida é inválido.");
                     erros.Add((int)ErrosEnumeration.PasswordInvalida);
                 }
-                if (!ValidaNumFuncionario(model.NumFuncionario))
-                {
-                    _logger.LogDebug($"O Número de Funcionário {model.NumFuncionario} é inválido.");
-                    erros.Add((int)ErrosEnumeration.NumFuncionarioInvalido);
-                }
-                if (!HashPassword(model.Password).Equals(administrador.Password))
+                if (!_hashPasswordService.HashPassword(model.Password).Equals(administrador.Password))
                 {
                     _logger.LogDebug("As Passwords não coincidem.");
                     erros.Add((int)ErrosEnumeration.PasswordsNaoCorrespondem);
@@ -256,34 +177,55 @@ namespace Business
 
                 if (!erros.Any())
                 {
-                    Administrador a = _mapper.Map<Administrador>(model);
-                    a.Password = HashPassword(model.NovaPassword);
-                    _administradorDAO.EditarConta(a);
+                    Administrador administradorEditado = _mapper.Map<Administrador>(model);
+                    administradorEditado.NumFuncionario = administrador.NumFuncionario;
+                    administradorEditado.Password = _hashPasswordService.HashPassword(model.NovaPassword);
+                    _administradorDAO.EditarConta(administradorEditado);
                 }
             }
             
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
-
-        public ServiceResult<AdministradorViewDTO> GetAdministrador(int idFuncionario)
+        public ServiceResult<TrabalhadorViewDTO> GetAdministrador(int idFuncionario)
         {
             _logger.LogDebug("A executar [AdministradorBusiness -> GetAdministrador]");
             IList<int> erros = new List<int>();
-            AdministradorViewDTO administradorDTO = null;
+            TrabalhadorViewDTO administradorDTO = null;
 
-            Administrador administrador = _administradorDAO.GetContaId(idFuncionario);
+            Administrador administrador = _administradorDAO.GetContaIdFuncionario(idFuncionario);
             if (administrador == null)
             {
-                _logger.LogWarning($"O IdFuncionario {idFuncionario} não existe!");
+                _logger.LogWarning($"Não existe nenhum Funcionário com Número de Funcionário {idFuncionario}!");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
             else
             {
-                administradorDTO = _mapper.Map<AdministradorViewDTO>(administrador);
+                administradorDTO = _mapper.Map<TrabalhadorViewDTO>(administrador);
             }
 
-            return new ServiceResult<AdministradorViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = administradorDTO };
+            return new ServiceResult<TrabalhadorViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = administradorDTO };
+        }
+
+
+
+        private bool ValidaNome(string nome)
+        {
+            _logger.LogDebug("A executar [AdministradorBusiness -> ValidaNome]");
+            return nome.Length <= 100;
+        }
+
+        private bool ValidaPassword(string password)
+        {
+            _logger.LogDebug("A executar [AdministradorBusiness -> ValidaPassword]");
+            return password.Length >= 8 && password.Length <= 45;
+        }
+
+        private bool ValidaNumFuncionario(int numFuncionario)
+        {
+            _logger.LogDebug("A executar [AdministradorBusiness -> ValidaNumFuncionario]");
+            Regex rx = new Regex("^[0-9]{5}$");
+            return rx.IsMatch(numFuncionario.ToString());
         }
     }
 }

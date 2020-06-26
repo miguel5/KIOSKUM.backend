@@ -1,6 +1,5 @@
 ﻿using System;
 using Business.Interfaces;
-using DTO.FuncionarioDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,7 +23,7 @@ namespace API.Models
         }
 
 
-        [HttpPost("criar")]
+        /*[HttpPost("criar")]
         public IActionResult CriarConta([FromBody] FuncionarioViewDTO model)
         {
             _logger.LogDebug("A executar api/funcionario/criar -> Post");
@@ -123,7 +122,7 @@ namespace API.Models
                 return StatusCode(500);
             }
         }
-
+        */
 
     }
 }
