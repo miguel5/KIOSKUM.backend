@@ -6,86 +6,38 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using AutoMapper;
 using Business.Interfaces;
 using DAO.Interfaces;
-using Entities;
-using Helpers;
 using DTO;
 using DTO.ClienteDTOs;
-using AutoMapper;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Entities;
+using Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Services;
+using Services.HashPassword;
 
 namespace Business
 {
     public class ClienteBusiness : IClienteBusiness
     {
         private readonly ILogger _logger;
+        private readonly IHashPasswordService _hashPasswordService;
         private readonly AppSettings _appSettings;
         private readonly IMapper _mapper;
         private readonly IClienteDAO _clienteDAO;
 
-        public ClienteBusiness(ILogger<ClienteBusiness> logger, IOptions<AppSettings> appSettings, IMapper mapper, IClienteDAO clienteDAO)
+        public ClienteBusiness(ILogger<ClienteBusiness> logger, IHashPasswordService hashPasswordService, IOptions<AppSettings> appSettings, IMapper mapper, IClienteDAO clienteDAO)
         {
             _logger = logger;
+            _hashPasswordService = hashPasswordService;
             _appSettings = appSettings.Value;
             _mapper = mapper;
             _clienteDAO = clienteDAO;
         }
-
-
-        private string HashPassword(string password)
-        {
-            _logger.LogDebug("A executar [ClienteBusiness -> HashPassword]");
-            return Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: new byte[0],
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8));
-        }
-
-
-        private string GerarCodigo()
-        {
-            _logger.LogDebug("A executar [ClienteBusiness -> GerarCodigo]");
-            Random random = new Random();
-            const string carateres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(carateres, 8).Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
-
-        private bool ValidaNome(string nome)
-        {
-            _logger.LogDebug("A executar [ClienteBusiness -> ValidaNome]");
-            return nome.Length <= 100;
-        }
-
-        private bool ValidaEmail(string email)
-        {
-            _logger.LogDebug("A executar [ClienteBusiness -> ValidaEmail]");
-            Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
-            return rx.IsMatch(email) && email.Length <= 100;
-        }
-
-        private bool ValidaPassword(string password)
-        {
-            _logger.LogDebug("A executar [ClienteBusiness -> ValidaPassword]");
-            return password.Length >= 8 && password.Length <= 45;
-        }
-
-        private bool ValidaNumTelemovel(int numTelemovel)
-        {
-            _logger.LogDebug("A executar [ClienteBusiness -> ValidaNumTelemovel]");
-            Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
-            return rx.IsMatch(numTelemovel.ToString());
-        }
-
-
 
         public ServiceResult CriarConta(ClienteViewDTO model)
         {
@@ -140,7 +92,7 @@ namespace Business
                 string codigoValidacao = GerarCodigo();
                 int numMaximoTentativas = _appSettings.NumTentativasCodigoValidacao;
                 Cliente cliente = _mapper.Map<Cliente>(model);
-                cliente.Password = HashPassword(model.Password);
+                cliente.Password = _hashPasswordService.HashPassword(model.Password);
                 _clienteDAO.InserirConta(cliente, codigoValidacao, numMaximoTentativas);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
@@ -255,7 +207,7 @@ namespace Business
             return new ServiceResult<Email> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = emailBoasVindas };
         }
 
-        public ServiceResult<TokenDTO> Login(AutenticacaoDTO model)
+        public ServiceResult<TokenDTO> Login(AutenticacaoClienteDTO model)
         {
             _logger.LogDebug("A executar [ClienteBusiness -> Login]");
             if (string.IsNullOrWhiteSpace(model.Email))
@@ -286,7 +238,7 @@ namespace Business
                 Cliente cliente = _clienteDAO.GetContaEmail(model.Email);
                 if (!erros.Any())
                 {
-                    if (cliente.Password.Equals(HashPassword(model.Password)))
+                    if (cliente.Password.Equals(_hashPasswordService.HashPassword(model.Password)))
                     {
                         var tokenHandler = new JwtSecurityTokenHandler();
                         var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -376,7 +328,7 @@ namespace Business
                     _logger.LogDebug($"O Número de Telemóvel {model.NumTelemovel} é inválido.");
                     erros.Add((int)ErrosEnumeration.NumTelemovelInvalido);
                 }
-                if (!HashPassword(model.Password).Equals(cliente.Password))
+                if (!_hashPasswordService.HashPassword(model.Password).Equals(cliente.Password))
                 {
                     _logger.LogDebug("As Passwords não coincidem.");
                     erros.Add((int)ErrosEnumeration.PasswordsNaoCorrespondem);
@@ -385,7 +337,7 @@ namespace Business
                 if (!erros.Any())
                 {
                     Cliente c = _mapper.Map<Cliente>(model);
-                    c.Password = HashPassword(model.NovaPassword);
+                    c.Password = _hashPasswordService.HashPassword(model.NovaPassword);
                     c.IdCliente = idCliente;
                     _clienteDAO.EditarConta(c);
                 }
@@ -413,5 +365,46 @@ namespace Business
 
             return new ServiceResult<ClienteViewDTO> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = clienteDTO };
         }
+
+
+
+
+        private string GerarCodigo()
+        {
+            _logger.LogDebug("A executar [ClienteBusiness -> GerarCodigo]");
+            Random random = new Random();
+            const string carateres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(carateres, 8).Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+
+        private bool ValidaNome(string nome)
+        {
+            _logger.LogDebug("A executar [ClienteBusiness -> ValidaNome]");
+            return nome.Length <= 100;
+        }
+
+        private bool ValidaEmail(string email)
+        {
+            _logger.LogDebug("A executar [ClienteBusiness -> ValidaEmail]");
+            Regex rx = new Regex(".+@([a-z\\-_\\.]+)\\.[a-z]*");
+            return rx.IsMatch(email) && email.Length <= 100;
+        }
+
+        private bool ValidaPassword(string password)
+        {
+            _logger.LogDebug("A executar [ClienteBusiness -> ValidaPassword]");
+            return password.Length >= 8 && password.Length <= 45;
+        }
+
+        private bool ValidaNumTelemovel(int numTelemovel)
+        {
+            _logger.LogDebug("A executar [ClienteBusiness -> ValidaNumTelemovel]");
+            Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
+            return rx.IsMatch(numTelemovel.ToString());
+        }
+
+
+
     }
 }

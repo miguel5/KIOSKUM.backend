@@ -1,7 +1,4 @@
-﻿using System;
-using Entities;
-
-namespace Services.Pagamentos
+﻿namespace Services.Pagamentos
 {
     public interface IPagamentosService
     {

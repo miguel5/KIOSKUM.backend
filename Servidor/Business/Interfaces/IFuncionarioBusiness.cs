@@ -1,12 +1,14 @@
-﻿using DTO.FuncionarioDTOs;
+﻿using DTO;
+using DTO.TrabalhadorDTOs;
 using Services;
 
 namespace Business.Interfaces
 {
     public interface IFuncionarioBusiness
     {
-        ServiceResult CriarConta(FuncionarioViewDTO model);
-        ServiceResult EditarConta(FuncionarioViewDTO model);
-        ServiceResult<FuncionarioViewDTO> GetFuncionario(int numFuncionario);
+        ServiceResult CriarConta(TrabalhadorViewDTO model);
+        ServiceResult<TokenDTO> Login(AutenticacaoTrabalhadorDTO model);
+        ServiceResult EditarConta(int idFuncionario, EditarTrabalhadorDTO model);
+        ServiceResult<TrabalhadorViewDTO> GetFuncionario(int idFuncionario);
     }
 }

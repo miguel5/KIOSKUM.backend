@@ -10,7 +10,6 @@ namespace Services.EmailSender
 {
     public class EmailSenderService : IEmailSenderService, IDisposable
     {
-
         private readonly ILogger<EmailSenderService> _logger;
         private readonly EmailSettings _emailSettings;
         private SmtpClient _smtp;

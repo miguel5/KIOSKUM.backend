@@ -19,7 +19,32 @@ namespace DAO
             _connectionDBService = connectionDBService;
         }
 
-        public void EditarConta(Administrador administrador)
+        public void EditarConta(Administrador administradorEditado)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ExisteNumFuncionario(int numFuncionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Administrador GetContaIdFuncionario(int idFuncionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Administrador GetContaNumFuncionario(int numFuncionario)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void InserirConta(Administrador administrador)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*public void EditarConta(Administrador administrador)
         {
             _logger.LogDebug("A executar [AdministradorDAO -> EditarConta]");
             try
@@ -226,6 +251,6 @@ namespace DAO
             {
                 _connectionDBService.CloseConnection();
             }
-        }
+        }*/
     }
 }

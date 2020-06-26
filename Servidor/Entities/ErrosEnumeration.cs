@@ -17,10 +17,10 @@
         EmailPasswordIncorreta = 13,
         PasswordsNaoCorrespondem = 14,
 
-
         NumFuncionarioJaExiste = 20,
         NumFuncionarioNaoExiste = 21,
         NumFuncionarioInvalido = 22,
+        NumFuncionarioPasswordIncorreta = 23,
 
         ProdutoNaoExiste = 30,
         NomeProdutoJaExiste = 31,

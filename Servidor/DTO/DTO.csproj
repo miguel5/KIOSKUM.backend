@@ -10,4 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Entities\Entities.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TrabalhadorDTOs\" />
+  </ItemGroup>
 </Project>

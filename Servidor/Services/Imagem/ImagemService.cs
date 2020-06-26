@@ -21,7 +21,6 @@ namespace Services.Imagem
         }
 
 
-
         public ServiceResult<string> ValidaImagem(IFormFile ficheiro)
         {
             _logger.LogDebug("A executar [ImagemService -> ValidaImagem]");
@@ -58,8 +57,6 @@ namespace Services.Imagem
             }
             return new ServiceResult<string> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = extensao };
         }
-
-
 
         public async Task GuardarImagem(IFormFile ficheiro, string pathAnterior, string pathNova, string webRootPath)
         {

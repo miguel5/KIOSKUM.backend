@@ -34,41 +34,6 @@ namespace Business
             _categoriaDAO = categoriaDAO;
         }
 
-        private bool ValidaNome(string nome)
-        {
-            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaNome]");
-            return nome.Length <= 45;
-        }
-
-        private bool ValidaPreco(double preco)
-        {
-            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaPreco]");
-            Regex rx = new Regex("^\\d{1,6}(.\\d{1,2})?$");
-            return rx.IsMatch(preco.ToString());
-        }
-
-        private bool ValidaIngredientes(IList<string> ingredientes)
-        {
-            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaIngredientes]");
-            bool sucesso = true;
-            foreach(string ingrediente in ingredientes) if(sucesso)
-            {
-                sucesso = ingrediente.Length <= 45;
-            }
-            return sucesso;
-        }
-
-        private bool ValidaAlergenios(IList<string> alergenios)
-        {
-            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaAlergenios]");
-            bool sucesso = true;
-            foreach (string alergenio in alergenios) if (sucesso)
-            {
-                sucesso = alergenio.Length <= 45;
-            }
-            return sucesso;
-        }
-
 
         public ServiceResult<Tuple<string, string>> RegistarProduto(RegistarProdutoDTO model, string extensao)
         {
@@ -346,6 +311,43 @@ namespace Business
                 }
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
+        }
+
+
+
+        private bool ValidaNome(string nome)
+        {
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaNome]");
+            return nome.Length <= 45;
+        }
+
+        private bool ValidaPreco(double preco)
+        {
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaPreco]");
+            Regex rx = new Regex("^\\d{1,6}(.\\d{1,2})?$");
+            return rx.IsMatch(preco.ToString());
+        }
+
+        private bool ValidaIngredientes(IList<string> ingredientes)
+        {
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaIngredientes]");
+            bool sucesso = true;
+            foreach (string ingrediente in ingredientes) if (sucesso)
+                {
+                    sucesso = ingrediente.Length <= 45;
+                }
+            return sucesso;
+        }
+
+        private bool ValidaAlergenios(IList<string> alergenios)
+        {
+            _logger.LogDebug("A executar [ProdutoBusiness -> ValidaAlergenios]");
+            bool sucesso = true;
+            foreach (string alergenio in alergenios) if (sucesso)
+            {
+                sucesso = alergenio.Length <= 45;
+            }
+            return sucesso;
         }
     }
 }

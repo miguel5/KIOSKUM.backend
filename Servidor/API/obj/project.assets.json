@@ -2042,6 +2042,7 @@
           "DTO": "1.0.0",
           "Entities": "1.0.0",
           "Helpers": "1.0.0",
+          "Microsoft.AspNetCore.Cryptography.KeyDerivation": "3.1.5",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.Extensions.Logging": "3.1.5",
           "MySql.Data": "8.0.20"
@@ -6858,7 +6859,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.300/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.301/RuntimeIdentifierGraph.json"
       }
     }
   }

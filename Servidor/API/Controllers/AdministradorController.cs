@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using Business.Interfaces;
 using DTO;
-using DTO.AdministradorDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -26,7 +25,7 @@ namespace API.Controllers
         }
 
 
-        [HttpPost("criar")]
+        /*[HttpPost("criar")]
         public IActionResult CriarConta([FromBody] AdministradorViewDTO model)
         {
             _logger.LogDebug("A executar api/administrador/criar -> Post");
@@ -166,6 +165,6 @@ namespace API.Controllers
                 _logger.LogError(e, e.Message);
                 return StatusCode(500);
             }
-        }
+        }*/
     }
 }

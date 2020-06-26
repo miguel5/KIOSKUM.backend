@@ -27,7 +27,7 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Cliente")]
+        /*[Authorize(Roles = "Cliente")]
         [HttpPost("registar")]
         public IActionResult RegistarReserva (RegistarReservaDTO model)
         {
@@ -57,7 +57,7 @@ namespace API.Controllers
             /*catch (NumFuncionarioInexistenteException)
             {
                 return Unauthorized();
-            }*/
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -244,15 +244,15 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            /*catch (NumFuncionarioInexistenteException)
+            catch (NumFuncionarioInexistenteException)
             {
                 return Unauthorized();
-            }*/
+            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
                 return StatusCode(500);
             }
-        }
+        }*/
     }
 }

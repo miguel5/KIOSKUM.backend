@@ -7,6 +7,5 @@ namespace Services.Imagem
     {
         ServiceResult<string> ValidaImagem(IFormFile ficheiro);
         Task GuardarImagem(IFormFile ficheiro, string pathAnterior, string pathNova, string webRootPath);
-
     }
 }

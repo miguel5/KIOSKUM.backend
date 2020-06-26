@@ -8,8 +8,8 @@ namespace Business.Interfaces
     public interface IReservaBusiness
     {
         ServiceResult RegistarReserva(int idCliente, RegistarReservaDTO model);
-        ServiceResult FuncionarioDecideReserva(FuncionarioDecideReservaDTO model, bool decisao);
+        ServiceResult FuncionarioDecideReserva(int idFuncionario, int idReserva, bool decisao);
         IList<ReservaViewDTO> GetReservasEstado(EstadosReservaEnum estadosReserva);
-        ServiceResult EntregarReserva(EntregarReservaDTO model);
+        ServiceResult EntregarReserva(int idFuncionario, int idReserva);
     }
 }

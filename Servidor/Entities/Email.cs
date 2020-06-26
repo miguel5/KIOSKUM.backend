@@ -5,7 +5,6 @@
         public string Assunto { get; set; }
         public string Conteudo { get; set; }
 
-
         public void AdicionaCodigo(string codigo)
         {
             Conteudo += codigo;
