@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Business.Interfaces;
-using Entities;
 using Services.Imagem;
 using DTO.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
