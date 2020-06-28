@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Claims;
 using Business.Interfaces;
 using DTO;
 using DTO.TrabalhadorDTOs;
@@ -115,9 +114,7 @@ namespace API.Models
 
             try
             {
-                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                int idFuncionario = int.Parse(nameIdentifier);
-                ServiceResult resultado = _funcionarioBusiness.EditarConta(idFuncionario, model);
+                ServiceResult resultado = _funcionarioBusiness.EditarConta(model.NumFuncionario, model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome} e Número de Funcionário {model.NumFuncionario} editou a sua conta com sucesso.");
@@ -125,7 +122,7 @@ namespace API.Models
                 }
                 else
                 {
-                    _logger.LogInformation($"Ocorreu um erro ao efetuar a edição do Funcionário com IdFuncionario {idFuncionario}.");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar a edição do Funcionário com Número de Funcionário {model.NumFuncionario}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -142,23 +139,22 @@ namespace API.Models
         }
 
 
+        [Authorize(Roles = "Administrador")]
         [HttpGet("get")]
-        public IActionResult GetFuncionario()
+        public IActionResult GetFuncionario(int numFuncionario)
         {
             _logger.LogDebug("A executar api/funcionario/get -> Get");
             try
             {
-                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                int idFuncionario = int.Parse(nameIdentifier);
-                ServiceResult<TrabalhadorViewDTO> resultado = _funcionarioBusiness.GetFuncionario(idFuncionario);
+                ServiceResult<TrabalhadorViewDTO> resultado = _funcionarioBusiness.GetFuncionario(numFuncionario);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"Get do Funcionário com IdFuncionario {idFuncionario} efetuado com sucesso.");
+                    _logger.LogInformation($"Get do Funcionário com o Número de Funcionário {numFuncionario} efetuado com sucesso.");
                     return Ok(resultado.Resultado);
                 }
                 else
                 {
-                    _logger.LogInformation($"Ocorreu um erro ao efetuar o Get do Funcionário com IdFuncionario {idFuncionario}.");
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o Get do Funcionário com Número de Funcionário {numFuncionario}.");
                     return BadRequest(resultado.Erros);
                 }
             }

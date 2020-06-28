@@ -9,6 +9,6 @@ namespace Business.Interfaces
         ServiceResult CriarConta(TrabalhadorViewDTO model);
         ServiceResult<TokenDTO> Login(AutenticacaoTrabalhadorDTO model);
         ServiceResult EditarConta(int idFuncionario, EditarTrabalhadorDTO model);
-        ServiceResult<TrabalhadorViewDTO> GetFuncionario(int idFuncionario);
+        ServiceResult<TrabalhadorViewDTO> GetFuncionario(int numFuncionario);
     }
 }
