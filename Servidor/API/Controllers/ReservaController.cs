@@ -27,7 +27,7 @@ namespace API.Controllers
         }
 
 
-        /*[Authorize(Roles = "Cliente")]
+        [Authorize(Roles = "Cliente")]
         [HttpPost("registar")]
         public IActionResult RegistarReserva (RegistarReservaDTO model)
         {
@@ -54,10 +54,6 @@ namespace API.Controllers
             {
                 return BadRequest(new { message = e.Message });
             }
-            /*catch (NumFuncionarioInexistenteException)
-            {
-                return Unauthorized();
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -65,17 +61,16 @@ namespace API.Controllers
             }
         }
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpPost("aceitar")]
-        public IActionResult AceitarReserva(FuncionarioDecideReservaDTO model)
+        public IActionResult AceitarReserva(int idReserva)
         {
-            if(model is null)
-            {
-                return BadRequest(nameof(model));
-            }
-
             try
             {
-                ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(model, true);
+                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                int idFuncionario = int.Parse(nameIdentifier);
+
+                ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(idFuncionario, idReserva, true);
                 if (resultado.Sucesso)
                 {
                     return Ok();
@@ -96,17 +91,16 @@ namespace API.Controllers
             }
         }
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpPost("rejeitar")]
-        public IActionResult RejeitarReserva(FuncionarioDecideReservaDTO model)
+        public IActionResult RejeitarReserva(int idReserva)
         {
-            if (model is null)
-            {
-                return BadRequest(nameof(model));
-            }
-
             try
             {
-                ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(model, false);
+                string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                int idFuncionario = int.Parse(nameIdentifier);
+
+                ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(idFuncionario, idReserva, false);
                 if (resultado.Sucesso)
                 {
                     return Ok();
@@ -128,6 +122,7 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpGet("pendentes")]
         public IActionResult GetReservasPendentes()
         { 
@@ -144,6 +139,7 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpGet("rejeitadas")]
         public IActionResult GetReservasRejeitadas()
         {
@@ -160,6 +156,7 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpGet("aceites")]
         public IActionResult GetReservasAceites()
         {
@@ -176,6 +173,7 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpGet("pagas")]
         public IActionResult GetReservasPagas()
         {
@@ -192,6 +190,7 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpGet("entregues")]
         public IActionResult GetReservasEntregues()
         {
@@ -208,6 +207,7 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpGet("canceladas")]
         public IActionResult GetReservasCanceladas()
         {
@@ -225,16 +225,14 @@ namespace API.Controllers
 
 
         [HttpPost("entregar")]
-        public IActionResult EntregarReserva(EntregarReservaDTO model)
+        public IActionResult EntregarReserva(int idReserva)
         {
-            if (model is null)
-            {
-                return BadRequest(nameof(model));
-            }
+            string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            int idFuncionario = int.Parse(nameIdentifier);
 
             try
             {
-                ServiceResult resultado = _reservaBusiness.EntregarReserva(model);
+                ServiceResult resultado = _reservaBusiness.EntregarReserva(idFuncionario, idReserva);
                 if (resultado.Sucesso)
                 {
                     return Ok();
@@ -244,15 +242,11 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (NumFuncionarioInexistenteException)
-            {
-                return Unauthorized();
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
                 return StatusCode(500);
             }
-        }*/
+        }
     }
 }

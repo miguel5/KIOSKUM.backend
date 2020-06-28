@@ -193,9 +193,9 @@ namespace Business
             _logger.LogDebug("A executar [ReservaBusiness -> ValidaItens]");
             bool result = true;
             foreach (Item item in itens) if (result)
-                {
-                    result = item.Quantidade >= 1 && item.Observacoes.Length >= 0 && item.Observacoes.Length <= 300 && _produtoDAO.ExisteProduto(item.IdProduto);
-                }
+            {
+                result = item.Quantidade >= 1 && item.Observacoes.Length >= 0 && item.Observacoes.Length <= 300 && _produtoDAO.ExisteProduto(item.IdProduto);
+            }
             return result;
         }
 

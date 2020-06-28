@@ -187,16 +187,16 @@ namespace Business
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
-        public ServiceResult<TrabalhadorViewDTO> GetFuncionario(int idFuncionario)
+        public ServiceResult<TrabalhadorViewDTO> GetFuncionario(int numFuncionario)
         {
             _logger.LogDebug("A executar [FuncionarioBusiness -> GetFuncionario]");
             IList<int> erros = new List<int>();
             TrabalhadorViewDTO funcionarioDTO = null;
 
-            Funcionario funcionario = _funcionarioDAO.GetContaIdFuncionario(idFuncionario);
+            Funcionario funcionario = _funcionarioDAO.GetContaNumFuncionario(numFuncionario);
             if (funcionario == null)
             {
-                _logger.LogWarning($"Não existe nenhum Funcionário com Número de Funcionário {idFuncionario}!");
+                _logger.LogWarning($"Não existe nenhum Funcionário com Número de Funcionário {numFuncionario}!");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
             else
