@@ -154,12 +154,13 @@ namespace Business
             IList<Categoria> categorias = _categoriaDAO.GetCategoriasDesativadas();
             if (categorias != null)
             {
-                string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Categoria");
+                string pathImagem = $"{_appSettings.ServerUrl}/Images/Categoria";
                 foreach (Categoria categoria in categorias)
                 {
                     Console.WriteLine(categoria.ExtensaoImagem);
                     CategoriaViewDTO categoriaViewDTO = _mapper.Map<CategoriaViewDTO>(categoria);
-                    categoriaViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{categoria.IdCategoria}.{categoria.ExtensaoImagem}"));
+                    string url = $"{pathImagem}/{categoria.IdCategoria}.{categoria.ExtensaoImagem}";
+                    categoriaViewDTO.Url = new Uri(url);
                     categoriasViewDTO.Add(categoriaViewDTO);
                 }
             }
@@ -181,11 +182,12 @@ namespace Business
             IList<Categoria> categorias = _categoriaDAO.GetCategorias();
             if (categorias != null)
             {
-                string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Categoria");
+                string pathImagem = $"{_appSettings.ServerUrl}/Images/Categoria";
                 foreach (Categoria categoria in categorias)
                 {
                     CategoriaViewDTO categoriaViewDTO = _mapper.Map<CategoriaViewDTO>(categoria);
-                    categoriaViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{categoria.IdCategoria}.{categoria.ExtensaoImagem}"));
+                    string url = $"{pathImagem}/{categoria.IdCategoria}.{categoria.ExtensaoImagem}";
+                    categoriaViewDTO.Url = new Uri(url);
                     categoriasViewDTO.Add(categoriaViewDTO);
                 }
             }
@@ -212,11 +214,11 @@ namespace Business
                     IList<Produto> produtos = _categoriaDAO.GetProdutosCategoria(idCategoria);
                     if (produtos != null)
                     {
-                        string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Produto");
+                        string pathImagem = $"{_appSettings.ServerUrl}/Images/ Produto";
                         foreach (Produto produto in produtos)
                         {
                             ProdutoViewDTO produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
-                            produtoViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
+                            produtoViewDTO.Url = new Uri($"{pathImagem}/{produto.IdProduto}.{produto.ExtensaoImagem}");
                             produtosViewDTO.Add(produtoViewDTO);
                         }
                     }
@@ -251,7 +253,8 @@ namespace Business
                 if (_categoriaDAO.IsAtiva(idCategoria))
                 {
                     categoriaViewDTO = _mapper.Map<CategoriaViewDTO>(categoria);
-                    categoriaViewDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl, "Images", "Categoria", $"{categoria.IdCategoria}.{categoria.ExtensaoImagem}"));
+                    string url = $"{_appSettings.ServerUrl}/{categoria.IdCategoria}.{categoria.ExtensaoImagem}";
+                    categoriaViewDTO.Url = new Uri(url);
                 }
                 else
                 {
