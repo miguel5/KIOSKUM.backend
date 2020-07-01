@@ -25,9 +25,14 @@ namespace DAO
             throw new System.NotImplementedException();
         }
 
-        public List<Reserva> GetReservasEstado(int estado)
+        public IList<Reserva> GetReservasEstado(int estado)
         {
-            throw new System.NotImplementedException();
+            IList<Reserva> lista = new List<Reserva>();
+            for(int i = 0; i < 200 ; i++)
+            {
+                lista.Add(new Reserva() { Estado = EstadosReservaEnum.Aceite});
+            }
+            return lista;
         }
 
         public void RegistarReserva(Reserva reserva)

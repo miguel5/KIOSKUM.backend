@@ -22,6 +22,7 @@ using Services.EmailSender;
 using Services.Imagem;
 using DTO.ReservaDTOs;
 using DTO.TrabalhadorDTOs;
+using Services.HashPassword;
 
 namespace API
 {
@@ -65,6 +66,7 @@ namespace API
 
             services.AddTransient<IConnectionDBService, ConnectionDBService>();
             services.AddTransient<IEmailSenderService, EmailSenderService>();
+            services.AddScoped<IHashPasswordService, HashPasswordService>();
             services.AddScoped<IImagemService, ImagemService>();
 
             services.AddScoped<IAdministradorDAO, AdministradorDAO>();
@@ -78,7 +80,6 @@ namespace API
             services.AddScoped<IClienteBusiness, ClienteBusiness>();
             services.AddScoped<IFuncionarioBusiness, FuncionarioBusiness>();
             services.AddScoped<IProdutoBusiness, ProdutoBusiness>();
-
 
             var config = new MapperConfiguration(cfg =>
             {
