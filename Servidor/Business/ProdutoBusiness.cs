@@ -333,9 +333,9 @@ namespace Business
             _logger.LogDebug("A executar [ProdutoBusiness -> ValidaIngredientes]");
             bool sucesso = true;
             foreach (string ingrediente in ingredientes) if (sucesso)
-                {
-                    sucesso = ingrediente.Length <= 45;
-                }
+            {
+                sucesso = ingrediente.Length <= 45;
+            }
             return sucesso;
         }
 
