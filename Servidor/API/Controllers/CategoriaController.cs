@@ -56,7 +56,7 @@ namespace API.Controllers
                     ServiceResult<Tuple<string, string>> resultado = _categoriaBusiness.RegistarCategoria(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
-                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath.ToString());
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath);
                         _logger.LogInformation($"A Categoria com nome {model.Nome} foi registado com sucesso.");
                         return Ok();
                     }
@@ -104,7 +104,7 @@ namespace API.Controllers
                     ServiceResult<Tuple<string, string>> resultado = _categoriaBusiness.EditarCategoria(model, resultadoValidacaoImagem.Resultado);
                     if (resultado.Sucesso)
                     {
-                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath.ToString());
+                        await _imagemService.GuardarImagem(model.File, resultado.Resultado.Item1, resultado.Resultado.Item2, _webHostEnvironment.WebRootPath);
                         _logger.LogInformation($"A Categoria com  IdCategoria {model.IdCategoria} foi editada, com o nome {model.Nome}.");
                         return Ok();
                     }
