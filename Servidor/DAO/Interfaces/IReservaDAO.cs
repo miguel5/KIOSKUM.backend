@@ -10,6 +10,6 @@ namespace DAO.Interfaces
         bool ExisteReserva(int idReserva);
         Reserva GetReserva(int idReserva);
         void EditarReserva(Reserva reserva);
-        List<Reserva> GetReservasEstado(int estado);
+        IList<Reserva> GetReservasEstado(int estado);
     }
 }

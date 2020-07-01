@@ -22,6 +22,7 @@ using Services.EmailSender;
 using Services.Imagem;
 using DTO.ReservaDTOs;
 using DTO.TrabalhadorDTOs;
+using Services.HashPassword;
 
 namespace API
 {
@@ -66,6 +67,7 @@ namespace API
             services.AddTransient<IConnectionDBService, ConnectionDBService>();
             services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddScoped<IImagemService, ImagemService>();
+            services.AddScoped<IHashPasswordService, HashPasswordService>();
 
             services.AddScoped<IAdministradorDAO, AdministradorDAO>();
             services.AddScoped<ICategoriaDAO, CategoriaDAO>();
