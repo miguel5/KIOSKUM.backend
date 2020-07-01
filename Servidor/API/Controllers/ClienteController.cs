@@ -51,7 +51,7 @@ namespace API.Controllers
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome}, com Email {model.Email} e Número de Telemóvel {model.NumTelemovel} registou-se com sucesso.");
-                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailCodigoValidacao(model.Email, _webHostEnvironment.WebRootPath.ToString());
+                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailCodigoValidacao(model.Email, _webHostEnvironment.ContentRootPath);
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);
@@ -100,7 +100,7 @@ namespace API.Controllers
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O Cliente com Email {model.Email} confirmou a sua conta com sucesso.");
-                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailBoasVindas(model.Email, _webHostEnvironment.ContentRootPath.ToString());
+                    ServiceResult<Email> resultadoEmails = _clienteBusiness.GetEmailBoasVindas(model.Email, _webHostEnvironment.ContentRootPath);
                     if (resultadoEmails.Sucesso)
                     {
                         await _emailSenderService.SendEmail(model.Email, resultadoEmails.Resultado);

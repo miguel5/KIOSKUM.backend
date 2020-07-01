@@ -99,7 +99,7 @@ namespace Business
         }
 
 
-        public ServiceResult<Email> GetEmailCodigoValidacao(string email, string webRootPath)
+        public ServiceResult<Email> GetEmailCodigoValidacao(string email, string contentRootPath)
         {
             _logger.LogDebug("A executar [ClienteBusiness -> GetEmailCodigoValidacao]");
             if (string.IsNullOrWhiteSpace(email))
@@ -114,7 +114,7 @@ namespace Business
             if(codigoValidacao != null)
             {
                 _logger.LogDebug("Início da leitura do ficheiro de EmailGerarCodigo.json.");
-                string pathEmailgerarCodigo = Path.Combine(webRootPath, "Files", "EmailGerarCodigo.json");
+                string pathEmailgerarCodigo = Path.Combine(contentRootPath, "Files", "EmailGerarCodigo.json");
                 StreamReader sr = new StreamReader(pathEmailgerarCodigo);
                 string json = sr.ReadToEnd();
                 _logger.LogDebug("Fim da leitura do ficheiro de EmailGerarCodigo.json.");
@@ -179,7 +179,7 @@ namespace Business
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
-        public ServiceResult<Email> GetEmailBoasVindas(string email, string webRootPath)
+        public ServiceResult<Email> GetEmailBoasVindas(string email, string contentRootPath)
         {
             _logger.LogDebug("A executar [ClienteBusiness -> GetEmailBoasVindas]");
             if (string.IsNullOrWhiteSpace(email))
@@ -193,7 +193,7 @@ namespace Business
             if (_clienteDAO.ExisteEmail(email))
             {
                 _logger.LogDebug("Início da leitura do ficheiro de EmailBoasVindas.json.");
-                string pathEmailBoasVindas = Path.Combine(webRootPath, "Files", "EmailBoasVindas.json");
+                string pathEmailBoasVindas = Path.Combine(contentRootPath, "Files", "EmailBoasVindas.json");
                 StreamReader sr = new StreamReader(pathEmailBoasVindas);
                 string json = sr.ReadToEnd();
                 _logger.LogDebug("Fim da leitura do ficheiro de EmailBoasVindas.json.");
