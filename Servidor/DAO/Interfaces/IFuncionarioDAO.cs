@@ -9,6 +9,6 @@ namespace DAO.Interfaces
         void EditarConta(Funcionario funcionario);
         Funcionario GetContaNumFuncionario(int numFuncionario);
         void InserirConta(Funcionario funcionario);
-        Funcionario GetContaIdFuncionario(int numFuncionario);
+        Funcionario GetContaIdFuncionario(int idFuncionario);
     }
 }

@@ -17,7 +17,30 @@ namespace DAO
 
         public bool ExisteReserva(int idReserva)
         {
-            throw new System.NotImplementedException();
+            _logger.LogDebug("A executar [ReservaDAO -> ExisteReserva]");
+            try
+            {
+                _connectionDBService.OpenConnection();
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "existe_reserva";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?id", idReserva);
+                    cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                    object val = cmd.ExecuteScalar();
+
+                    return Convert.ToBoolean(val);
+                }
+            }
+            catch { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
         }
 
         public Reserva GetReserva(int idReserva)
