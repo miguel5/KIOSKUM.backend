@@ -149,7 +149,7 @@ namespace Business
         public IList<CategoriaViewDTO> GetCategoriasDesativadas()
         {
             _logger.LogDebug("A executar [CategoriaBusiness -> GetCategoriasDesativadas]");
-            IList<CategoriaViewDTO> categoriasViewDTO = null;
+            IList<CategoriaViewDTO> categoriasViewDTO = new List<CategoriaViewDTO>();
 
             IList<Categoria> categorias = _categoriaDAO.GetCategoriasDesativadas();
             if (categorias != null)
@@ -159,14 +159,9 @@ namespace Business
                 {
                     Console.WriteLine(categoria.ExtensaoImagem);
                     CategoriaViewDTO categoriaViewDTO = _mapper.Map<CategoriaViewDTO>(categoria);
-                    string url = $"{pathImagem}/{categoria.IdCategoria}.{categoria.ExtensaoImagem}";
-                    categoriaViewDTO.Url = new Uri(url);
+                    categoriaViewDTO.Url = new Uri($"{pathImagem}/{categoria.IdCategoria}.{categoria.ExtensaoImagem}");
                     categoriasViewDTO.Add(categoriaViewDTO);
                 }
-            }
-            else
-            {
-                categoriasViewDTO = new List<CategoriaViewDTO>();
             }
 
             return categoriasViewDTO;
