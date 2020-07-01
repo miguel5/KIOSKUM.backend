@@ -73,6 +73,11 @@ namespace DAO
                     cmd.Parameters.AddWithValue("?estado", reserva.Estado);
                     cmd.Parameters["?estado"].Direction = ParameterDirection.Input;
 
+                    string hora = reserva.HoraEntrega.ToString("MM-dd-yyyy HH:mm:ss");
+
+                    cmd.Parameters.AddWithValue("?horaEntrega", hora);
+                    cmd.Parameters["?horaEntrega"].Direction = ParameterDirection.Input;
+
                     reservaId = Convert.ToInt32(cmd.ExecuteScalar());
                 }
 
@@ -111,10 +116,10 @@ namespace DAO
                         cmdI.Parameters["?quantidade"].Direction = ParameterDirection.Input;
 
                         if(item.Observacoes == default(string)) {
-                            cmdI.Parameters.AddWithValue("?observacoes", item.Observacoes);
+                            cmdI.Parameters.AddWithValue("?observacoes", null);
                         }
                         else {
-                            cmdI.Parameters.AddWithValue("?observacoes", null);
+                            cmdI.Parameters.AddWithValue("?observacoes", item.Observacoes);
                         }
                         cmdI.Parameters["?observacoes"].Direction = ParameterDirection.Input;
 
