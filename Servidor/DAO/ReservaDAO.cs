@@ -55,7 +55,78 @@ namespace DAO
 
         public void RegistarReserva(Reserva reserva)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                _connectionDBService.OpenConnection();
+
+                int reservaId;
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "registar_reserva";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?preco", reserva.Preco);
+                    cmd.Parameters["?preco"].Direction = ParameterDirection.Input;
+
+                    cmd.Parameters.AddWithValue("?estado", reserva.Estado);
+                    cmd.Parameters["?estado"].Direction = ParameterDirection.Input;
+
+                    reservaId = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                using (MySqlCommand cmdU = new MySqlCommand())
+                {
+                    cmdU.Connection = _connectionDBService.Connection;
+
+                    cmdU.CommandText = "registar_reserva_utilizadores";
+                    cmdU.CommandType = CommandType.StoredProcedure;
+
+                    cmdU.Parameters.AddWithValue("?idCliente", reserva.IdCliente);
+                    cmdU.Parameters["?idCliente"].Direction = ParameterDirection.Input;
+
+                    cmdU.Parameters.AddWithValue("?idReserva", reservaId);
+                    cmdU.Parameters["?idReserva"].Direction = ParameterDirection.Input;
+
+                    cmdU.ExecuteNonQuery();
+                }
+
+                foreach (Item item in reserva.Itens)
+                {
+                    using (MySqlCommand cmdI = new MySqlCommand())
+                    {
+                        cmdI.Connection = _connectionDBService.Connection;
+
+                        cmdI.CommandText = "registar_reserva_produto";
+                        cmdI.CommandType = CommandType.StoredProcedure;
+
+                        cmdI.Parameters.AddWithValue("?idProduto", item.IdProduto);
+                        cmdI.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+                        cmdI.Parameters.AddWithValue("?idReserva", reservaId);
+                        cmdI.Parameters["?idReserva"].Direction = ParameterDirection.Input;
+
+                        cmdI.Parameters.AddWithValue("?quantidade", item.Quantidade);
+                        cmdI.Parameters["?quantidade"].Direction = ParameterDirection.Input;
+
+                        if(item.Observacoes == default(string)) {
+                            cmdI.Parameters.AddWithValue("?observacoes", item.Observacoes);
+                        }
+                        else {
+                            cmdI.Parameters.AddWithValue("?observacoes", null);
+                        }
+                        cmdI.Parameters["?observacoes"].Direction = ParameterDirection.Input;
+
+                        cmdI.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
         }
     }
 }
