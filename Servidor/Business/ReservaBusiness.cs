@@ -107,7 +107,7 @@ namespace Business
                         ServiceResult<string> resultado = _pagamentoService.PedirPagamento(new MBWayPagamentoModel { NumTelemovel = numTelemovel, Valor = reserva.Preco });
                         if (!resultado.Sucesso)
                         {
-                            reserva.TransactionUniqueId = resultado.Resultado;
+                            reserva.TransactionToken = resultado.Resultado;
                             erros.Add((int)ErrosEnumeration.ErroNoPedidoDePagamento);
                             _reservaDAO.EditarReserva(reserva);
                         }

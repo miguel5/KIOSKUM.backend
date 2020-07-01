@@ -14,6 +14,6 @@ namespace Entities
         public double Preco { get; set; }
         public DateTime HoraEntrega { get; set; }
         public DateTime HoraPagamento { get; set; }
-        public string TransactionUniqueId { get; set; }
+        public string TransactionToken { get; set; }
     }
 }

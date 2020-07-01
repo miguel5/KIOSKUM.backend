@@ -66,8 +66,8 @@ namespace API
 
             services.AddTransient<IConnectionDBService, ConnectionDBService>();
             services.AddTransient<IEmailSenderService, EmailSenderService>();
-            services.AddScoped<IImagemService, ImagemService>();
             services.AddScoped<IHashPasswordService, HashPasswordService>();
+            services.AddScoped<IImagemService, ImagemService>();
 
             services.AddScoped<IAdministradorDAO, AdministradorDAO>();
             services.AddScoped<ICategoriaDAO, CategoriaDAO>();
@@ -80,7 +80,6 @@ namespace API
             services.AddScoped<IClienteBusiness, ClienteBusiness>();
             services.AddScoped<IFuncionarioBusiness, FuncionarioBusiness>();
             services.AddScoped<IProdutoBusiness, ProdutoBusiness>();
-
 
             var config = new MapperConfiguration(cfg =>
             {
