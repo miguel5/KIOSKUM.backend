@@ -249,7 +249,7 @@ namespace DAO
                 {
                     cmd.Connection = _connectionDBService.Connection;
 
-                    cmd.CommandText = "get_categorias";
+                    cmd.CommandText = "get_categorias_ativadas";
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     using (MySqlDataReader var = cmd.ExecuteReader())
@@ -444,7 +444,7 @@ namespace DAO
                                 cmdI.Parameters.AddWithValue("?idProduto", produto.IdProduto);
                                 cmdI.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
-                                using (MySqlDataReader varI = cmd.ExecuteReader())
+                                using (MySqlDataReader varI = cmdI.ExecuteReader())
                                 {
                                     while (varI.Read())
                                     {
@@ -463,7 +463,7 @@ namespace DAO
                                 cmdA.Parameters.AddWithValue("?idProduto", produto.IdProduto);
                                 cmdA.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
-                                using (MySqlDataReader varA = cmd.ExecuteReader())
+                                using (MySqlDataReader varA = cmdA.ExecuteReader())
                                 {
                                     while (varA.Read())
                                     {

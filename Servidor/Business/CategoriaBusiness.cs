@@ -195,7 +195,7 @@ namespace Business
         {
             _logger.LogDebug("A executar [CategoriaBusiness -> GetProdutosAtivadosCategoria]");
             IList<int> erros = new List<int>();
-            IList<ProdutoViewDTO> produtosViewDTO = null;
+            IList<ProdutoViewDTO> produtosViewDTO = new List<ProdutoViewDTO>();
 
             if (!_categoriaDAO.ExisteCategoria(idCategoria))
             {
@@ -233,7 +233,7 @@ namespace Business
         {
             _logger.LogDebug("A executar [CategoriaBusiness -> GetProdutosDesativadosCategoria]");
             IList<int> erros = new List<int>();
-            IList<ProdutoViewDTO> produtosViewDTO = null;
+            IList<ProdutoViewDTO> produtosViewDTO = new List<ProdutoViewDTO>();
 
             if (!_categoriaDAO.ExisteCategoria(idCategoria))
             {
