@@ -21,6 +21,7 @@
         NumFuncionarioNaoExiste = 21,
         NumFuncionarioInvalido = 22,
         NumFuncionarioPasswordIncorreta = 23,
+        NumFuncionarioInvalidoLogin = 24,
 
         ProdutoNaoExiste = 30,
         NomeProdutoJaExiste = 31,
