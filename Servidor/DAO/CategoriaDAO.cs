@@ -236,9 +236,9 @@ namespace DAO
             }
         }
 
-        public IList<Categoria> GetCategorias()
+        public IList<Categoria> GetCategoriasAtivadas()
         {
-            _logger.LogDebug("A executar [CategoriaDAO -> GetCategorias]");
+            _logger.LogDebug("A executar [CategoriaDAO -> GetCategoriasAtivadas]");
             IList<Categoria> categorias = new List<Categoria>();
 
             try
@@ -333,14 +333,15 @@ namespace DAO
             }
         }
 
-        public IList<Produto> GetProdutosCategoria(int idCategoria)
+        public IList<Produto> GetProdutosAtivadosCategoria(int idCategoria)
         {
-            _logger.LogDebug("A executar [CategoriaDAO -> GetProdutosCategoria]");
+            _logger.LogDebug("A executar [CategoriaDAO -> GetProdutosAtivadosCategoria]");
 
             IList<Produto> produtos = new List<Produto>();
             try
             {
                 _connectionDBService.OpenConnection();
+                _connectionDBService.OpenConnection2();
 
                 using (MySqlCommand cmd = new MySqlCommand())
                 {
@@ -358,33 +359,37 @@ namespace DAO
                         {
                             Produto produto = new Produto { IdProduto = var.GetInt32(0), Nome = var.GetString(1), IdCategoria = idCategoria, Preco = var.GetDouble(2), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(3) };
 
-                            cmd.CommandText = "get_ingredientes_produto";
-                            cmd.CommandType = CommandType.StoredProcedure;
-
-                            cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                            cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
-
-                            using (MySqlDataReader varI = cmd.ExecuteReader())
+                            using (MySqlCommand cmdIA = new MySqlCommand())
                             {
-                                while (varI.Read())
+                                cmdIA.Connection = _connectionDBService.Connection2;
+
+                                cmdIA.CommandText = "get_ingredientes_produto";
+                                cmdIA.CommandType = CommandType.StoredProcedure;
+
+                                cmdIA.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                                cmdIA.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+                                using (MySqlDataReader varI = cmdIA.ExecuteReader())
                                 {
-                                    produto.Ingredientes.Add(varI.GetString(0));
+                                    while (varI.Read())
+                                    {
+                                        produto.Ingredientes.Add(varI.GetString(0));
+                                    }
                                 }
-                            }
 
+                                cmdIA.Parameters.Clear();
+                                cmdIA.CommandText = "get_alergenios_produto";
+                                cmdIA.CommandType = CommandType.StoredProcedure;
 
-                            cmd.CommandText = "get_alergenicos_produto";
-                            cmd.CommandType = CommandType.StoredProcedure;
+                                cmdIA.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                                cmdIA.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
-                            cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                            cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
-
-                            using (MySqlDataReader varI = cmd.ExecuteReader())
-                            {
-
-                                while (var.Read())
+                                using (MySqlDataReader varI = cmdIA.ExecuteReader())
                                 {
-                                    produto.Alergenios.Add(var.GetString(0));
+                                    while (var.Read())
+                                    {
+                                        produto.Alergenios.Add(var.GetString(0));
+                                    }
                                 }
                             }
                             produtos.Add(produto);
@@ -397,8 +402,90 @@ namespace DAO
             finally
             {
                 _connectionDBService.CloseConnection();
+                _connectionDBService.CloseConnection2();
             }
         }
+
+
+        public IList<Produto> GetProdutosDesativadosCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar [CategoriaDAO -> GetProdutosDesativadosCategoria]");
+
+            IList<Produto> produtos = new List<Produto>();
+
+            try
+            {
+                _connectionDBService.OpenConnection();
+                _connectionDBService.OpenConnection2();
+
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.Parameters.AddWithValue("?id", idCategoria);
+                    cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                    cmd.CommandText = "get_produtos_desativados_categoria";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    using (MySqlDataReader var = cmd.ExecuteReader())
+                    {
+                        while (var.Read())
+                        {
+                            Produto produto = new Produto { IdProduto = var.GetInt32(0), Nome = var.GetString(1), IdCategoria = idCategoria, Preco = var.GetDouble(2), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(3) };
+
+                            using (MySqlCommand cmdI = new MySqlCommand())
+                            {
+                                cmdI.Connection = _connectionDBService.Connection2;
+
+                                cmdI.CommandText = "get_ingredientes_produto";
+                                cmdI.CommandType = CommandType.StoredProcedure;
+
+                                cmdI.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                                cmdI.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+                                using (MySqlDataReader varI = cmd.ExecuteReader())
+                                {
+                                    while (varI.Read())
+                                    {
+                                        produto.Ingredientes.Add(varI.GetString(0));
+                                    }
+                                }
+                            }
+
+                            using (MySqlCommand cmdA = new MySqlCommand())
+                            {
+                                cmdA.Connection = _connectionDBService.Connection2;
+
+                                cmdA.CommandText = "get_alergenios_produto";
+                                cmdA.CommandType = CommandType.StoredProcedure;
+
+                                cmdA.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                                cmdA.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+                                using (MySqlDataReader varA = cmd.ExecuteReader())
+                                {
+                                    while (varA.Read())
+                                    {
+                                        produto.Alergenios.Add(varA.GetString(0));
+                                    }
+                                }
+                            }
+
+                            produtos.Add(produto);
+                        }
+                    }
+                }
+                return produtos;
+            }
+            catch (Exception) { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+                _connectionDBService.CloseConnection2();
+            }
+        }
+
 
         public bool IsAtiva(int idCategoria)
         {

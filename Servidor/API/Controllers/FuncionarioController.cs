@@ -25,7 +25,9 @@ namespace API.Models
         }
 
 
-        [Authorize(Roles = "Administrador")]
+
+        //[Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         [HttpPost("criar")]
         public IActionResult CriarConta([FromBody] TrabalhadorViewDTO model)
         {

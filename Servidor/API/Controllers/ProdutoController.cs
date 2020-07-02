@@ -127,31 +127,6 @@ namespace API.Controllers
 
         [AllowAnonymous]
         //[Authorize(Roles = "Administrador")]
-        [HttpGet("desativados")]
-        public IActionResult GetProdutosDesativados()
-        {
-            _logger.LogDebug("A executar api/produto/desativados -> Get");
-            try
-            {
-                IList<ProdutoViewDTO> resultado = _produtoBusiness.GetProdutosDesativados();
-                return Ok(resultado);
-
-            }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, e.Message);
-                return StatusCode(500);
-            }
-        }
-
-
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
         [HttpGet("especifico")]
         public IActionResult GetProduto(int idProduto)
         {
