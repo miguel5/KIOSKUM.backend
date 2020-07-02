@@ -221,7 +221,7 @@ namespace Business
                 if (_produtoDAO.IsAtivo(idProduto))
                 {
                     produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
-                    produtoViewDTO.Url = new Uri(Path.Combine(_appSettings.ServerUrl, "Images", "Produto", $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
+                    produtoViewDTO.Url = new Uri($"{_appSettings.ServerUrl}/Images/Produto/{produto.IdProduto}.{produto.ExtensaoImagem}");
                 }
                 else
                 {
@@ -307,9 +307,13 @@ namespace Business
         {
             _logger.LogDebug("A executar [ProdutoBusiness -> ValidaIngredientes]");
             bool sucesso = true;
-            foreach (string ingrediente in ingredientes) if (sucesso)
+            foreach (string ingrediente in ingredientes)
             {
-                sucesso = ingrediente.Length <= 45;
+                if (ingrediente == null || ingrediente.Length > 45)
+                {
+                    sucesso = false;
+                    break;
+                }
             }
             return sucesso;
         }
@@ -318,9 +322,13 @@ namespace Business
         {
             _logger.LogDebug("A executar [ProdutoBusiness -> ValidaAlergenios]");
             bool sucesso = true;
-            foreach (string alergenio in alergenios) if (sucesso)
+            foreach (string alergenio in alergenios)
             {
-                sucesso = alergenio.Length <= 45;
+                if(alergenio == null || alergenio.Length > 45)
+                {
+                    sucesso = false;
+                    break;
+                }
             }
             return sucesso;
         }

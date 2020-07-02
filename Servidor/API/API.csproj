@@ -11,8 +11,8 @@
     <Folder Include="Logs\" />
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\Images\" />
-    <Folder Include="wwwroot\Images\Categoria\" />
     <Folder Include="wwwroot\Images\Produto\" />
+    <Folder Include="wwwroot\Images\Categoria\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="mono_crash.mem.9613.70000a033000.blob" />

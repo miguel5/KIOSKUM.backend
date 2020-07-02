@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Business.Interfaces;
-using Services.Imagem;
 using DTO.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Services;
-using Microsoft.AspNetCore.Hosting;
+using Services.Imagem;
 
 namespace API.Controllers
 {
@@ -136,7 +135,7 @@ namespace API.Controllers
                 ServiceResult<ProdutoViewDTO> resultado = _produtoBusiness.GetProduto(idProduto);
                 if (resultado.Sucesso)
                 {
-                    _logger.LogInformation($"Foi efetuado o get do Produto com IdProduto {idProduto}.");
+                    _logger.LogInformation($"dFoi efetuado o get do Produto com IdProduto {idProduto}.");
                     return Ok(resultado.Resultado);
                 }
                 else
