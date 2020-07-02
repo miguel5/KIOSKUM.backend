@@ -12,7 +12,72 @@ namespace DAO
 
         public void EditarReserva(Reserva reserva)
         {
-            throw new System.NotImplementedException();
+            _logger.LogDebug("A executar [ReservaDAO -> EditarReserva]");
+            try
+            {
+                _connectionDBService.OpenConnection();
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "editar_reserva";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?idR", reserva.Idreserva);
+                    cmd.Parameters["?idR"].Direction = ParameterDirection.Input;
+
+                    if(reserva.HoraPagamento == default(DateTime)) {
+                        cmd.Parameters.AddWithValue("?horaPaga", null);
+                    }
+                    else {
+                        string hora = reserva.HoraPagamento.ToString("MM-dd-yyyy HH:mm:ss");
+                        cmd.Parameters.AddWithValue("?horaPaga", hora);
+                    }
+
+                    cmd.Parameters["?horaPaga"].Direction = ParameterDirection.Input;
+
+
+                    if(reserva.TransactionUniqueId == default(string)) {
+                        cmd.Parameters.AddWithValue("?token", null);
+                    }
+                    else {
+                        cmd.Parameters.AddWithValue("?token", reserva.token);
+                    }
+
+                    cmd.Parameters["?token"].Direction = ParameterDirection.Input;
+
+
+                    cmd.Parameters.AddWithValue("?idC", reserva.IdCliente);
+                    cmd.Parameters["?idC"].Direction = ParameterDirection.Input;
+
+                    if(reserva.IdFuncionarioDecide == default(int)) {
+                        cmd.Parameters.AddWithValue("?idAceita", null);
+                    }
+                    else {
+                        cmd.Parameters.AddWithValue("?idAceita", reserva.IdFuncionarioDecide);
+                    }
+
+                    cmd.Parameters["?idAceita"].Direction = ParameterDirection.Input;
+
+
+                    if(reserva.IdFuncionarioEntrega == default(int)) {
+                        cmd.Parameters.AddWithValue("?idAceita", null);
+                    }
+                    else {
+                        cmd.Parameters.AddWithValue("?idEntrega", reserva.IdFuncionarioEntrega);
+                    }
+
+                    cmd.Parameters["?idEntrega"].Direction = ParameterDirection.Input;
+
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
         }
 
         public bool ExisteReserva(int idReserva)
