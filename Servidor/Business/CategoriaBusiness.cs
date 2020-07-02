@@ -169,12 +169,12 @@ namespace Business
 
 
 
-        public IList<CategoriaViewDTO> GetCategorias()
+        public IList<CategoriaViewDTO> GetCategoriasAtivadas()
         {
             _logger.LogDebug("A executar [CategoriaBusiness -> GetCategoriasAtivadas]");
             IList<CategoriaViewDTO> categoriasViewDTO = new List<CategoriaViewDTO>();
 
-            IList<Categoria> categorias = _categoriaDAO.GetCategorias();
+            IList<Categoria> categorias = _categoriaDAO.GetCategoriasAtivadas();
             if (categorias != null)
             {
                 string pathImagem = $"{_appSettings.ServerUrl}/Images/Categoria";
@@ -191,9 +191,9 @@ namespace Business
         }
 
 
-        public ServiceResult<IList<ProdutoViewDTO>> GetProdutosCategoria(int idCategoria)
+        public ServiceResult<IList<ProdutoViewDTO>> GetProdutosAtivadosCategoria(int idCategoria)
         {
-            _logger.LogDebug("A executar [CategoriaBusiness -> GetProdutosCategoria]");
+            _logger.LogDebug("A executar [CategoriaBusiness -> GetProdutosAtivadosCategoria]");
             IList<int> erros = new List<int>();
             IList<ProdutoViewDTO> produtosViewDTO = null;
 
@@ -206,10 +206,10 @@ namespace Business
             {
                 if (_categoriaDAO.IsAtiva(idCategoria))
                 {
-                    IList<Produto> produtos = _categoriaDAO.GetProdutosCategoria(idCategoria);
+                    IList<Produto> produtos = _categoriaDAO.GetProdutosAtivadosCategoria(idCategoria);
                     if (produtos != null)
                     {
-                        string pathImagem = $"{_appSettings.ServerUrl}/Images/ Produto";
+                        string pathImagem = $"{_appSettings.ServerUrl}/Images/Produto";
                         foreach (Produto produto in produtos)
                         {
                             ProdutoViewDTO produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
@@ -228,6 +228,43 @@ namespace Business
             return new ServiceResult<IList<ProdutoViewDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosViewDTO };
         }
 
+
+        public ServiceResult<IList<ProdutoViewDTO>> GetProdutosDesativadosCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar [CategoriaBusiness -> GetProdutosDesativadosCategoria]");
+            IList<int> erros = new List<int>();
+            IList<ProdutoViewDTO> produtosViewDTO = null;
+
+            if (!_categoriaDAO.ExisteCategoria(idCategoria))
+            {
+                _logger.LogWarning($"A Categoria com IdCategoria {idCategoria} não existe!");
+                erros.Add((int)ErrosEnumeration.CategoriaNaoExiste);
+            }
+            else
+            {
+                if (_categoriaDAO.IsAtiva(idCategoria))
+                {
+                    IList<Produto> produtos = _categoriaDAO.GetProdutosDesativadosCategoria(idCategoria);
+                    if (produtos != null)
+                    {
+                        string pathImagem = $"{_appSettings.ServerUrl}/Images/Produto";
+                        foreach (Produto produto in produtos)
+                        {
+                            ProdutoViewDTO produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
+                            produtoViewDTO.Url = new Uri($"{pathImagem}/{produto.IdProduto}.{produto.ExtensaoImagem}");
+                            produtosViewDTO.Add(produtoViewDTO);
+                        }
+                    }
+                }
+                else
+                {
+                    _logger.LogDebug($"A Categoria com IdCategoria {idCategoria} encontra-se desativada!");
+                    erros.Add((int)ErrosEnumeration.CategoriaDesativada);
+                }
+            }
+
+            return new ServiceResult<IList<ProdutoViewDTO>> { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any(), Resultado = produtosViewDTO };
+        }
 
 
         public ServiceResult<CategoriaViewDTO> GetCategoria(int idCategoria)

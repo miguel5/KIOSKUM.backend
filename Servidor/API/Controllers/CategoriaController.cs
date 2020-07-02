@@ -157,13 +157,13 @@ namespace API.Controllers
 
         [AllowAnonymous]
         //[Authorize(Roles = "Administrador,Cliente")]
-        [HttpGet("todas")]
-        public IActionResult GetCategorias()
+        [HttpGet("ativadas")]
+        public IActionResult GetCategoriasAtivadas()
         {
             _logger.LogDebug("A executar api/categoria/todas -> Get");
             try
             {
-                IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategorias();
+                IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoriasAtivadas();
                 _logger.LogInformation("Get das Categorias ativadas efetuado com sucesso.");
                 return Ok(resultado);
 
@@ -183,13 +183,46 @@ namespace API.Controllers
 
         [AllowAnonymous]
         //[Authorize(Roles = "Administrador,Cliente")]
-        [HttpGet("produtos")]
-        public IActionResult GetProdutosCategoria(int idCategoria)
+        [HttpGet("produtos/ativados")]
+        public IActionResult GetProdutosAtivadosCategoria(int idCategoria)
         {
-            _logger.LogDebug("A executar api/categoria/produtos -> Get");
+            _logger.LogDebug("A executar api/categoria/produtos/ativados -> Get");
             try
             {
-                ServiceResult<IList<ProdutoViewDTO>> resultado = _categoriaBusiness.GetProdutosCategoria(idCategoria);
+                ServiceResult<IList<ProdutoViewDTO>> resultado = _categoriaBusiness.GetProdutosAtivadosCategoria(idCategoria);
+                if (resultado.Sucesso)
+                {
+                    _logger.LogInformation($"Get dos Ativados Produtos da Categoria com IdCategoria {idCategoria} efetuado com sucesso.");
+                    return Ok(resultado.Resultado);
+                }
+                else
+                {
+                    _logger.LogInformation($"Ocorreu um erro ao efetuar o Get dos Produtos Ativados da Categoria com IdCategoria {idCategoria}.");
+                    return BadRequest(resultado.Erros);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                _logger.LogError(e, e.Message);
+                return BadRequest(new { message = e.Message });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                return StatusCode(500);
+            }
+        }
+
+
+        [AllowAnonymous]
+        //[Authorize(Roles = "Administrador,Cliente")]
+        [HttpGet("produtos/desativados")]
+        public IActionResult GetProdutosDesativadosCategoria(int idCategoria)
+        {
+            _logger.LogDebug("A executar api/categoria/produtos/desativados -> Get");
+            try
+            {
+                ServiceResult<IList<ProdutoViewDTO>> resultado = _categoriaBusiness.GetProdutosDesativadosCategoria(idCategoria);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"Get dos Produtos da Categoria com IdCategoria {idCategoria} efetuado com sucesso.");
@@ -212,7 +245,6 @@ namespace API.Controllers
                 return StatusCode(500);
             }
         }
-
 
 
         [AllowAnonymous]

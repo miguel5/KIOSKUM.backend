@@ -202,31 +202,6 @@ namespace Business
         }
 
 
-        public IList<ProdutoViewDTO> GetProdutosDesativados()
-        {
-            _logger.LogDebug("A executar [ProdutoBusiness -> GetProdutosDesativados]");
-            IList<ProdutoViewDTO> produtosViewDTO = null;
-
-            IList<Produto> produtos = _produtoDAO.GetProdutosDesativados();
-            if (produtos != null)
-            {
-                string pathImagem = Path.Combine(_appSettings.ServerUrl, "Images", "Produto");
-                foreach (Produto produto in produtos)
-                {
-                    ProdutoViewDTO produtoViewDTO = _mapper.Map<ProdutoViewDTO>(produto);
-                    produtoViewDTO.Url = new Uri(Path.Combine(pathImagem, $"{produto.IdProduto}.{produto.ExtensaoImagem}"));
-                    produtosViewDTO.Add(produtoViewDTO);
-                }
-            }
-            else
-            {
-                produtosViewDTO = new List<ProdutoViewDTO>();
-            }
-
-            return produtosViewDTO;
-        }
-
-
 
         public ServiceResult<ProdutoViewDTO> GetProduto(int idProduto)
         {
