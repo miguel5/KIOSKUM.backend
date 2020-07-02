@@ -7,6 +7,9 @@ namespace DTO.ProdutoDTOs
     public class ProdutoViewDTO
     {
         [Required]
+        public string IdProduto { get; set; }
+
+        [Required]
         public string Nome { get; set; }
 
         [Required]

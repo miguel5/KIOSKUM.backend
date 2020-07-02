@@ -1,23 +1,129 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using DAO.Interfaces;
 using Entities;
+using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
+using Services.DBConnection;
 
 namespace DAO
 {
     public class ReservaDAO : IReservaDAO
     {
-        public ReservaDAO()
+        private readonly ILogger _logger;
+        private readonly IConnectionDBService _connectionDBService;
+
+        public ReservaDAO(ILogger<ReservaDAO> logger, IConnectionDBService connectionDBService)
         {
+            _logger = logger;
+            _connectionDBService = connectionDBService;
         }
 
         public void EditarReserva(Reserva reserva)
         {
-            throw new System.NotImplementedException();
+            _logger.LogDebug("A executar [ReservaDAO -> EditarReserva]");
+            try
+            {
+                _connectionDBService.OpenConnection();
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "editar_reserva";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?idR", reserva.IdReserva);
+                    cmd.Parameters["?idR"].Direction = ParameterDirection.Input;
+
+                    if (reserva.HoraPagamento == default(DateTime))
+                    {
+                        cmd.Parameters.AddWithValue("?horaPaga", null);
+                    }
+                    else
+                    {
+                        string hora = reserva.HoraPagamento.ToString("MM-dd-yyyy HH:mm:ss");
+                        cmd.Parameters.AddWithValue("?horaPaga", hora);
+                    }
+
+                    cmd.Parameters["?horaPaga"].Direction = ParameterDirection.Input;
+
+
+                    if (reserva.TransactionToken == default)
+                    {
+                        cmd.Parameters.AddWithValue("?token", null);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("?token", reserva.TransactionToken);
+                    }
+
+                    cmd.Parameters["?token"].Direction = ParameterDirection.Input;
+
+
+                    cmd.Parameters.AddWithValue("?idC", reserva.IdCliente);
+                    cmd.Parameters["?idC"].Direction = ParameterDirection.Input;
+
+                    if (reserva.IdFuncionarioDecide == default(int))
+                    {
+                        cmd.Parameters.AddWithValue("?idAceita", null);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("?idAceita", reserva.IdFuncionarioDecide);
+                    }
+
+                    cmd.Parameters["?idAceita"].Direction = ParameterDirection.Input;
+
+
+                    if (reserva.IdFuncionarioEntrega == default(int))
+                    {
+                        cmd.Parameters.AddWithValue("?idAceita", null);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("?idEntrega", reserva.IdFuncionarioEntrega);
+                    }
+
+                    cmd.Parameters["?idEntrega"].Direction = ParameterDirection.Input;
+
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
         }
 
         public bool ExisteReserva(int idReserva)
         {
-            throw new System.NotImplementedException();
+            _logger.LogDebug("A executar [ReservaDAO -> ExisteReserva]");
+            try
+            {
+                _connectionDBService.OpenConnection();
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "existe_reserva";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?id", idReserva);
+                    cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                    object val = cmd.ExecuteScalar();
+
+                    return Convert.ToBoolean(val);
+                }
+            }
+            catch { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
         }
 
         public Reserva GetReserva(int idReserva)
@@ -27,17 +133,90 @@ namespace DAO
 
         public IList<Reserva> GetReservasEstado(int estado)
         {
-            IList<Reserva> lista = new List<Reserva>();
-            for(int i = 0; i < 200 ; i++)
-            {
-                lista.Add(new Reserva() { Estado = EstadosReservaEnum.Aceite});
-            }
-            return lista;
+            throw new System.NotImplementedException();
         }
 
         public void RegistarReserva(Reserva reserva)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                _connectionDBService.OpenConnection();
+
+                int reservaId;
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "registar_reserva";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?preco", reserva.Preco);
+                    cmd.Parameters["?preco"].Direction = ParameterDirection.Input;
+
+                    cmd.Parameters.AddWithValue("?estado", reserva.Estado);
+                    cmd.Parameters["?estado"].Direction = ParameterDirection.Input;
+
+                    string hora = reserva.HoraEntrega.ToString("MM-dd-yyyy HH:mm:ss");
+
+                    cmd.Parameters.AddWithValue("?horaEntrega", hora);
+                    cmd.Parameters["?horaEntrega"].Direction = ParameterDirection.Input;
+
+                    reservaId = Convert.ToInt32(cmd.ExecuteScalar());
+                }
+
+                using (MySqlCommand cmdU = new MySqlCommand())
+                {
+                    cmdU.Connection = _connectionDBService.Connection;
+
+                    cmdU.CommandText = "registar_reserva_utilizadores";
+                    cmdU.CommandType = CommandType.StoredProcedure;
+
+                    cmdU.Parameters.AddWithValue("?idCliente", reserva.IdCliente);
+                    cmdU.Parameters["?idCliente"].Direction = ParameterDirection.Input;
+
+                    cmdU.Parameters.AddWithValue("?idReserva", reservaId);
+                    cmdU.Parameters["?idReserva"].Direction = ParameterDirection.Input;
+
+                    cmdU.ExecuteNonQuery();
+                }
+
+                foreach (Item item in reserva.Itens)
+                {
+                    using (MySqlCommand cmdI = new MySqlCommand())
+                    {
+                        cmdI.Connection = _connectionDBService.Connection;
+
+                        cmdI.CommandText = "registar_reserva_produto";
+                        cmdI.CommandType = CommandType.StoredProcedure;
+
+                        cmdI.Parameters.AddWithValue("?idProduto", item.IdProduto);
+                        cmdI.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+                        cmdI.Parameters.AddWithValue("?idReserva", reservaId);
+                        cmdI.Parameters["?idReserva"].Direction = ParameterDirection.Input;
+
+                        cmdI.Parameters.AddWithValue("?quantidade", item.Quantidade);
+                        cmdI.Parameters["?quantidade"].Direction = ParameterDirection.Input;
+
+                        if (item.Observacoes == default(string))
+                        {
+                            cmdI.Parameters.AddWithValue("?observacoes", null);
+                        }
+                        else
+                        {
+                            cmdI.Parameters.AddWithValue("?observacoes", item.Observacoes);
+                        }
+                        cmdI.Parameters["?observacoes"].Direction = ParameterDirection.Input;
+
+                        cmdI.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
         }
     }
 }

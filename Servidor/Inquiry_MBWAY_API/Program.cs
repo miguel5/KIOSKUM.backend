@@ -10,25 +10,25 @@ namespace Inquiry_MBWAY_API
 {
     class Program
     {
+        private readonly IReservaDAO _reservaDAO;
         private readonly AppSettings _appSettings;
 
-        public Program(IOptions<AppSettings> appSettings)
+        public Program(IReservaDAO reservaDAO, IOptions<AppSettings> appSettings)
         {
+            _reservaDAO = reservaDAO;
             _appSettings = appSettings.Value;
         }
 
         public static void Main()
         {
-            IReservaDAO _reservaDAO = new ReservaDAO();
-
-            IList<Reserva> listaReservasAceites =_reservaDAO.GetReservasEstado((int)EstadosReservaEnum.Aceite);
+            //IList<Reserva> listaReservasAceites = _reservaDAO.GetReservasEstado((int)EstadosReservaEnum.Aceite);
 
 
             /*
              * Codigo API MBWAY
              * Inicio
              */
-            Random random = new Random();
+            /*Random random = new Random();
             foreach (Reserva reserva in listaReservasAceites)
             {
                 var x = random.NextDouble();
@@ -44,7 +44,7 @@ namespace Inquiry_MBWAY_API
                 }
                 else { }
 
-            }
+            }*/
 
             /*
              * Fim
