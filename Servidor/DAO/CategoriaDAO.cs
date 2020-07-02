@@ -236,7 +236,7 @@ namespace DAO
             }
         }
 
-        public IList<Categoria> GetCategorias()
+        public IList<Categoria> GetCategoriasAtivadas()
         {
             _logger.LogDebug("A executar [CategoriaDAO -> GetCategorias]");
             IList<Categoria> categorias = new List<Categoria>();
@@ -249,7 +249,7 @@ namespace DAO
                 {
                     cmd.Connection = _connectionDBService.Connection;
 
-                    cmd.CommandText = "get_categorias";
+                    cmd.CommandText = "get_categorias_ativadas";
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     using (MySqlDataReader var = cmd.ExecuteReader())
