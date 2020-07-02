@@ -104,27 +104,35 @@ namespace Business
             else
             { 
                 Administrador administrador = _administradorDAO.GetContaNumFuncionario(model.NumFuncionario);
-                if (administrador.Password.Equals(_hashPasswordService.HashPassword(model.Password)))
+                if(administrador == null)
                 {
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                    var tokenDescriptor = new SecurityTokenDescriptor
-                    {
-                        Subject = new ClaimsIdentity(new Claim[]
-                        {
-                            new Claim(ClaimTypes.NameIdentifier, administrador.IdFuncionario.ToString()),
-                            new Claim(ClaimTypes.Role, "Administrador")
-                        }),
-                        Expires = DateTime.UtcNow.AddHours(12),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                    };
-                    var token = tokenHandler.CreateToken(tokenDescriptor);
-                    resultToken = new TokenDTO { Token = tokenHandler.WriteToken(token) };
+                    _logger.LogWarning($"O Número de Funcionário {model.NumFuncionario} é um Funcionário.");
+                    erros.Add((int)ErrosEnumeration.NumFuncionarioInvalidoLogin);
                 }
                 else
                 {
-                    _logger.LogWarning("A Password está incorreta!");
-                    erros.Add((int)ErrosEnumeration.EmailPasswordIncorreta);
+                    if (administrador.Password.Equals(_hashPasswordService.HashPassword(model.Password)))
+                    {
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                        var tokenDescriptor = new SecurityTokenDescriptor
+                        {
+                            Subject = new ClaimsIdentity(new Claim[]
+                            {
+                            new Claim(ClaimTypes.NameIdentifier, administrador.IdFuncionario.ToString()),
+                            new Claim(ClaimTypes.Role, "Administrador")
+                            }),
+                            Expires = DateTime.UtcNow.AddHours(12),
+                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                        };
+                        var token = tokenHandler.CreateToken(tokenDescriptor);
+                        resultToken = new TokenDTO { Token = tokenHandler.WriteToken(token) };
+                    }
+                    else
+                    {
+                        _logger.LogWarning("A Password está incorreta!");
+                        erros.Add((int)ErrosEnumeration.NumFuncionarioPasswordIncorreta);
+                    }
                 }
             }
 
@@ -178,6 +186,7 @@ namespace Business
                 if (!erros.Any())
                 {
                     Administrador administradorEditado = _mapper.Map<Administrador>(model);
+                    administradorEditado.IdFuncionario = administrador.IdFuncionario;
                     administradorEditado.NumFuncionario = administrador.NumFuncionario;
                     administradorEditado.Password = _hashPasswordService.HashPassword(model.NovaPassword);
                     _administradorDAO.EditarConta(administradorEditado);
