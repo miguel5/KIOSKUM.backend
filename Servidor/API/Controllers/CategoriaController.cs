@@ -160,7 +160,7 @@ namespace API.Controllers
         [HttpGet("ativadas")]
         public IActionResult GetCategoriasAtivadas()
         {
-            _logger.LogDebug("A executar api/categoria/todas -> Get");
+            _logger.LogDebug("A executar api/categoria/ativadas -> Get");
             try
             {
                 IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoriasAtivadas();
