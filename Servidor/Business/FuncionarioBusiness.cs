@@ -104,27 +104,35 @@ namespace Business
             else
             {
                 Funcionario funcionario = _funcionarioDAO.GetContaNumFuncionario(model.NumFuncionario);
-                if (funcionario.Password.Equals(_hashPasswordService.HashPassword(model.Password)))
+                if(funcionario == null)
                 {
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-                    var tokenDescriptor = new SecurityTokenDescriptor
-                    {
-                        Subject = new ClaimsIdentity(new Claim[]
-                        {
-                            new Claim(ClaimTypes.NameIdentifier, funcionario.IdFuncionario.ToString()),
-                            new Claim(ClaimTypes.Role, "Funcionario")
-                        }),
-                        Expires = DateTime.UtcNow.AddHours(9),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                    };
-                    var token = tokenHandler.CreateToken(tokenDescriptor);
-                    resultToken = new TokenDTO { Token = tokenHandler.WriteToken(token) };
+                    _logger.LogWarning($"O Número de Funcionário {model.NumFuncionario} é um Administrador.");
+                    erros.Add((int)ErrosEnumeration.NumFuncionarioInvalidoLogin);
                 }
                 else
                 {
-                    _logger.LogWarning("A Password está incorreta!");
-                    erros.Add((int)ErrosEnumeration.EmailPasswordIncorreta);
+                    if (funcionario.Password.Equals(_hashPasswordService.HashPassword(model.Password)))
+                    {
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                        var tokenDescriptor = new SecurityTokenDescriptor
+                        {
+                            Subject = new ClaimsIdentity(new Claim[]
+                            {
+                            new Claim(ClaimTypes.NameIdentifier, funcionario.IdFuncionario.ToString()),
+                            new Claim(ClaimTypes.Role, "Funcionario")
+                            }),
+                            Expires = DateTime.UtcNow.AddHours(9),
+                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                        };
+                        var token = tokenHandler.CreateToken(tokenDescriptor);
+                        resultToken = new TokenDTO { Token = tokenHandler.WriteToken(token) };
+                    }
+                    else
+                    {
+                        _logger.LogWarning("A Password está incorreta!");
+                        erros.Add((int)ErrosEnumeration.NumFuncionarioPasswordIncorreta);
+                    }
                 }
             }
 
