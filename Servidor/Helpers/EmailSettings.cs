@@ -2,9 +2,8 @@
 {
     public class EmailSettings
     {
+        public string Name { get; set; }
         public string MyEmail { get; set; }
-        public string MyPassword { get; set; }
-        public string ServerAddressSMTP { get; set; }
-        public int Port { get; set; }
+        public string SendGridAPIKey { get; set; }
     }
 }
