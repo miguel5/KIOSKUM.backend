@@ -386,9 +386,9 @@ namespace DAO
 
                                 using (MySqlDataReader varI = cmdIA.ExecuteReader())
                                 {
-                                    while (var.Read())
+                                    while (varI.Read())
                                     {
-                                        produto.Alergenios.Add(var.GetString(0));
+                                        produto.Alergenios.Add(varI.GetString(0));
                                     }
                                 }
                             }
