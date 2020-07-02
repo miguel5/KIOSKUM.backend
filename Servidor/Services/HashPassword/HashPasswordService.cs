@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Extensions.Logging;
 
 namespace Services.HashPassword
 {

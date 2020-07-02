@@ -15,11 +15,11 @@ namespace API
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureLogging(logBuilder =>
-                    {
-                        logBuilder.ClearProviders();
-                        logBuilder.AddConsole();
-                        logBuilder.AddTraceSource("Information, ActivityTracing");
-                    })
+                {
+                    logBuilder.ClearProviders();
+                    logBuilder.AddConsole();
+                    logBuilder.AddTraceSource("Information, ActivityTracing");
+                })
                 .UseStartup<Startup>();
     }
 }
