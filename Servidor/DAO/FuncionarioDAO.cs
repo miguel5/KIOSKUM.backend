@@ -22,36 +22,6 @@ namespace DAO
 
         public void EditarConta(Funcionario funcionario)
         {
-            throw new NotImplementedException();
-        }
-
-        public bool ExisteIdFuncionario(int idFuncionario)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool ExisteNumFuncionario(int numFuncionario)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Funcionario GetContaIdFuncionario(int numFuncionario)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Funcionario GetContaNumFuncionario(int numFuncionario)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InserirConta(Funcionario funcionario)
-        {
-            throw new NotImplementedException();
-        }
-
-        /*public void EditarConta(Funcionario funcionario)
-        {
             _logger.LogDebug("A executar [FuncionarioDAO -> EditarConta]");
             try
             {
@@ -72,7 +42,38 @@ namespace DAO
                     cmd.Parameters.AddWithValue("?numero", funcionario.NumFuncionario);
                     cmd.Parameters["?numero"].Direction = ParameterDirection.Input;
 
+                    cmd.Parameters.AddWithValue("?pass", funcionario.Password);
+                    cmd.Parameters["?pass"].Direction = ParameterDirection.Input;
+
                     cmd.ExecuteNonQuery();
+                }
+            }
+            catch { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
+        }
+
+        public bool ExisteIdFuncionario(int idFuncionario)
+        {
+            _logger.LogDebug("A executar [FuncionarioDAO -> ExisteIdFuncionario]");
+            try
+            {
+                _connectionDBService.OpenConnection();
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "existe_id_funcionario";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?id", idFuncionario);
+                    cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                    object val = cmd.ExecuteScalar();
+
+                    return Convert.ToBoolean(val);
                 }
             }
             catch { throw; }
@@ -110,6 +111,42 @@ namespace DAO
             }
         }
 
+        public Funcionario GetContaIdFuncionario(int idFuncionario)
+        {
+            _logger.LogDebug("A executar [FuncionarioDAO -> GetContaIdFuncionario]");
+            try
+            {
+                _connectionDBService.OpenConnection();
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "get_funcionario_id";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?id", idFuncionario);
+                    cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                    using (MySqlDataReader var = cmd.ExecuteReader())
+                    {
+
+                        Funcionario funcionario = null;
+
+                        if (var.Read())
+                        {
+                            funcionario = new Funcionario { IdFuncionario = idFuncionario, Nome = var.GetString(0), NumFuncionario = var.GetInt32(1), Password = var.GetString(1) };
+                        }
+                        return funcionario;
+                    }
+                }
+            }
+            catch (Exception) { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
+        }
+
         public Funcionario GetContaNumFuncionario(int numFuncionario)
         {
             _logger.LogDebug("A executar [FuncionarioDAO -> GetContaNumFuncionario]");
@@ -133,7 +170,7 @@ namespace DAO
 
                         if (var.Read())
                         {
-                            funcionario = new Funcionario { IdFuncionario = var.GetInt32(0), Nome = var.GetString(1), NumFuncionario = numFuncionario };
+                            funcionario = new Funcionario { IdFuncionario = var.GetInt32(0), Nome = var.GetString(1), NumFuncionario = numFuncionario, Password = var.GetString(2) };
                         }
                         return funcionario;
                     }
@@ -165,6 +202,9 @@ namespace DAO
                     cmd.Parameters.AddWithValue("?numero", funcionario.NumFuncionario);
                     cmd.Parameters["?numero"].Direction = ParameterDirection.Input;
 
+                    cmd.Parameters.AddWithValue("?pass", funcionario.Password);
+                    cmd.Parameters["?pass"].Direction = ParameterDirection.Input;
+
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -173,6 +213,6 @@ namespace DAO
             {
                 _connectionDBService.CloseConnection();
             }
-        }*/
+        }
     }
 }

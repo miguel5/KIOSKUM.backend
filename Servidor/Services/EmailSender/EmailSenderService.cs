@@ -5,6 +5,8 @@ using Entities;
 using Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace Services.EmailSender
 {
@@ -19,25 +21,20 @@ namespace Services.EmailSender
         {
             _logger = logger;
             _emailSettings = appSettings.Value.EmailSettings;
-            _smtp = new SmtpClient
-            {
-                Host = _emailSettings.ServerAddressSMTP, 
-                Credentials = new System.Net.NetworkCredential
-                 (_emailSettings.MyEmail, _emailSettings.MyPassword),
-                Port = _emailSettings.Port,
-                EnableSsl = true
-            };
         }
 
         public async Task SendEmail(string email, Email mensagem)
         {
-            MailMessage mail = new MailMessage();
-            mail.To.Add(email);
-            mail.From = new MailAddress(_emailSettings.MyEmail);
-            mail.Subject = mensagem.Assunto;
-            mail.Body = mensagem.Conteudo;
-            mail.IsBodyHtml = true;
-            await _smtp.SendMailAsync(mail);
+            _logger.LogDebug("A executar [EmailSenderService -> SendEmail]");
+            var apikey = _emailSettings.SendGridAPIKey;
+            var client = new SendGridClient(apikey);
+            var from = new EmailAddress(_emailSettings.MyEmail, _emailSettings.Name);
+            var subject = mensagem.Assunto;
+            var to = new EmailAddress(email);
+            var plainTextContent = "";
+            var htmlContent = $"<p>{mensagem.Conteudo}</p>";
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+            await client.SendEmailAsync(msg);
         }
 
         public void Dispose()
