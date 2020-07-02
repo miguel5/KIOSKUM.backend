@@ -190,21 +190,27 @@ namespace DAO
                         {
                             produto = new Produto { IdProduto = idProduto, Nome = var.GetString(0), IdCategoria = var.GetInt32(3), Preco = var.GetDouble(1), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(2) };
 
+                            var.Close();
+
+                            cmd.Parameters.Clear();
+
                             cmd.CommandText = "get_ingredientes_produto";
                             cmd.CommandType = CommandType.StoredProcedure;
 
                             cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
                             cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
-                            var.Close();
+
                             using (MySqlDataReader varI = cmd.ExecuteReader())
                             {
                                 while (varI.Read())
                                 {
                                     produto.Ingredientes.Add(varI.GetString(0));
                                 }
-                                varI.Close();
                             }
+
+                            cmd.Parameters.Clear();
+
                             cmd.CommandText = "get_alergenios_produto";
                             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -217,7 +223,6 @@ namespace DAO
                                 {
                                     produto.Alergenios.Add(varA.GetString(0));
                                 }
-                                varA.Close();
                             }
                         }
                         return produto;
@@ -255,9 +260,7 @@ namespace DAO
                         if (var.Read())
                         {
                             produto = new Produto { IdProduto = var.GetInt32(0), Nome = nome, IdCategoria = var.GetInt32(3), Preco = var.GetDouble(1), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(2) };
-                            var.Close();
                         }
-                        var.Close();
                     }
                 }
 
@@ -276,7 +279,6 @@ namespace DAO
                         {
                             produto.Ingredientes.Add(var.GetString(0));
                         }
-                        var.Close();
                     }
                 }
 
@@ -296,7 +298,6 @@ namespace DAO
                         {
                             produto.Alergenios.Add(var.GetString(0));
                         }
-                        var.Close();
                     }
                 }
                 return produto;
@@ -307,79 +308,6 @@ namespace DAO
                 _connectionDBService.CloseConnection();
             }
         }
-
-
-
-        public IList<Produto> GetProdutosDesativados()
-        {
-            _logger.LogDebug("A executar [ProdutoDAO -> GetProdutosDesativados]");
-
-            IList<Produto> produtos = new List<Produto>();
-
-            try
-            {
-                _connectionDBService.OpenConnection();
-
-                using (MySqlCommand cmd = new MySqlCommand())
-                {
-                    cmd.Connection = _connectionDBService.Connection;
-
-                    cmd.CommandText = "get_produtos_desativados";
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    using (MySqlDataReader var = cmd.ExecuteReader())
-                    {
-                        while (var.Read())
-                        {
-                            Produto produto = new Produto { IdProduto = var.GetInt32(0), Nome = var.GetString(1), IdCategoria = var.GetInt32(4), Preco = var.GetDouble(2), Ingredientes = new List<string>(), Alergenios = new List<string>(), ExtensaoImagem = var.GetString(3) };
-
-                            using (MySqlCommand cmdI = new MySqlCommand())
-                            {
-                                cmdI.CommandText = "get_ingredientes_produto";
-                                cmdI.CommandType = CommandType.StoredProcedure;
-
-                                cmdI.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                                cmdI.Parameters["?idProduto"].Direction = ParameterDirection.Input;
-
-                                using (MySqlDataReader varI = cmd.ExecuteReader())
-                                {
-                                    while (varI.Read())
-                                    {
-                                        produto.Ingredientes.Add(varI.GetString(0));
-                                    }
-                                }
-                            }
-
-                            using (MySqlCommand cmdA = new MySqlCommand())
-                            {
-                                cmdA.CommandText = "get_alergenios_produto";
-                                cmdA.CommandType = CommandType.StoredProcedure;
-
-                                cmdA.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                                cmdA.Parameters["?idProduto"].Direction = ParameterDirection.Input;
-
-                                using (MySqlDataReader varA = cmd.ExecuteReader())
-                                {
-                                    while (varA.Read())
-                                    {
-                                        produto.Alergenios.Add(varA.GetString(0));
-                                    }
-                                }
-                            }
-
-                            produtos.Add(produto);
-                        }
-                    }
-                }
-                return produtos;
-            }
-            catch (Exception) { throw; }
-            finally
-            {
-                _connectionDBService.CloseConnection();
-            }
-        }
-
 
         public bool IsAtivo(int idProduto)
         {
@@ -453,6 +381,8 @@ namespace DAO
 
                         int ingredientId = Convert.ToInt32(cmdI.ExecuteScalar());
 
+                        cmdI.Parameters.Clear();
+
                         cmdI.CommandText = "adicionar_produto_ingrediente";
                         cmdI.CommandType = CommandType.StoredProcedure;
 
@@ -479,6 +409,8 @@ namespace DAO
                         cmdA.Parameters["?nome"].Direction = ParameterDirection.Input;
 
                         int alergenicId = Convert.ToInt32(cmdA.ExecuteScalar());
+
+                        cmdA.Parameters.Clear();
 
                         cmdA.CommandText = "adicionar_produto_alergenio";
                         cmdA.CommandType = CommandType.StoredProcedure;
