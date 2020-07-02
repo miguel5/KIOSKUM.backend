@@ -132,7 +132,7 @@ namespace Business
         }
 
 
-        public ServiceResult EditarConta(int idFuncionario, EditarTrabalhadorDTO model)
+        public ServiceResult EditarConta(EditarTrabalhadorDTO model)
         {
             _logger.LogDebug("A executar [FuncionarioBusiness -> CriarConta]");
             if (string.IsNullOrWhiteSpace(model.Nome))
@@ -150,7 +150,7 @@ namespace Business
             }
 
             IList<int> erros = new List<int>();
-            Funcionario funcionario = _funcionarioDAO.GetContaIdFuncionario(idFuncionario);
+            Funcionario funcionario = _funcionarioDAO.GetContaNumFuncionario(model.NumFuncionario);
 
             if(funcionario == null)
             {
@@ -179,6 +179,7 @@ namespace Business
                 if (!erros.Any())
                 {
                     Funcionario funcionarioEditado = _mapper.Map<Funcionario>(model);
+                    funcionarioEditado.IdFuncionario = funcionario.IdFuncionario;
                     funcionarioEditado.NumFuncionario = funcionario.NumFuncionario;
                     funcionarioEditado.Password = _hashPasswordService.HashPassword(model.NovaPassword);
                     _funcionarioDAO.EditarConta(funcionarioEditado);

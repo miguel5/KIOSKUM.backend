@@ -9,7 +9,6 @@ using Services;
 
 namespace API.Models
 {
-    [Authorize(Roles = "Funcionario")]
     [ApiController]
     [Route("api/funcionario")]
     public class FuncionarioController : ControllerBase
@@ -26,8 +25,7 @@ namespace API.Models
 
 
 
-        //[Authorize(Roles = "Administrador")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("criar")]
         public IActionResult CriarConta([FromBody] TrabalhadorViewDTO model)
         {
@@ -116,7 +114,7 @@ namespace API.Models
 
             try
             {
-                ServiceResult resultado = _funcionarioBusiness.EditarConta(model.NumFuncionario, model);
+                ServiceResult resultado = _funcionarioBusiness.EditarConta(model);
                 if (resultado.Sucesso)
                 {
                     _logger.LogInformation($"O {model.Nome} e Número de Funcionário {model.NumFuncionario} editou a sua conta com sucesso.");
