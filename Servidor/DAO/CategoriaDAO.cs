@@ -387,9 +387,9 @@ namespace DAO
 
                                 using (MySqlDataReader varI = cmdIA.ExecuteReader())
                                 {
-                                    while (var.Read())
+                                    while (varI.Read())
                                     {
-                                        produto.Alergenios.Add(var.GetString(0));
+                                        produto.Alergenios.Add(varI.GetString(0));
                                     }
                                 }
                             }
@@ -444,7 +444,7 @@ namespace DAO
                                 cmdI.Parameters.AddWithValue("?idProduto", produto.IdProduto);
                                 cmdI.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
-                                using (MySqlDataReader varI = cmd.ExecuteReader())
+                                using (MySqlDataReader varI = cmdI.ExecuteReader())
                                 {
                                     while (varI.Read())
                                     {
@@ -463,7 +463,7 @@ namespace DAO
                                 cmdA.Parameters.AddWithValue("?idProduto", produto.IdProduto);
                                 cmdA.Parameters["?idProduto"].Direction = ParameterDirection.Input;
 
-                                using (MySqlDataReader varA = cmd.ExecuteReader())
+                                using (MySqlDataReader varA = cmdA.ExecuteReader())
                                 {
                                     while (varA.Read())
                                     {

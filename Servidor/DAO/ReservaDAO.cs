@@ -26,7 +26,7 @@ namespace DAO
                     cmd.Parameters.AddWithValue("?idR", reserva.Idreserva);
                     cmd.Parameters["?idR"].Direction = ParameterDirection.Input;
 
-                    if(reserva.HoraPagamento == default(DateTime)) {
+                    if(reserva.HoraPagamento == default) {
                         cmd.Parameters.AddWithValue("?horaPaga", null);
                     }
                     else {
@@ -36,21 +36,15 @@ namespace DAO
 
                     cmd.Parameters["?horaPaga"].Direction = ParameterDirection.Input;
 
-
-                    if(reserva.TransactionUniqueId == default(string)) {
-                        cmd.Parameters.AddWithValue("?token", null);
-                    }
-                    else {
-                        cmd.Parameters.AddWithValue("?token", reserva.token);
-                    }
-
+                    
+                    cmd.Parameters.AddWithValue("?token", reserva.token);
                     cmd.Parameters["?token"].Direction = ParameterDirection.Input;
 
 
                     cmd.Parameters.AddWithValue("?idC", reserva.IdCliente);
                     cmd.Parameters["?idC"].Direction = ParameterDirection.Input;
 
-                    if(reserva.IdFuncionarioDecide == default(int)) {
+                    if(reserva.IdFuncionarioDecide == default) {
                         cmd.Parameters.AddWithValue("?idAceita", null);
                     }
                     else {
@@ -60,7 +54,7 @@ namespace DAO
                     cmd.Parameters["?idAceita"].Direction = ParameterDirection.Input;
 
 
-                    if(reserva.IdFuncionarioEntrega == default(int)) {
+                    if(reserva.IdFuncionarioEntrega == default) {
                         cmd.Parameters.AddWithValue("?idAceita", null);
                     }
                     else {
@@ -110,7 +104,71 @@ namespace DAO
 
         public Reserva GetReserva(int idReserva)
         {
-            throw new System.NotImplementedException();
+            _logger.LogDebug("A executar [ReservaDAO -> GetReserva]");
+            try
+            {
+                _connectionDBService.OpenConnection();
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "get_reserva";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?id", idReserva);
+                    cmd.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                    using (MySqlDataReader var = cmd.ExecuteReader())
+                    {
+                        Reserva reserva = null;
+                        if (var.Read())
+                        {
+                            reserva = new Reserva { IdReserva = idReserva, Itens = new List<Item>(), Estado = var.GetInt32(4), Preco = var.GetDouble(2), HoraEntrega = , HoraPagamento = , TransactionUniqueId = var.GetString(3    )};
+
+                            var.Close();
+
+                            cmd.Parameters.Clear();
+
+                            cmd.CommandText = "get_ingredientes_produto";
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                            cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+
+                            using (MySqlDataReader varI = cmd.ExecuteReader())
+                            {
+                                while (varI.Read())
+                                {
+                                    produto.Ingredientes.Add(varI.GetString(0));
+                                }
+                            }
+
+                            cmd.Parameters.Clear();
+
+                            cmd.CommandText = "get_alergenios_produto";
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
+                            cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+
+                            using (MySqlDataReader varA = cmd.ExecuteReader())
+                            {
+                                while (varA.Read())
+                                {
+                                    produto.Alergenios.Add(varA.GetString(0));
+                                }
+                            }
+                        }
+                        return produto;
+                    }
+                }
+            }
+            catch (Exception) { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+            }
         }
 
         public List<Reserva> GetReservasEstado(int estado)
@@ -138,7 +196,7 @@ namespace DAO
                     cmd.Parameters.AddWithValue("?estado", reserva.Estado);
                     cmd.Parameters["?estado"].Direction = ParameterDirection.Input;
 
-                    string hora = reserva.HoraEntrega.ToString("MM-dd-yyyy HH:mm:ss");
+                    string hora = reserva.HoraEntrega.ToString("yyyy-MM-dd HH:mm:ss");
 
                     cmd.Parameters.AddWithValue("?horaEntrega", hora);
                     cmd.Parameters["?horaEntrega"].Direction = ParameterDirection.Input;
@@ -180,12 +238,7 @@ namespace DAO
                         cmdI.Parameters.AddWithValue("?quantidade", item.Quantidade);
                         cmdI.Parameters["?quantidade"].Direction = ParameterDirection.Input;
 
-                        if(item.Observacoes == default(string)) {
-                            cmdI.Parameters.AddWithValue("?observacoes", null);
-                        }
-                        else {
-                            cmdI.Parameters.AddWithValue("?observacoes", item.Observacoes);
-                        }
+                        cmdI.Parameters.AddWithValue("?observacoes", item.Observacoes);
                         cmdI.Parameters["?observacoes"].Direction = ParameterDirection.Input;
 
                         cmdI.ExecuteNonQuery();
