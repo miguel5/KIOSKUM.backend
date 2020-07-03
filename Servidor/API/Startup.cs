@@ -23,6 +23,8 @@ using Services.Imagem;
 using DTO.ReservaDTOs;
 using DTO.TrabalhadorDTOs;
 using Services.HashPassword;
+using Services.Pagamentos;
+using Services.Pagamentos.MBWay;
 
 namespace API
 {
@@ -68,18 +70,21 @@ namespace API
             services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddScoped<IHashPasswordService, HashPasswordService>();
             services.AddScoped<IImagemService, ImagemService>();
+            services.AddScoped<IPagamentosService,MBWayService>();
 
             services.AddScoped<IAdministradorDAO, AdministradorDAO>();
             services.AddScoped<ICategoriaDAO, CategoriaDAO>();
             services.AddScoped<IClienteDAO, ClienteDAO>();
             services.AddScoped<IFuncionarioDAO, FuncionarioDAO>();
             services.AddScoped<IProdutoDAO, ProdutoDAO>();
+            services.AddScoped<IReservaDAO, ReservaDAO>();
 
             services.AddScoped<IAdministradorBusiness, AdministradorBusiness>();
             services.AddScoped<ICategoriaBusiness, CategoriaBusiness>();
             services.AddScoped<IClienteBusiness, ClienteBusiness>();
             services.AddScoped<IFuncionarioBusiness, FuncionarioBusiness>();
             services.AddScoped<IProdutoBusiness, ProdutoBusiness>();
+            services.AddScoped<IReservaBusiness, ReservaBusiness>();
 
             var config = new MapperConfiguration(cfg =>
             {

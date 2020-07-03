@@ -29,7 +29,7 @@ namespace API.Controllers
 
         [Authorize(Roles = "Cliente")]
         [HttpPost("registar")]
-        public IActionResult RegistarReserva (RegistarReservaDTO model)
+        public IActionResult RegistarReserva ([FromBody] RegistarReservaDTO model)
         {
             string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idCliente = int.Parse(nameIdentifier);
@@ -40,6 +40,7 @@ namespace API.Controllers
                     return BadRequest(nameof(model));
                 }
 
+                Console.WriteLine(model.HoraEntrega);
                 ServiceResult resultado = _reservaBusiness.RegistarReserva(idCliente, model);
                 if (resultado.Sucesso)
                 {
