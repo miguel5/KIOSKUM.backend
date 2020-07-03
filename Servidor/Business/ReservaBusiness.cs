@@ -64,16 +64,17 @@ namespace Business
                 _logger.LogDebug("Existe um Item que é inválido.");
                 erros.Add((int)ErrosEnumeration.ItensInvalidos);
             }
-            if (!ValidaHoraEntrega(model.HoraEntrega))
+            /*if (!ValidaHoraEntrega(model.HoraEntrega))
             {
                 _logger.LogDebug($"A Hora {model.HoraEntrega} é inválida.");
                 erros.Add((int)ErrosEnumeration.HoraEntregaInvalida);
-            }
+            }*/
 
             if (!erros.Any())
             {
                 Reserva reserva = _mapper.Map<Reserva>(model);
                 reserva.Preco = CalculaValorTotalReserva(model.Itens);
+                Console.WriteLine(reserva.Preco);
                 _reservaDAO.RegistarReserva(reserva);
             }
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };

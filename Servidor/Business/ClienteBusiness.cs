@@ -224,7 +224,7 @@ namespace Business
             if (!_clienteDAO.ExisteEmail(model.Email))
             {
                 _logger.LogWarning($"O Email {model.Email} não existe.");
-                erros.Add((int)ErrosEnumeration.EmailPasswordIncorreta);
+                erros.Add((int)ErrosEnumeration.EmailNaoExiste);
             }
             else
             {
