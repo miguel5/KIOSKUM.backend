@@ -40,7 +40,6 @@ namespace API.Controllers
                     return BadRequest(nameof(model));
                 }
 
-                Console.WriteLine(model.HoraEntrega);
                 ServiceResult resultado = _reservaBusiness.RegistarReserva(idCliente, model);
                 if (resultado.Sucesso)
                 {
@@ -158,7 +157,7 @@ namespace API.Controllers
 
 
         [Authorize(Roles = "Funcionario,Administrador")]
-        [HttpGet("aceites")]
+        [HttpGet("aceitadas")]
         public IActionResult GetReservasAceites()
         {
             try

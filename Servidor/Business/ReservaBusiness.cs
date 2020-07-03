@@ -57,8 +57,10 @@ namespace Business
             IList<int> erros = new List<int>();
 
             if (!_clienteDAO.ExisteCliente(idCliente)){
+                _logger.LogWarning($"Não existe nenhum Cliente com o IdCliente {idCliente}.");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
+
             if(!ValidaItens(model.Itens))
             {
                 _logger.LogDebug("Existe um Item que é inválido.");
@@ -69,29 +71,33 @@ namespace Business
                 _logger.LogDebug($"A Hora {model.HoraEntrega} é inválida.");
                 erros.Add((int)ErrosEnumeration.HoraEntregaInvalida);
             }*/
-
             if (!erros.Any())
             {
                 Reserva reserva = _mapper.Map<Reserva>(model);
+                reserva.IdCliente = idCliente;
                 reserva.Preco = CalculaValorTotalReserva(model.Itens);
-                Console.WriteLine(reserva.Preco);
                 _reservaDAO.RegistarReserva(reserva);
             }
+
             return new ServiceResult { Erros = new ErrosDTO { Erros = erros }, Sucesso = !erros.Any() };
         }
 
 
         public ServiceResult FuncionarioDecideReserva(int idFuncionario, int idReserva, bool decisao)
         {
+            _logger.LogDebug("A executar [ReservaBusiness -> EditarReserva]");
+
             IList<int> erros = new List<int>();
 
             if (!_funcionarioDAO.ExisteIdFuncionario(idFuncionario))
             {
+                _logger.LogWarning($"Não existe nenhum Funcionário com o IdFuncionario {idFuncionario}.");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
 
             if (!_reservaDAO.ExisteReserva(idReserva))
             {
+                _logger.LogWarning($"Não existe nenhuma Reserva com o IdReserva {idReserva}.");
                 erros.Add((int)ErrosEnumeration.ReservaNaoExiste);
             }
 
@@ -108,18 +114,25 @@ namespace Business
                         ServiceResult<string> resultado = _pagamentoService.PedirPagamento(new MBWayPagamentoModel { NumTelemovel = numTelemovel, Valor = reserva.Preco });
                         if (!resultado.Sucesso)
                         {
-                            reserva.TransactionToken = resultado.Resultado;
+                            _logger.LogWarning($"Ocorreu um erro no pedido de pagamento da Reserva com IdReserva {idReserva}.");
                             erros.Add((int)ErrosEnumeration.ErroNoPedidoDePagamento);
+                        }
+                        else
+                        {
+                            _logger.LogDebug($"A Reserva com IdReserva {idReserva} foi Aceitada pelo Funcionário com Funiconário {idFuncionario}.");
+                            reserva.TransactionToken = resultado.Resultado;
                             _reservaDAO.EditarReserva(reserva);
                         }
                     }
                     else
                     {
+                        _logger.LogDebug($"A Reserva com IdReserva {idReserva} foi Cancelada pelo Funcionário com Funiconário {idFuncionario}.");
                         _reservaDAO.EditarReserva(reserva);
                     }
                 }
                 else
                 {
+                    _logger.LogWarning($"A Reserva com IdReserva {idReserva} não pode transitar para o estado Aceitada/Rejeitada.");
                     erros.Add((int)ErrosEnumeration.TransicaoEstadosReservaImpossivel);
                 }
             }
@@ -129,6 +142,8 @@ namespace Business
 
         public IList<ReservaViewDTO> GetReservasEstado(EstadosReservaEnum estadosReserva)
         {
+            _logger.LogDebug("A executar [ReservaBusiness -> GetReservasEstado]");
+
             IList<ReservaViewDTO> reservasViewDTO = new List<ReservaViewDTO>();
 
             IList<Reserva> reservas = _reservaDAO.GetReservasEstado((int) estadosReserva);
@@ -157,14 +172,18 @@ namespace Business
 
         public ServiceResult EntregarReserva(int idFuncionario, int idReserva)
         {
+            _logger.LogDebug("A executar [ReservaBusiness -> EntregarReserva]");
+
             IList<int> erros = new List<int>();
 
             if (!_funcionarioDAO.ExisteIdFuncionario(idFuncionario))
             {
+                _logger.LogWarning($"Não existe nenhum Funcionário com o IdFuncionario {idFuncionario}.");
                 erros.Add((int)ErrosEnumeration.ContaNaoExiste);
             }
             if (!_reservaDAO.ExisteReserva(idReserva))
             {
+                _logger.LogWarning($"Não existe nenhuma Reserva com o IdReserva {idReserva}.");
                 erros.Add((int)ErrosEnumeration.ReservaNaoExiste);
             }
 
@@ -178,6 +197,7 @@ namespace Business
                 }
                 else
                 {
+                    _logger.LogWarning($"A Reserva com IdReserva {idReserva} não pode transitar para o estado Entregue.");
                     erros.Add((int)ErrosEnumeration.TransicaoEstadosReservaImpossivel);
                 }
 
@@ -192,18 +212,26 @@ namespace Business
         private bool ValidaItens(IList<Item> itens)
         {
             _logger.LogDebug("A executar [ReservaBusiness -> ValidaItens]");
-            bool result = true;
-            foreach (Item item in itens) if (result)
+
+            bool sucesso = true;
+
+            foreach (Item item in itens)
             {
-                result = item.Quantidade >= 1 && item.Observacoes.Length >= 0 && item.Observacoes.Length <= 300 && _produtoDAO.ExisteProduto(item.IdProduto);
+                if (item.Quantidade < 1 || (item.Observacoes != default && (item.Observacoes.Length <= 0 || item.Observacoes.Length > 300) || !_produtoDAO.ExisteProduto(item.IdProduto) || !_produtoDAO.IsAtivo(item.IdProduto)))
+                {
+                    sucesso = false;
+                    break;
+                }
             }
-            return result;
+
+            return sucesso;
         }
 
 
         private bool ValidaHoraEntrega(DateTime horaEntrega)
         {
             _logger.LogDebug("A executar [ReservaBusiness -> ValidaHoraEntrega]");
+
             BarSettings barSettings = _appSettings.BarSettings;
             DateTime abertura;
             DateTime encerramento;
@@ -215,6 +243,8 @@ namespace Business
 
         private double CalculaValorTotalReserva(IList<Item> itens)
         {
+            _logger.LogDebug("A executar [ReservaBusiness -> CalculaValorTotalReserva]");
+
             double precoTotal = 0;
             foreach (Item item in itens)
             {
