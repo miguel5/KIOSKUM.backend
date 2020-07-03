@@ -30,7 +30,7 @@ namespace DAO
                         cmd.Parameters.AddWithValue("?horaPaga", null);
                     }
                     else {
-                        string hora = reserva.HoraPagamento.ToString("MM-dd-yyyy HH:mm:ss");
+                        string hora = reserva.HoraPagamento.ToString("yyyy-MM-dd HH:mm:ss");
                         cmd.Parameters.AddWithValue("?horaPaga", hora);
                     }
 
