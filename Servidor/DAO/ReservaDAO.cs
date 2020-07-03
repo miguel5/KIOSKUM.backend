@@ -23,7 +23,7 @@ namespace DAO
                     cmd.CommandText = "editar_reserva";
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("?idR", reserva.Idreserva);
+                    cmd.Parameters.AddWithValue("?idR", reserva.IdReserva);
                     cmd.Parameters["?idR"].Direction = ParameterDirection.Input;
 
                     if(reserva.HoraPagamento == default) {
@@ -37,7 +37,7 @@ namespace DAO
                     cmd.Parameters["?horaPaga"].Direction = ParameterDirection.Input;
 
                     
-                    cmd.Parameters.AddWithValue("?token", reserva.token);
+                    cmd.Parameters.AddWithValue("?token", reserva.TransactionToken);
                     cmd.Parameters["?token"].Direction = ParameterDirection.Input;
 
 
@@ -123,44 +123,62 @@ namespace DAO
                         Reserva reserva = null;
                         if (var.Read())
                         {
-                            reserva = new Reserva { IdReserva = idReserva, Itens = new List<Item>(), Estado = var.GetInt32(4), Preco = var.GetDouble(2), HoraEntrega = , HoraPagamento = , TransactionUniqueId = var.GetString(3    )};
+                            DateTime hora;
+                            if (!var.IsDBNull(0)) {
+                                hora = var.GetDateTime(0); 
+                            }
+
+                            reserva = new Reserva { IdReserva = idReserva, Itens = new List<Item>(), Estado = var.GetInt32(4), Preco = var.GetDouble(2), HoraEntrega = var.GetDateTime(1), HoraPagamento = hora, TransactionToken = var.GetValue(3).ToString()};
 
                             var.Close();
 
                             cmd.Parameters.Clear();
 
-                            cmd.CommandText = "get_ingredientes_produto";
+                            cmd.CommandText = "get_reserva_utilizadores";
                             cmd.CommandType = CommandType.StoredProcedure;
 
-                            cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                            cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+                            cmd.Parameters.AddWithValue("?id", reserva.idReserva);
+                            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
 
 
                             using (MySqlDataReader varI = cmd.ExecuteReader())
                             {
-                                while (varI.Read())
+                                if (varI.Read())
                                 {
-                                    produto.Ingredientes.Add(varI.GetString(0));
+
+                                    int idAceita, idRecebe;
+                                    if (!var.IsDBNull(1)) {
+                                        idAceita = varI.GetInt32(1); 
+                                    }
+
+                                    if (!var.IsDBNull(2)) {
+                                        idRecebe hora = varI.GetInt32(2); 
+                                    }
+
+                                    reserva.IdCliente = varI.GetInt32(0);
+                                    reserva.IdFuncionarioDecide = idAceita;
+                                    reserva.IdFuncionarioEntrega = idRecebe;
                                 }
                             }
 
                             cmd.Parameters.Clear();
 
-                            cmd.CommandText = "get_alergenios_produto";
+                            cmd.CommandText = "get_reserva_produtos";
                             cmd.CommandType = CommandType.StoredProcedure;
 
-                            cmd.Parameters.AddWithValue("?idProduto", produto.IdProduto);
-                            cmd.Parameters["?idProduto"].Direction = ParameterDirection.Input;
+                            cmd.Parameters.AddWithValue("?id", produto.idReserva);
+                            cmd.Parameters["?id"].Direction = ParameterDirection.Input;
 
                             using (MySqlDataReader varA = cmd.ExecuteReader())
                             {
                                 while (varA.Read())
                                 {
-                                    produto.Alergenios.Add(varA.GetString(0));
+                                    Item item = new Item {idProduto = var.GetInt32(0), Quantidade = var.GetInt32(1), Observacoes = var.GetValue.(2).ToString()}
+                                    reserva.Itens.add(item);
                                 }
                             }
                         }
-                        return produto;
+                        return reserva;
                     }
                 }
             }
