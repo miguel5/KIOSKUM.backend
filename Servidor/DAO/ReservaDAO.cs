@@ -55,7 +55,7 @@ namespace DAO
 
 
                     if(reserva.IdFuncionarioEntrega == default) {
-                        cmd.Parameters.AddWithValue("?idAceita", null);
+                        cmd.Parameters.AddWithValue("?idEntrega", null);
                     }
                     else {
                         cmd.Parameters.AddWithValue("?idEntrega", reserva.IdFuncionarioEntrega);
@@ -63,6 +63,8 @@ namespace DAO
 
                     cmd.Parameters["?idEntrega"].Direction = ParameterDirection.Input;
 
+                    cmd.Parameters.AddWithValue("?estado", reserva.Estado);
+                    cmd.Parameters["?estado"].Direction = ParameterDirection.Input;
 
                     cmd.ExecuteNonQuery();
                 }
@@ -137,7 +139,7 @@ namespace DAO
                             cmd.CommandText = "get_reserva_utilizadores";
                             cmd.CommandType = CommandType.StoredProcedure;
 
-                            cmd.Parameters.AddWithValue("?id", reserva.idReserva);
+                            cmd.Parameters.AddWithValue("?id", idReserva);
                             cmd.Parameters["?id"].Direction = ParameterDirection.Input;
 
 
@@ -147,12 +149,12 @@ namespace DAO
                                 {
 
                                     int idAceita, idRecebe;
-                                    if (!var.IsDBNull(1)) {
+                                    if (!varI.IsDBNull(1)) {
                                         idAceita = varI.GetInt32(1); 
                                     }
 
-                                    if (!var.IsDBNull(2)) {
-                                        idRecebe hora = varI.GetInt32(2); 
+                                    if (!varI.IsDBNull(2)) {
+                                        idRecebe = varI.GetInt32(2); 
                                     }
 
                                     reserva.IdCliente = varI.GetInt32(0);
@@ -166,15 +168,15 @@ namespace DAO
                             cmd.CommandText = "get_reserva_produtos";
                             cmd.CommandType = CommandType.StoredProcedure;
 
-                            cmd.Parameters.AddWithValue("?id", produto.idReserva);
+                            cmd.Parameters.AddWithValue("?id", idReserva);
                             cmd.Parameters["?id"].Direction = ParameterDirection.Input;
 
                             using (MySqlDataReader varA = cmd.ExecuteReader())
                             {
                                 while (varA.Read())
                                 {
-                                    Item item = new Item {idProduto = var.GetInt32(0), Quantidade = var.GetInt32(1), Observacoes = var.GetValue.(2).ToString()}
-                                    reserva.Itens.add(item);
+                                    Item item = new Item {IdProduto = varA.GetInt32(0), Quantidade = varA.GetInt32(1), Observacoes = varA.GetValue(2).ToString()}
+                                    reserva.Itens.Add(item);
                                 }
                             }
                         }
@@ -191,7 +193,100 @@ namespace DAO
 
         public List<Reserva> GetReservasEstado(int estado)
         {
-            throw new System.NotImplementedException();
+            _logger.LogDebug("A executar [ReservaDAO -> GetReservasEstado]");
+
+            IList<Reserva> reservas = new List<Reserva>();
+
+            try
+            {
+                _connectionDBService.OpenConnection();
+                _connectionDBService.OpenConnection2();
+
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    cmd.Connection = _connectionDBService.Connection;
+
+                    cmd.CommandText = "get_reservas_estado";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("?estado", estado);
+                    cmd.Parameters["?estado"].Direction = ParameterDirection.Input;
+
+                    using (MySqlDataReader var = cmd.ExecuteReader())
+                    {
+                        while (var.Read())
+                        {
+                            DateTime hora;
+                            if (!var.IsDBNull(1)) {
+                                hora = var.GetDateTime(1); 
+                            }
+
+                            Reserva reserva = new Reserva { IdReserva = var.GetInt32(0), Itens = new List<Item>(), Estado = estado, Preco = var.GetDouble(3), HoraEntrega = var.GetDateTime(2), HoraPagamento = hora, TransactionToken = var.GetValue(4).ToString()};
+
+                            using (MySqlCommand cmdU = new MySqlCommand())
+                            {
+                                cmdU.Connection = _connectionDBService.Connection2;
+
+                                cmdU.CommandText = "get_reserva_utilizadores";
+                                cmdU.CommandType = CommandType.StoredProcedure;
+
+                                cmdU.Parameters.AddWithValue("?id", reserva.idReserva);
+                                cmdU.Parameters["?id"].Direction = ParameterDirection.Input;
+
+
+                                using (MySqlDataReader varU = cmdU.ExecuteReader())
+                                {
+                                    if (varU.Read())
+                                    {
+
+                                        int idAceita, idRecebe;
+                                        if (!varU.IsDBNull(1)) {
+                                            idAceita = varU.GetInt32(1); 
+                                        }
+
+                                      if (!varU.IsDBNull(2)) {
+                                            idRecebe = varU.GetInt32(2); 
+                                        }
+
+                                        reserva.IdCliente = varU.GetInt32(0);
+                                        reserva.IdFuncionarioDecide = idAceita;
+                                        reserva.IdFuncionarioEntrega = idRecebe;
+                                    }
+                                }
+                            }
+
+                            using (MySqlCommand cmdP = new MySqlCommand())
+                            {
+                                cmdP.Connection = _connectionDBService.Connection2;
+
+                                cmdP.CommandText = "get_reserva_produtos";
+                                cmdP.CommandType = CommandType.StoredProcedure;
+
+                                cmdP.Parameters.AddWithValue("?id", reserva.idReserva);
+                                cmdP.Parameters["?id"].Direction = ParameterDirection.Input;
+
+                                using (MySqlDataReader varP = cmdP.ExecuteReader())
+                                {
+                                    while (varP.Read())
+                                    {
+                                        Item item = new Item {IdProduto = varP.GetInt32(0), Quantidade = varP.GetInt32(1), Observacoes = varP.GetValue(2).ToString()}
+                                        reserva.Itens.Add(item);
+                                    }
+                                }
+                            }
+
+                            reservas.Add(reserva);
+                        }
+                    }
+                }
+                return reservas;
+            }
+            catch (Exception) { throw; }
+            finally
+            {
+                _connectionDBService.CloseConnection();
+                _connectionDBService.CloseConnection2();
+            }
         }
 
         public void RegistarReserva(Reserva reserva)
