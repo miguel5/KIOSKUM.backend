@@ -141,10 +141,6 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -172,11 +168,6 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -203,11 +194,6 @@ namespace API.Controllers
                     _logger.LogInformation($"Ocorreu um erro ao ativar o Produto com IdProduto {idProduto}.");
                     return BadRequest(resultado.Erros);
                 }
-            }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
             {
