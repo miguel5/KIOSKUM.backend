@@ -88,10 +88,6 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(new { message = e.Message });
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -120,10 +116,6 @@ namespace API.Controllers
                     _logger.LogInformation($"Ocorreu um erro ao rejeitar a Reserva com IdReserva {idReserva}.");
                     return BadRequest(resultado.Erros);
                 }
-            }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
             {

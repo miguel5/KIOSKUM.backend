@@ -138,11 +138,6 @@ namespace API.Controllers
                 return Ok(resultado);
 
             }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -162,12 +157,6 @@ namespace API.Controllers
                 IList<CategoriaViewDTO> resultado = _categoriaBusiness.GetCategoriasAtivadas();
                 _logger.LogInformation("Get das Categorias ativadas efetuado com sucesso.");
                 return Ok(resultado);
-
-            }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
             {
@@ -196,11 +185,6 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -209,7 +193,7 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Roles = "Administrador,Cliente")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("produtos/desativados")]
         public IActionResult GetProdutosDesativadosCategoria(int idCategoria)
         {
@@ -227,11 +211,6 @@ namespace API.Controllers
                     _logger.LogInformation($"Ocorreu um erro ao efetuar o Get dos Produtos da Categoria com IdCategoria {idCategoria}.");
                     return BadRequest(resultado.Erros);
                 }
-            }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
             {
@@ -260,11 +239,6 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -292,11 +266,6 @@ namespace API.Controllers
                     return BadRequest(resultado.Erros);
                 }
             }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
-            }
             catch (Exception e)
             {
                 _logger.LogError(e, e.Message);
@@ -323,11 +292,6 @@ namespace API.Controllers
                     _logger.LogInformation($"Ocorreu um erro ao ativar a Categoria com IdCategoria {idCategoria}.");
                     return BadRequest(resultado.Erros);
                 }
-            }
-            catch (ArgumentNullException e)
-            {
-                _logger.LogError(e, e.Message);
-                return BadRequest(new { message = e.Message });
             }
             catch (Exception e)
             {
