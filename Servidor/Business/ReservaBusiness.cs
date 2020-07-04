@@ -157,6 +157,7 @@ namespace Business
                     ItemViewDTO itemViewDTO = _mapper.Map<ItemViewDTO>(item);
                     Produto produto = _produtoDAO.GetProduto(item.IdProduto);
                     itemViewDTO.ProdutoView = _mapper.Map<ProdutoViewDTO>(produto);
+                    itemViewDTO.ProdutoView.Url = new Uri($"{_appSettings.ServerUrl}/Images/Produto/{produto.IdProduto}.{produto.ExtensaoImagem}");
                     itensDTO.Add(itemViewDTO);
                 }
 
