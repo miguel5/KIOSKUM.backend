@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Business.Interfaces;
-using Services.Imagem;
 using DTO.CategoriaDTOs;
 using DTO.ProdutoDTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Services;
-using Microsoft.AspNetCore.Hosting;
+using Services.Imagem;
 
 namespace API.Controllers
 {
@@ -32,8 +32,7 @@ namespace API.Controllers
 
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("registar")]
         public async Task<IActionResult> RegistarCategoria([FromForm] RegistarCategoriaDTO model)
         {
@@ -80,8 +79,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("editar")]
         public async Task<IActionResult> EditarCategoria([FromForm] EditarCategoriaDTO model)
         {
@@ -128,8 +126,7 @@ namespace API.Controllers
         }
 
 
-        //[Authorize(Roles = "Administrador")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("desativadas")]
         public IActionResult GetCategoriasDesativadas()
         {
@@ -155,8 +152,7 @@ namespace API.Controllers
 
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador,Cliente")]
+        [Authorize(Roles = "Administrador,Cliente")]
         [HttpGet("ativadas")]
         public IActionResult GetCategoriasAtivadas()
         {
@@ -181,8 +177,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador,Cliente")]
+        [Authorize(Roles = "Administrador,Cliente")]
         [HttpGet("produtos/ativados")]
         public IActionResult GetProdutosAtivadosCategoria(int idCategoria)
         {
@@ -214,8 +209,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador,Cliente")]
+        [Authorize(Roles = "Administrador,Cliente")]
         [HttpGet("produtos/desativados")]
         public IActionResult GetProdutosDesativadosCategoria(int idCategoria)
         {
@@ -247,8 +241,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("especifica")]
         public IActionResult GetCategoria(int idCategoria)
         {
@@ -280,8 +273,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("desativar")]
         public IActionResult DesativarCategoria(int idCategoria)
         {
@@ -313,8 +305,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("ativar")]
         public IActionResult AtivarCategoria(int idCategoria)
         {

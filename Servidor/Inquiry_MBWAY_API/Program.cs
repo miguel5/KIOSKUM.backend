@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using DAO;
 using DAO.Interfaces;
 using Entities;
@@ -32,7 +31,6 @@ namespace Inquiry_MBWAY_API
 
         private static void Run(IServiceProvider services)
         {
-            Console.WriteLine("Entrei");
             var logger = services.GetService<ILogger<Program>>();
 
             var _reservaDAO = services.GetService<IReservaDAO>();

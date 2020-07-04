@@ -403,8 +403,5 @@ namespace Business
             Regex rx = new Regex("^9[1236]{1}[0-9]{7}$");
             return rx.IsMatch(numTelemovel.ToString());
         }
-
-
-
     }
 }

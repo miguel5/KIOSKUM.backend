@@ -2,15 +2,15 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Business.Interfaces;
-using Entities;
-using Services.EmailSender;
 using DTO;
 using DTO.ClienteDTOs;
+using Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Services;
-using Microsoft.AspNetCore.Hosting;
+using Services.EmailSender;
 
 namespace API.Controllers
 {

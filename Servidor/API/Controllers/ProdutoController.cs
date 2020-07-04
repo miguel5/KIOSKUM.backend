@@ -28,8 +28,7 @@ namespace API.Controllers
             _imagemService = imagemService;
         }
 
-        //Authorize(Roles = "Administrador")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("registar")]
         public async Task<IActionResult> RegistarProduto([FromForm] RegistarProdutoDTO model)
         {
@@ -76,8 +75,7 @@ namespace API.Controllers
         }
 
 
-        //[Authorize(Roles = "Administrador")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("editar")]
         public async Task<IActionResult> EditarProduto([FromForm] EditarProdutoDTO model)
         {
@@ -124,8 +122,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("especifico")]
         public IActionResult GetProduto(int idProduto)
         {
@@ -156,8 +153,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("desativar")]
         public IActionResult DesativarProduto(int idProduto)
         {
@@ -189,8 +185,7 @@ namespace API.Controllers
         }
 
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("ativar")]
         public IActionResult AtivarProduto(int idProduto)
         {
