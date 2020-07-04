@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using AutoMapper;
 using Business.Interfaces;
 using DAO.Interfaces;
-using Entities;
-using Helpers;
-using Services.Pagamentos;
-using Services.Pagamentos.MBWay;
 using DTO;
 using DTO.ProdutoDTOs;
 using DTO.ReservaDTOs;
-using AutoMapper;
+using Entities;
+using Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Services;
+using Services.Pagamentos;
+using Services.Pagamentos.MBWay;
 
 namespace Business
 {
