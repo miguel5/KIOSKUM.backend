@@ -31,6 +31,8 @@ namespace API.Controllers
         [HttpPost("registar")]
         public IActionResult RegistarReserva ([FromBody] RegistarReservaDTO model)
         {
+            _logger.LogDebug("A executar api/reserva/registar -> Post");
+
             string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idCliente = int.Parse(nameIdentifier);
             try
@@ -43,10 +45,12 @@ namespace API.Controllers
                 ServiceResult resultado = _reservaBusiness.RegistarReserva(idCliente, model);
                 if (resultado.Sucesso)
                 {
+                    _logger.LogInformation($"O cliente com IdCliente {idCliente} realizou um pedido de Reserva.");
                     return Ok();
                 }
                 else
                 {
+                    _logger.LogInformation("Ocorreu um erro no pedido de Reserva.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -65,6 +69,8 @@ namespace API.Controllers
         [HttpPost("aceitar")]
         public IActionResult AceitarReserva(int idReserva)
         {
+            _logger.LogDebug("A executar api/reserva/aceitar -> Post");
+
             try
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -73,10 +79,12 @@ namespace API.Controllers
                 ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(idFuncionario, idReserva, true);
                 if (resultado.Sucesso)
                 {
+                    _logger.LogInformation($"A Reserva com IdReserva {idReserva} foi aceitada.");
                     return Ok();
                 }
                 else
                 {
+                    _logger.LogInformation($"Ocorreu um erro ao aceitar a Reserva com IdReserva {idReserva}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -95,6 +103,7 @@ namespace API.Controllers
         [HttpPost("rejeitar")]
         public IActionResult RejeitarReserva(int idReserva)
         {
+            _logger.LogDebug("A executar api/reserva/rejeitar -> Post");
             try
             {
                 string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -103,10 +112,12 @@ namespace API.Controllers
                 ServiceResult resultado = _reservaBusiness.FuncionarioDecideReserva(idFuncionario, idReserva, false);
                 if (resultado.Sucesso)
                 {
+                    _logger.LogInformation($"A Reserva com IdReserva {idReserva} foi rejeitada.");
                     return Ok();
                 }
                 else
-                {
+                { 
+                    _logger.LogInformation($"Ocorreu um erro ao rejeitar a Reserva com IdReserva {idReserva}.");
                     return BadRequest(resultado.Erros);
                 }
             }
@@ -125,7 +136,9 @@ namespace API.Controllers
         [Authorize(Roles = "Funcionario,Administrador")]
         [HttpGet("pendentes")]
         public IActionResult GetReservasPendentes()
-        { 
+        {
+            _logger.LogDebug("A executar api/reserva/pendentes -> Get");
+
             try
             {
                 IList<ReservaViewDTO> reservasPendentes = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Pendente);
@@ -143,6 +156,8 @@ namespace API.Controllers
         [HttpGet("rejeitadas")]
         public IActionResult GetReservasRejeitadas()
         {
+            _logger.LogDebug("A executar api/reserva/rejeitadas -> Get");
+
             try
             {
                 IList<ReservaViewDTO> reservasRejeitadas = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Rejeitada);
@@ -160,6 +175,8 @@ namespace API.Controllers
         [HttpGet("aceitadas")]
         public IActionResult GetReservasAceites()
         {
+            _logger.LogDebug("A executar api/reserva/aceitadas -> Get");
+
             try
             {
                 IList<ReservaViewDTO> reservasAceites = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Aceite);
@@ -177,6 +194,8 @@ namespace API.Controllers
         [HttpGet("pagas")]
         public IActionResult GetReservasPagas()
         {
+            _logger.LogDebug("A executar api/reserva/pagas -> Get");
+
             try
             {
                 IList<ReservaViewDTO> reservasPagas = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Paga);
@@ -194,6 +213,8 @@ namespace API.Controllers
         [HttpGet("entregues")]
         public IActionResult GetReservasEntregues()
         {
+            _logger.LogDebug("A executar api/reserva/entregues -> Get");
+
             try
             {
                 IList<ReservaViewDTO> reservasEntregues = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Entregue);
@@ -211,6 +232,8 @@ namespace API.Controllers
         [HttpGet("canceladas")]
         public IActionResult GetReservasCanceladas()
         {
+            _logger.LogDebug("A executar api/reserva/canceladas -> Get");
+
             try
             {
                 IList<ReservaViewDTO> reservasCanceladas = _reservaBusiness.GetReservasEstado(EstadosReservaEnum.Cancelada);
@@ -224,9 +247,12 @@ namespace API.Controllers
         }
 
 
+        [Authorize(Roles = "Funcionario,Administrador")]
         [HttpPost("entregar")]
         public IActionResult EntregarReserva(int idReserva)
         {
+            _logger.LogDebug("A executar api/reserva/entregar -> Post");
+
             string nameIdentifier = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             int idFuncionario = int.Parse(nameIdentifier);
 
@@ -235,10 +261,12 @@ namespace API.Controllers
                 ServiceResult resultado = _reservaBusiness.EntregarReserva(idFuncionario, idReserva);
                 if (resultado.Sucesso)
                 {
+                    _logger.LogInformation($"A Reserva com IdReserva {idReserva} foi entregue.");
                     return Ok();
                 }
                 else
                 {
+                    _logger.LogInformation($"Ocorreu um erro na entrega da Reserva com IdReserva {idReserva}.");
                     return BadRequest(resultado.Erros);
                 }
             }
