@@ -12,6 +12,6 @@ namespace DTO.ReservaDTOs
         public int Quantidade { get; set; }
 
         [Required]
-        public string Descricao { get; set; }
+        public string Observacoes { get; set; }
     }
 }
